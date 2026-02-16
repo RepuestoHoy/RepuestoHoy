@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { CARS, CATEGORIES } from '@/lib/data'
-import { Search, HelpCircle, Car, Package, Shield, Truck } from 'lucide-react'
+import { Search, HelpCircle, Car } from 'lucide-react'
 
 export default function HomePage() {
   const router = useRouter()
@@ -21,38 +21,38 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen">
-      {/* Header */}
-      <header className="bg-gradient-to-r from-slate-900 via-blue-900 to-blue-800 text-white">
+    <div className="min-h-screen bg-white">
+      {/* Header - NEGRO */}
+      <header className="bg-[#111111] text-white">
         <div className="max-w-6xl mx-auto px-4 py-5">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-red-500 rounded-xl flex items-center justify-center">
+            <div className="w-11 h-11 bg-[#E10600] rounded-lg flex items-center justify-center">
               <Car className="w-6 h-6" />
             </div>
             <div>
-              <h1 className="text-xl font-bold">Repuesto Hoy</h1>
-              <p className="text-sm text-blue-200">Caracas • Entrega same-day</p>
+              <h1 className="text-xl font-bold tracking-tight">REPUESTO HOY</h1>
+              <p className="text-sm text-gray-400">Caracas • Entrega same-day</p>
             </div>
           </div>
         </div>
       </header>
 
-      {/* Hero */}
-      <section className="bg-gradient-to-br from-slate-900 via-blue-900 to-blue-800 pb-20">
+      {/* Hero - FONDO BLANCO */}
+      <section className="bg-white pb-16 border-b border-[#E0E0E0]">
         <div className="max-w-4xl mx-auto px-4 pt-12 pb-8 text-center">
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
-            ¿Cuál es tu carro?
+          <h2 className="text-4xl md:text-5xl font-extrabold text-[#111111] mb-4 tracking-tight">
+            ¿CUÁL ES TU CARRO?
           </h2>
-          <p className="text-xl text-blue-200 mb-10">
+          <p className="text-xl text-[#2A2A2A] mb-10">
             Te mostramos exactamente qué necesita en minutos
           </p>
 
           {/* Search Box */}
-          <form onSubmit={handleSearch} className="bg-white rounded-3xl p-6 md:p-8 shadow-2xl">
+          <form onSubmit={handleSearch} className="bg-white rounded-xl p-6 md:p-8 border border-[#E0E0E0] shadow-xl max-w-2xl mx-auto">
             <div className="grid md:grid-cols-3 gap-4 mb-6">
               {/* Brand */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-xs font-bold text-[#2A2A2A] mb-2 uppercase tracking-wider">
                   Marca
                 </label>
                 <select
@@ -63,7 +63,7 @@ export default function HomePage() {
                   }}
                   className="select"
                 >
-                  <option value="">Selecciona marca</option>
+                  <option value="">Selecciona</option>
                   {CARS.map(car => (
                     <option key={car.brand} value={car.brand}>{car.brand}</option>
                   ))}
@@ -72,16 +72,16 @@ export default function HomePage() {
 
               {/* Model */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-xs font-bold text-[#2A2A2A] mb-2 uppercase tracking-wider">
                   Modelo
                 </label>
                 <select
                   value={model}
                   onChange={(e) => setModel(e.target.value)}
                   disabled={!brand}
-                  className="select disabled:bg-gray-100 disabled:cursor-not-allowed"
+                  className="select disabled:bg-[#F5F5F5] disabled:cursor-not-allowed"
                 >
-                  <option value="">Selecciona modelo</option>
+                  <option value="">Selecciona</option>
                   {selectedCar?.models.map(m => (
                     <option key={m} value={m}>{m}</option>
                   ))}
@@ -90,16 +90,16 @@ export default function HomePage() {
 
               {/* Year */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-xs font-bold text-[#2A2A2A] mb-2 uppercase tracking-wider">
                   Año
                 </label>
                 <select
                   value={year}
                   onChange={(e) => setYear(e.target.value)}
                   disabled={!model}
-                  className="select disabled:bg-gray-100 disabled:cursor-not-allowed"
+                  className="select disabled:bg-[#F5F5F5] disabled:cursor-not-allowed"
                 >
-                  <option value="">Selecciona año</option>
+                  <option value="">Selecciona</option>
                   {selectedCar?.years.slice().reverse().map(y => (
                     <option key={y} value={y}>{y}</option>
                   ))}
@@ -110,25 +110,25 @@ export default function HomePage() {
             <button
               type="submit"
               disabled={!brand || !model || !year}
-              className="w-full btn-primary text-lg py-4 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="btn-primary text-lg py-4 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Search className="w-5 h-5 inline mr-2" />
-              Ver qué necesito
+              VER QUÉ NECESITO
             </button>
 
             <div className="relative my-6">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-200"></div>
+                <div className="w-full border-t border-[#E0E0E0]"></div>
               </div>
               <div className="relative flex justify-center">
-                <span className="px-4 bg-white text-sm text-gray-500">o</span>
+                <span className="px-4 bg-white text-sm text-[#2A2A2A]">o</span>
               </div>
             </div>
 
             <button
               type="button"
               onClick={() => router.push('/buscar')}
-              className="btn-secondary w-full"
+              className="btn-secondary"
             >
               <HelpCircle className="w-5 h-5 inline mr-2" />
               No estoy seguro - Ayúdame
@@ -137,94 +137,94 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Features */}
-      <section className="max-w-6xl mx-auto px-4 -mt-10">
-        <div className="grid md:grid-cols-3 gap-6">
-          <div className="card p-6 text-center hover:shadow-lg transition-shadow">
-            <div className="w-14 h-14 bg-gradient-to-br from-blue-600 to-blue-800 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <Car className="w-7 h-7 text-white" />
+      {/* Features - FONDO GRIS CLARO */}
+      <section className="bg-[#F5F5F5] py-12">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="grid md:grid-cols-3 gap-6">
+            <div className="card p-6 text-center hover:shadow-lg transition-shadow">
+              <div className="w-12 h-12 bg-[#111111] rounded-lg flex items-center justify-center mx-auto mb-4">
+                <Car className="w-6 h-6 text-white" />
+              </div>
+              <div className="w-8 h-8 bg-white text-[#111111] rounded-full flex items-center justify-center font-bold text-sm mx-auto -mt-10 mb-3 border-4 border-[#F5F5F5]">
+                1
+              </div>
+              <h3 className="text-lg font-bold text-[#111111] mb-2 uppercase">Tu Carro</h3>
+              <p className="text-[#2A2A2A] text-sm">
+                Seleccionás tu marca, modelo y año. Guardamos para la próxima.
+              </p>
             </div>
-            <div className="w-8 h-8 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center font-bold mx-auto -mt-11 mb-4 border-4 border-white">
-              1
-            </div>
-            <h3 className="text-lg font-bold text-gray-900 mb-2">Tu Carro</h3>
-            <p className="text-gray-600 text-sm">
-              Seleccionás tu marca, modelo y año. Guardamos para la próxima.
-            </p>
-          </div>
 
-          <div className="card p-6 text-center hover:shadow-lg transition-shadow">
-            <div className="w-14 h-14 bg-gradient-to-br from-blue-600 to-blue-800 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <Package className="w-7 h-7 text-white" />
+            <div className="card p-6 text-center hover:shadow-lg transition-shadow">
+              <div className="w-12 h-12 bg-[#111111] rounded-lg flex items-center justify-center mx-auto mb-4">
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+              </div>
+              <div className="w-8 h-8 bg-white text-[#111111] rounded-full flex items-center justify-center font-bold text-sm mx-auto -mt-10 mb-3 border-4 border-[#F5F5F5]">
+                2
+              </div>
+              <h3 className="text-lg font-bold text-[#111111] mb-2 uppercase">Chequeo Express</h3>
+              <p className="text-[#2A2A2A] text-sm">
+                Te decimos exactamente qué necesita según km y último mantenimiento.
+              </p>
             </div>
-            <div className="w-8 h-8 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center font-bold mx-auto -mt-11 mb-4 border-4 border-white">
-              2
-            </div>
-            <h3 className="text-lg font-bold text-gray-900 mb-2">Chequeo Express</h3>
-            <p className="text-gray-600 text-sm">
-              Te decimos exactamente qué necesita según km y último mantenimiento.
-            </p>
-          </div>
 
-          <div className="card p-6 text-center hover:shadow-lg transition-shadow">
-            <div className="w-14 h-14 bg-gradient-to-br from-blue-600 to-blue-800 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <Shield className="w-7 h-7 text-white" />
+            <div className="card p-6 text-center hover:shadow-lg transition-shadow">
+              <div className="w-12 h-12 bg-[#111111] rounded-lg flex items-center justify-center mx-auto mb-4">
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+              </div>
+              <div className="w-8 h-8 bg-white text-[#111111] rounded-full flex items-center justify-center font-bold text-sm mx-auto -mt-10 mb-3 border-4 border-[#F5F5F5]">
+                3
+              </div>
+              <h3 className="text-lg font-bold text-[#111111] mb-2 uppercase">Compará Precios</h3>
+              <p className="text-[#2A2A2A] text-sm">
+                Elegí entre Económico, Estándar o Premium. Mejor precio garantizado.
+              </p>
             </div>
-            <div className="w-8 h-8 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center font-bold mx-auto -mt-11 mb-4 border-4 border-white">
-              3
-            </div>
-            <h3 className="text-lg font-bold text-gray-900 mb-2">Compará Precios</h3>
-            <p className="text-gray-600 text-sm">
-              Elegí entre Económico, Estándar o Premium. Mejor precio garantizado.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Trust Section */}
-      <section className="max-w-6xl mx-auto px-4 py-16">
-        <h3 className="text-2xl font-bold text-center text-gray-900 mb-10">
-          ¿Por qué elegirnos?
-        </h3>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="card p-6 text-center">
-            <div className="w-12 h-12 bg-yellow-100 rounded-xl flex items-center justify-center mx-auto mb-3">
-              <span className="text-2xl">⚡</span>
-            </div>
-            <h4 className="font-semibold text-gray-900 mb-1">Entrega Hoy</h4>
-            <p className="text-sm text-gray-600">En Chacao, Baruta y alrededores</p>
-          </div>
-
-          <div className="card p-6 text-center">
-            <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mx-auto mb-3">
-              <span className="text-2xl">💰</span>
-            </div>
-            <h4 className="font-semibold text-gray-900 mb-1">Mejor Precio</h4>
-            <p className="text-sm text-gray-600">Garantizado o devolvemos la diferencia</p>
-          </div>
-
-          <div className="card p-6 text-center">
-            <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-3">
-              <span className="text-2xl">✓</span>
-            </div>
-            <h4 className="font-semibold text-gray-900 mb-1">Fitment Garantizado</h4>
-            <p className="text-sm text-gray-600">Si no le queda, lo cambiamos gratis</p>
-          </div>
-
-          <div className="card p-6 text-center">
-            <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mx-auto mb-3">
-              <span className="text-2xl">💬</span>
-            </div>
-            <h4 className="font-semibold text-gray-900 mb-1">WhatsApp Directo</h4>
-            <p className="text-sm text-gray-600">Atención personalizada en minutos</p>
           </div>
         </div>
       </section>
 
-      {/* Categories */}
+      {/* Trust Section - FONDO BLANCO */}
+      <section className="bg-white py-16 border-b border-[#E0E0E0]">
+        <div className="max-w-6xl mx-auto px-4">
+          <h3 className="text-2xl font-bold text-center text-[#111111] mb-10 uppercase tracking-tight">
+            ¿Por qué elegirnos?
+          </h3>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="card p-6 text-center hover:border-[#111111] transition-colors">
+              <div className="text-3xl mb-3">⚡</div>
+              <h4 className="font-bold text-[#111111] mb-1">Entrega Hoy</h4>
+              <p className="text-sm text-[#2A2A2A]">En Chacao, Baruta y alrededores</p>
+            </div>
+
+            <div className="card p-6 text-center hover:border-[#111111] transition-colors">
+              <div className="text-3xl mb-3">💰</div>
+              <h4 className="font-bold text-[#111111] mb-1">Mejor Precio</h4>
+              <p className="text-sm text-[#2A2A2A]">Garantizado o devolvemos la diferencia</p>
+            </div>
+
+            <div className="card p-6 text-center hover:border-[#111111] transition-colors">
+              <div className="text-3xl mb-3">✓</div>
+              <h4 className="font-bold text-[#111111] mb-1">Fitment Garantizado</h4>
+              <p className="text-sm text-[#2A2A2A]">Si no le queda, lo cambiamos gratis</p>
+            </div>
+
+            <div className="card p-6 text-center hover:border-[#111111] transition-colors">
+              <div className="text-3xl mb-3">💬</div>
+              <h4 className="font-bold text-[#111111] mb-1">WhatsApp Directo</h4>
+              <p className="text-sm text-[#2A2A2A]">Atención personalizada en minutos</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Categories - FONDO BLANCO */}
       <section className="bg-white py-16">
         <div className="max-w-6xl mx-auto px-4">
-          <h3 className="text-2xl font-bold text-center text-gray-900 mb-10">
+          <h3 className="text-2xl font-bold text-center text-[#111111] mb-10 uppercase tracking-tight">
             Buscar por categoría
           </h3>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
@@ -232,48 +232,42 @@ export default function HomePage() {
               <a
                 key={cat.id}
                 href={`/buscar?category=${cat.id}`}
-                className="card p-4 text-center hover:shadow-lg transition-all group"
+                className="card p-5 text-center hover:border-[#111111] hover:shadow-lg transition-all group"
               >
                 <span className="text-3xl mb-2 block group-hover:scale-110 transition-transform">
                   {cat.emoji}
                 </span>
-                <h4 className="font-semibold text-gray-900 text-sm">{cat.name}</h4>
+                <h4 className="font-bold text-[#111111] text-sm uppercase">{cat.name}</h4>
               </a>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-slate-900 text-white py-12">
+      {/* Footer - NEGRO */}
+      <footer className="bg-[#111111] text-white py-12">
         <div className="max-w-6xl mx-auto px-4">
-          <div className="flex flex-col md:flex-row justify-between items-center">
+          <div className="flex flex-col md:flex-row justify-between items-center mb-8">
             <div className="flex items-center gap-3 mb-4 md:mb-0">
-              <div className="w-10 h-10 bg-red-500 rounded-xl flex items-center justify-center">
+              <div className="w-11 h-11 bg-[#E10600] rounded-lg flex items-center justify-center">
                 <Car className="w-6 h-6" />
               </div>
               <div>
-                <h4 className="font-bold">Repuesto Hoy</h4>
-                <p className="text-sm text-slate-400">Caracas, Venezuela</p>
+                <h4 className="font-bold text-lg">REPUESTO HOY</h4>
+                <p className="text-sm text-gray-500">Caracas, Venezuela</p>
               </div>
             </div>
             <div className="text-center md:text-right">
-              <p className="text-slate-400 text-sm">Contacto</p>
+              <p className="text-gray-500 text-sm">Contacto</p>
               <p className="font-semibold">hola@repuestohoy.com</p>
-              <p className="text-sm text-slate-400">+58 412-XXX-XXXX</p>
+              <p className="text-sm text-gray-500">+58 412-XXX-XXXX</p>
             </div>
           </div>
-          <div className="border-t border-slate-800 mt-8 pt-8 text-center text-sm text-slate-500">
+          <div className="border-t border-[#2A2A2A] pt-8 text-center text-sm text-gray-600">
             © 2026 Repuesto Hoy. Todos los derechos reservados.
           </div>
         </div>
       </footer>
-
-      {/* Floating Badge */}
-      <div className="fixed bottom-6 right-6 bg-green-500 text-white px-4 py-3 rounded-full shadow-lg flex items-center gap-2 animate-pulse">
-        <span className="w-2 h-2 bg-white rounded-full"></span>
-        <span className="font-medium text-sm">Delivery activo en Caracas</span>
-      </div>
     </div>
   )
 }

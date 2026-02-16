@@ -8,14 +8,19 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primary: {
-          DEFAULT: '#1e3a5f',
-          light: '#2563eb',
+        // Paleta oficial Repuesto Hoy
+        'rh-red': {
+          DEFAULT: '#E10600',
+          hover: '#B00500',
         },
-        accent: {
-          DEFAULT: '#dc2626',
-          light: '#ef4444',
-        },
+        'rh-black': '#111111',
+        'rh-gray': '#2A2A2A',
+        'rh-white': '#FFFFFF',
+        'rh-gray-light': '#F5F5F5',
+        'rh-border': '#E0E0E0',
+      },
+      fontFamily: {
+        sans: ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
       },
     },
   },

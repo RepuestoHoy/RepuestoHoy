@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Repuesto Hoy - Nueva Paleta de Colores</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #FFFFFF;
+        }
+        
+        /* PALETA OFICIAL */
+        :root {
+            --rojo: #E10600;
+            --rojo-hover: #B00500;
+            --negro: #111111;
+            --gris: #2A2A2A;
+            --blanco: #FFFFFF;
+            --gris-claro: #F5F5F5;
+            --gris-borde: #E0E0E0;
+        }
+        
+        /* HEADER - NEGRO */
+        .header {
+            background: var(--negro);
+            padding: 16px 20px;
+            color: var(--blanco);
+        }
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .logo {
+            width: 44px;
+            height: 44px;
+            background: var(--rojo);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        .header-text h1 {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+        .header-text p {
+            font-size: 12px;
+            color: #888;
+            margin-top: 2px;
+        }
+        
+        /* HERO - FONDO BLANCO */
+        .hero {
+            background: var(--blanco);
+            padding: 40px 20px;
+            text-align: center;
+            border-bottom: 1px solid var(--gris-borde);
+        }
+        .hero h2 {
+            color: var(--negro);
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            letter-spacing: -1px;
+        }
+        .hero-subtitle {
+            color: var(--gris);
+            font-size: 16px;
+            margin-bottom: 32px;
+        }
+        
+        /* SEARCH BOX */
+        .search-box {
+            background: var(--blanco);
+            border: 1px solid var(--gris-borde);
+            border-radius: 12px;
+            padding: 24px 20px;
+            max-width: 600px;
+            margin: 0 auto;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+        .input-group {
+            margin-bottom: 16px;
+            text-align: left;
+        }
+        .input-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--gris);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .input-group select {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid var(--gris-borde);
+            border-radius: 8px;
+            font-size: 16px;
+            background: var(--blanco);
+            color: var(--negro);
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%232A2A2A' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+            background-position: right 12px center;
+            background-repeat: no-repeat;
+            background-size: 20px;
+            padding-right: 40px;
+        }
+        .input-group select:focus {
+            border-color: var(--negro);
+            outline: none;
+        }
+        
+        /* BOTÓN PRINCIPAL - ROJO */
+        .btn-primary {
+            width: 100%;
+            padding: 16px;
+            background: var(--rojo);
+            color: var(--blanco);
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-primary:hover {
+            background: var(--rojo-hover);
+        }
+        
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+            color: var(--gris);
+            font-size: 13px;
+        }
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--gris-borde);
+        }
+        .divider span {
+            padding: 0 16px;
+        }
+        
+        /* BOTÓN SECUNDARIO */
+        .btn-secondary {
+            width: 100%;
+            padding: 14px;
+            background: var(--blanco);
+            color: var(--negro);
+            border: 2px solid var(--gris-borde);
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-secondary:hover {
+            border-color: var(--negro);
+        }
+        
+        /* FEATURES */
+        .features {
+            background: var(--gris-claro);
+            padding: 40px 20px;
+        }
+        .features-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        .feature-card {
+            background: var(--blanco);
+            border: 1px solid var(--gris-borde);
+            border-radius: 8px;
+            padding: 24px;
+            text-align: center;
+        }
+        .feature-number {
+            width: 40px;
+            height: 40px;
+            background: var(--negro);
+            color: var(--blanco);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: 700;
+            margin: 0 auto 16px;
+        }
+        .feature-card h3 {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--negro);
+            margin-bottom: 8px;
+        }
+        .feature-card p {
+            font-size: 14px;
+            color: var(--gris);
+            line-height: 1.5;
+        }
+        
+        /* PRODUCTOS */
+        .products-section {
+            padding: 40px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .section-title {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--negro);
+            margin-bottom: 24px;
+            letter-spacing: -0.5px;
+        }
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        .product-card {
+            background: var(--blanco);
+            border: 1px solid var(--gris-borde);
+            border-radius: 8px;
+            overflow: hidden;
+            transition: box-shadow 0.2s;
+        }
+        .product-card:hover {
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        }
+        .product-image {
+            height: 200px;
+            background: var(--gris-claro);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 64px;
+            position: relative;
+        }
+        .product-badge {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .badge-economico { 
+            background: var(--gris-claro); 
+            color: var(--gris); 
+            border: 1px solid var(--gris-borde);
+        }
+        .badge-standard { 
+            background: var(--negro); 
+            color: var(--blanco); 
+        }
+        .badge-premium { 
+            background: var(--rojo); 
+            color: var(--blanco); 
+        }
+        .product-info {
+            padding: 20px;
+        }
+        .product-brand {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--gris);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+        .product-name {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--negro);
+            margin-bottom: 12px;
+            line-height: 1.3;
+        }
+        .product-price {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        /* PRECIO EN ROJO */
+        .price {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--rojo);
+        }
+        .price-original {
+            font-size: 14px;
+            color: var(--gris);
+            text-decoration: line-through;
+            margin-left: 8px;
+        }
+        .stock {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--gris);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .stock-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--rojo);
+            border-radius: 50%;
+        }
+        
+        /* CATEGORIAS */
+        .categories {
+            background: var(--blanco);
+            padding: 40px 20px;
+            border-top: 1px solid var(--gris-borde);
+            border-bottom: 1px solid var(--gris-borde);
+        }
+        .categories-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
+        }
+        .category-item {
+            background: var(--blanco);
+            border: 1px solid var(--gris-borde);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .category-item:hover {
+            border-color: var(--negro);
+        }
+        .category-emoji {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+        .category-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--negro);
+        }
+        
+        /* FOOTER - NEGRO */
+        .footer {
+            background: var(--negro);
+            color: var(--blanco);
+            padding: 48px 20px;
+        }
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 32px;
+        }
+        .footer-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .footer-logo {
+            width: 44px;
+            height: 44px;
+            background: var(--rojo);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        .footer h4 {
+            font-size: 18px;
+            font-weight: 700;
+        }
+        .footer p {
+            color: #888;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        .footer h5 {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .footer-links {
+            list-style: none;
+        }
+        .footer-links li {
+            margin-bottom: 8px;
+        }
+        /* LINKS EN BLANCO, HOVER ROJO */
+        .footer-links a {
+            color: #888;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+        .footer-links a:hover {
+            color: var(--rojo);
+        }
+        .footer-bottom {
+            max-width: 1200px;
+            margin: 32px auto 0;
+            padding-top: 24px;
+            border-top: 1px solid var(--gris);
+            text-align: center;
+            color: #666;
+            font-size: 13px;
+        }
+        
+        /* PALETA DISPLAY */
+        .palette-section {
+            background: var(--gris-claro);
+            padding: 40px 20px;
+            border-bottom: 1px solid var(--gris-borde);
+        }
+        .palette-title {
+            text-align: center;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--gris);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 24px;
+        }
+        .palette-grid {
+            max-width: 800px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+        .palette-item {
+            text-align: center;
+        }
+        .palette-color {
+            height: 80px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            border: 1px solid var(--gris-borde);
+        }
+        .palette-name {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--negro);
+            text-transform: uppercase;
+        }
+        .palette-hex {
+            font-size: 12px;
+            color: var(--gris);
+            font-family: monospace;
+        }
+        
+        /* INFO BOX */
+        .info-box {
+            background: var(--blanco);
+            border: 2px solid var(--rojo);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px;
+            max-width: 600px;
+            margin: 20px auto;
+        }
+        .info-box h3 {
+            color: var(--rojo);
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+        .info-box p {
+            color: var(--gris);
+            font-size: 14px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <!-- PALETA DE COLORES -->
+    <section class="palette-section">
+        <div class="palette-title">🎨 Paleta Oficial RepuestoHoy.com</div>
+        <div class="palette-grid">
+            <div class="palette-item">
+                <div class="palette-color" style="background: #E10600;"></div>
+                <div class="palette-name">Rojo</div>
+                <div class="palette-hex">#E10600</div>
+            </div>
+            <div class="palette-item">
+                <div class="palette-color" style="background: #111111;"></div>
+                <div class="palette-name">Negro</div>
+                <div class="palette-hex">#111111</div>
+            </div>
+            <div class="palette-item">
+                <div class="palette-color" style="background: #2A2A2A;"></div>
+                <div class="palette-name">Gris</div>
+                <div class="palette-hex">#2A2A2A</div>
+            </div>
+            <div class="palette-item">
+                <div class="palette-color" style="background: #FFFFFF; border: 2px solid #E0E0E0;"></div>
+                <div class="palette-name">Blanco</div>
+                <div class="palette-hex">#FFFFFF</div>
+            </div>
+        </div>
+        
+        <div class="info-box">
+            <h3>📋 Reglas de Aplicación</h3>
+            <p>
+                • Fondo general: BLANCO<br>
+                • Header y Footer: NEGRO<br>
+                • Botones principales: ROJO (#E10600) con texto blanco<br>
+                • Hover botones: ROJO OSCURO (#B00500)<br>
+                • Precios destacados: ROJO<br>
+                • Links: NEGRO → hover ROJO<br>
+                • Sin verdes, morados ni pasteles<br>
+                • Diseño limpio, industrial y moderno
+            </p>
+        </div>
+    </section>
+
+    <!-- HEADER -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">🚗</div>
+            <div class="header-text">
+                <h1>REPUESTO HOY</h1>
+                <p>Caracas • Entrega same-day</p>
+            </div>
+        </div>
+    </header>
+    
+    <!-- HERO -->
+    <section class="hero">
+        <h2>¿CUÁL ES TU CARRO?</h2>
+        <p class="hero-subtitle">Te mostramos exactamente qué necesita en minutos</p>
+        
+        <div class="search-box">
+            <div class="input-group">
+                <label>Marca</label>
+                <select>
+                    <option>Selecciona marca</option>
+                    <option>Toyota</option>
+                    <option>Chevrolet</option>
+                    <option>Ford</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>Modelo</label>
+                <select>
+                    <option>Selecciona modelo</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>Año</label>
+                <select>
+                    <option>Selecciona año</option>
+                </select>
+            </div>
+            
+            <button class="btn-primary">VER QUÉ NECESITO</button>
+            
+            <div class="divider"><span>o</span></div>
+            
+            <button class="btn-secondary">No estoy seguro - Ayúdame</button>
+        </div>
+    </section>
+    
+    <!-- FEATURES -->
+    <section class="features">
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-number">1</div>
+                <h3>TU CARRO</h3>
+                <p>Seleccionás marca, modelo y año una vez. Guardamos para la próxima.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-number">2</div>
+                <h3>CHEQUEO EXPRESS</h3>
+                <p>Sabemos qué necesita según kilómetros y último mantenimiento.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-number">3</div>
+                <h3>COMPARÁ PRECIOS</h3>
+                <p>Elegí entre Económico, Standard o Premium. Mejor precio garantizado.</p>
+            </div>
+        </div>
+    </section>
+    
+    <!-- PRODUCTS -->
+    <section class="products-section">
+        <h2 class="section-title">Repuestos para Toyota Corolla</h2>
+        <div class="products-grid">
+            <!-- Producto 1: ECONÓMICO -->
+            <div class="product-card">
+                <div class="product-image">
+                    🔧
+                    <span class="product-badge badge-economico">Económico</span>
+                </div>
+                <div class="product-info">
+                    <div class="product-brand">Genérico • SKU: GEN-PH3614</div>
+                    <div class="product-name">Filtro de Aceite Toyota Corolla</div>
+                    <div class="product-price">
+                        <div>
+                            <span class="price">$12.00</span>
+                        </div>
+                        <span class="stock"><span class="stock-dot"></span>En stock</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Producto 2: STANDARD -->
+            <div class="product-card">
+                <div class="product-image">
+                    🔧
+                    <span class="product-badge badge-standard">Standard</span>
+                </div>
+                <div class="product-info">
+                    <div class="product-brand">FRAM • SKU: PH3614</div>
+                    <div class="product-name">Filtro de Aceite Toyota Corolla</div>
+                    <div class="product-price">
+                        <div>
+                            <span class="price">$18.50</span>
+                            <span class="price-original">$25.00</span>
+                        </div>
+                        <span class="stock"><span class="stock-dot"></span>En stock</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Producto 3: PREMIUM -->
+            <div class="product-card">
+                <div class="product-image">
+                    🔧
+                    <span class="product-badge badge-premium">Premium</span>
+                </div>
+                <div class="product-info">
+                    <div class="product-brand">Toyota OEM • SKU: 90915-YZZF1</div>
+                    <div class="product-name">Filtro de Aceite Original Corolla</div>
+                    <div class="product-price">
+                        <div>
+                            <span class="price">$35.00</span>
+                        </div>
+                        <span class="stock"><span class="stock-dot"></span>En stock</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- CATEGORIES -->
+    <section class="categories">
+        <div class="categories-grid">
+            <div class="category-item">
+                <div class="category-emoji">🔧</div>
+                <div class="category-name">Filtros</div>
+            </div>
+            <div class="category-item">
+                <div class="category-emoji">🛑</div>
+                <div class="category-name">Frenos</div>
+            </div>
+            <div class="category-item">
+                <div class="category-emoji">⚡</div>
+                <div class="category-name">Motor</div>
+            </div>
+            <div class="category-item">
+                <div class="category-emoji">⬆️</div>
+                <div class="category-name">Suspensión</div>
+            </div>
+            <div class="category-item">
+                <div class="category-emoji">💡</div>
+                <div class="category-name">Eléctricos</div>
+            </div>
+            <div class="category-item">
+                <div class="category-emoji">⚙️</div>
+                <div class="category-name">Transmisión</div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div>
+                <div class="footer-brand">
+                    <div class="footer-logo">🚗</div>
+                    <h4>REPUESTO HOY</h4>
+                </div>
+                <p>Repuestos para tu carro con entrega same-day en Caracas. Confianza, urgencia y fuerza automotriz.</p>
+            </div>
+            <div>
+                <h5>Categorías</h5>
+                <ul class="footer-links">
+                    <li><a href="#">Filtros</a></li>
+                    <li><a href="#">Frenos</a></li>
+                    <li><a href="#">Motor</a></li>
+                    <li><a href="#">Suspensión</a></li>
+                </ul>
+            </div>
+            <div>
+                <h5>Ayuda</h5>
+                <ul class="footer-links">
+                    <li><a href="#">Cómo comprar</a></li>
+                    <li><a href="#">Zonas de entrega</a></li>
+                    <li><a href="#">Garantía</a></li>
+                    <li><a href="#">Contacto</a></li>
+                </ul>
+            </div>
+            <div>
+                <h5>Contacto</h5>
+                <ul class="footer-links">
+                    <li><a href="mailto:hola@repuestohoy.com">hola@repuestohoy.com</a></li>
+                    <li><a href="tel:+58412XXXXXXX">+58 412-XXX-XXXX</a></li>
+                    <li>Caracas, Venezuela</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            © 2026 Repuesto Hoy. Todos los derechos reservados.
+        </div>
+    </footer>
+</body>
+</html>
