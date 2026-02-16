@@ -31,7 +31,7 @@ export default function HomePage() {
             </div>
             <div>
               <h1 className="text-xl font-bold tracking-tight">REPUESTO HOY</h1>
-              <p className="text-sm text-gray-400">Caracas • Entrega same-day</p>
+              <p className="text-sm text-gray-400">Caracas • Entrega el mismo día</p>
             </div>
           </div>
         </div>
