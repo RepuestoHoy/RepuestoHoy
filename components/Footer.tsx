@@ -97,22 +97,22 @@ export default function Footer() {
             <ul className="space-y-2 text-sm">
               <li>
                 <Link href="/buscar?category=filtros" className="text-gray-400 hover:text-white transition-colors">
-                  🔧 Filtros
+                  Filtros
                 </Link>
               </li>
               <li>
                 <Link href="/buscar?category=frenos" className="text-gray-400 hover:text-white transition-colors">
-                  🛑 Frenos
+                  Frenos
                 </Link>
               </li>
               <li>
                 <Link href="/buscar?category=motor" className="text-gray-400 hover:text-white transition-colors">
-                  ⚡ Motor
+                  Motor
                 </Link>
               </li>
               <li>
                 <Link href="/buscar?category=suspension" className="text-gray-400 hover:text-white transition-colors">
-                  ⬆️ Suspensión
+                  Suspension
                 </Link>
               </li>
             </ul>
