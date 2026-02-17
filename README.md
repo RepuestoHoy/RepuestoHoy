@@ -181,4 +181,4 @@ Si algo falla en el setup:
 
 ---
 
-**¿Listo para empezar? Comenzá con Paso 1 (GitHub) y avisame cuando tengas el repo creado.**
+**¿Listo para empezar? Comenzá con Paso 1 (GitHub) y avisame cuando tengas el repo creado.**# Force rebuild Tue Feb 17 00:00:28 EST 2026
