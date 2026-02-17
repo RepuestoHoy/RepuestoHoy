@@ -109,7 +109,17 @@ function BuscarContent() {
 
               {/* Categories */}
               <div className="mb-8">
-                <h4 className="font-bold text-[#111111] mb-4 text-sm uppercase tracking-wider">Categoría</h4>
+                <div className="flex items-center justify-between mb-4">
+                  <h4 className="font-bold text-[#111111] text-sm uppercase tracking-wider">Categoría</h4>
+                  {selectedCategory && (
+                    <button
+                      onClick={() => setSelectedCategory(null)}
+                      className="text-xs text-[#E10600] font-medium hover:underline"
+                    >
+                      Quitar ✕
+                    </button>
+                  )}
+                </div>
                 <div className="space-y-2">
                   {CATEGORIES.map(cat => (
                     <button
@@ -117,14 +127,16 @@ function BuscarContent() {
                       onClick={() => setSelectedCategory(selectedCategory === cat.id ? null : cat.id)}
                       className={`w-full flex items-center gap-3 p-3 rounded-lg text-sm transition-all text-left ${
                         selectedCategory === cat.id
-                          ? 'bg-[#111111] text-white'
+                          ? 'bg-[#111111] text-white shadow-md'
                           : 'hover:bg-[#F5F5F5] text-[#2A2A2A]'
                       }`}
                     >
                       <span className="text-lg">{cat.emoji}</span>
                       <span className="font-medium flex-1">{cat.name}</span>
-                      {selectedCategory === cat.id && (
-                        <Check className="w-4 h-4" />
+                      {selectedCategory === cat.id ? (
+                        <X className="w-4 h-4" />
+                      ) : (
+                        <span className="w-4 h-4 rounded-full border-2 border-gray-300"></span>
                       )}
                     </button>
                   ))}
@@ -133,7 +145,17 @@ function BuscarContent() {
 
               {/* Type Filter */}
               <div>
-                <h4 className="font-bold text-[#111111] mb-4 text-sm uppercase tracking-wider">Calidad</h4>
+                <div className="flex items-center justify-between mb-4">
+                  <h4 className="font-bold text-[#111111] text-sm uppercase tracking-wider">Calidad</h4>
+                  {selectedType && (
+                    <button
+                      onClick={() => setSelectedType(null)}
+                      className="text-xs text-[#E10600] font-medium hover:underline"
+                    >
+                      Quitar ✕
+                    </button>
+                  )}
+                </div>
                 <div className="space-y-3">
                   {[
                     { id: 'economico', label: '💚 Económico', desc: 'Garantía 3 meses' },
@@ -145,7 +167,7 @@ function BuscarContent() {
                       onClick={() => setSelectedType(selectedType === type.id ? null : type.id)}
                       className={`w-full p-4 rounded-lg border-2 transition-all text-left ${
                         selectedType === type.id
-                          ? 'border-[#111111] bg-[#F5F5F5]'
+                          ? 'border-[#E10600] bg-red-50 shadow-md'
                           : 'border-[#E0E0E0] hover:border-[#2A2A2A]'
                       }`}
                     >
@@ -154,8 +176,10 @@ function BuscarContent() {
                           <div className="font-bold text-[#111111] text-sm">{type.label}</div>
                           <div className="text-xs text-[#2A2A2A] mt-1">{type.desc}</div>
                         </div>
-                        {selectedType === type.id && (
-                          <Check className="w-5 h-5 text-[#111111]" />
+                        {selectedType === type.id ? (
+                          <X className="w-5 h-5 text-[#E10600]" />
+                        ) : (
+                          <span className="w-5 h-5 rounded-full border-2 border-gray-300"></span>
                         )}
                       </div>
                     </button>
@@ -167,44 +191,51 @@ function BuscarContent() {
 
           {/* Results */}
           <main className="flex-1">
-            <div className="mb-8">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div>
-                  <h2 className="text-2xl font-extrabold text-[#111111] tracking-tight uppercase">
-                    {categoryObj ? categoryObj.name : 'Todos los repuestos'}
-                  </h2>
-                  <p className="text-[#2A2A2A] mt-2">
-                    {products.length} productos encontrados
-                    {brand && ` para ${brand} ${model}`}
-                  </p>
+            {/* Barra de filtros activos - MUY VISIBLE EN MÓVIL */}
+            {hasActiveFilters && (
+              <div className="mb-6 p-4 bg-[#F5F5F5] rounded-xl border border-[#E0E0E0]">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-sm font-bold text-[#111111]">Filtros activos:</span>
+                  <button
+                    onClick={clearAllFilters}
+                    className="text-sm text-[#E10600] font-medium hover:underline"
+                  >
+                    Limpiar todo ✕
+                  </button>
                 </div>
-                
-                {/* Active filters badges */}
-                {hasActiveFilters && (
-                  <div className="flex flex-wrap gap-2">
-                    {selectedCategory && categoryObj && (
-                      <button
-                        onClick={() => setSelectedCategory(null)}
-                        className="inline-flex items-center gap-2 px-4 py-2 bg-[#111111] text-white text-sm font-medium rounded-full"
-                      >
-                        {categoryObj.emoji} {categoryObj.name}
-                        <X className="w-4 h-4" />
-                      </button>
-                    )}
-                    {selectedType && (
-                      <button
-                        onClick={() => setSelectedType(null)}
-                        className="inline-flex items-center gap-2 px-4 py-2 bg-[#E10600] text-white text-sm font-medium rounded-full"
-                      >
-                        {selectedType === 'economico' && '💚 Económico'}
-                        {selectedType === 'standard' && '💛 Standard'}
-                        {selectedType === 'premium' && '❤️ Premium'}
-                        <X className="w-4 h-4" />
-                      </button>
-                    )}
-                  </div>
-                )}
+                <div className="flex flex-wrap gap-2">
+                  {selectedCategory && categoryObj && (
+                    <button
+                      onClick={() => setSelectedCategory(null)}
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-[#111111] text-white text-sm font-medium rounded-full active:scale-95 transition-transform"
+                    >
+                      {categoryObj.emoji} {categoryObj.name}
+                      <X className="w-4 h-4" />
+                    </button>
+                  )}
+                  {selectedType && (
+                    <button
+                      onClick={() => setSelectedType(null)}
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-[#E10600] text-white text-sm font-medium rounded-full active:scale-95 transition-transform"
+                    >
+                      {selectedType === 'economico' && '💚 Económico'}
+                      {selectedType === 'standard' && '💛 Standard'}
+                      {selectedType === 'premium' && '❤️ Premium'}
+                      <X className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
               </div>
+            )}
+
+            <div className="mb-6">
+              <h2 className="text-2xl font-extrabold text-[#111111] tracking-tight uppercase">
+                {categoryObj ? categoryObj.name : 'Todos los repuestos'}
+              </h2>
+              <p className="text-[#2A2A2A] mt-2">
+                {products.length} productos encontrados
+                {brand && ` para ${brand} ${model}`}
+              </p>
             </div>
 
             {loading ? (
