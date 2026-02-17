@@ -134,7 +134,7 @@ function BuscarContent() {
                 <div className="flex flex-col gap-2">
                   {[
                     { id: 'original', label: '⭐ Original', desc: 'Marca oficial del carro' },
-                    { id: 'generico', label: '🔧 Genérico', desc: 'Marca alternativa calidad' }
+                    { id: 'generico', label: '🔧 Genérico', desc: 'Marca alternativa' }
                   ].map(type => (
                     <button
                       key={type.id}

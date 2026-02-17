@@ -98,7 +98,7 @@ export const SAMPLE_PRODUCTS: Product[] = [
     stock: 20,
     images: [],
     compatible: [{ brand: 'Toyota', model: 'Corolla', years: '2008-2020' }],
-    features: ['Buena calidad', 'Cambio cada 5,000 km'],
+    features: ['Durabilidad estándar', 'Cambio cada 5,000 km'],
     sku: 'GEN-PH3614'
   },
   {
