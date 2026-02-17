@@ -182,10 +182,12 @@ export default function ProductoClient({ productId }: ProductoClientProps) {
                         onError={() => handleImageError(idx)}
                       />
                     ) : (
-                      {(() => {
-                    const IconComponent = category ? categoryIcons[category.icon] : null
-                    return IconComponent ? <IconComponent className="w-8 h-8 text-gray-400" /> : <span className="text-2xl">🔧</span>
-                  })()}
+                      <div className="flex items-center justify-center h-full">
+                        {(() => {
+                          const IconComponent = category ? categoryIcons[category.icon] : null
+                          return IconComponent ? <IconComponent className="w-8 h-8 text-gray-400" /> : <span className="text-2xl">🔧</span>
+                        })()}
+                      </div>
                     )}
                   </button>
                 ))}
@@ -371,10 +373,12 @@ export default function ProductoClient({ productId }: ProductoClientProps) {
                         className="object-cover group-hover:scale-105 transition-transform"
                       />
                     ) : (
-                      {(() => {
-                    const IconComponent = category ? categoryIcons[category.icon] : null
-                    return IconComponent ? <IconComponent className="w-10 h-10 text-gray-400" /> : <span className="text-4xl">🔧</span>
-                  })()}
+                      <div className="flex items-center justify-center h-full">
+                        {(() => {
+                          const IconComponent = category ? categoryIcons[category.icon] : null
+                          return IconComponent ? <IconComponent className="w-10 h-10 text-gray-400" /> : <span className="text-4xl">🔧</span>
+                        })()}
+                      </div>
                     )}
                   </div>
                   <div className="p-4">
