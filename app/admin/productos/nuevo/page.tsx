@@ -19,7 +19,7 @@ export default function NuevoProductoPage() {
     description: '',
     category_id: '',
     brand: '',
-    type: 'standard',
+    type: 'generico',
     cost_price: '',
     sale_price: '',
     stock: ''
@@ -179,7 +179,7 @@ export default function NuevoProductoPage() {
                   required
                   className="select"
                 >
-                  <option value="">Seleccioná categoría</option>
+                  <option value="">Selecciona categoría</option>
                   {CATEGORIES.map(cat => (
                     <option key={cat.id} value={cat.id}>
                       {cat.emoji} {cat.name}
@@ -204,16 +204,15 @@ export default function NuevoProductoPage() {
               </div>
             </div>
 
-            {/* Tipo de calidad */}
+            {/* Tipo de marca */}
             <div>
               <label className="block text-sm font-bold text-[#111111] mb-3">
-                Calidad del Producto *
+                Marca del Producto *
               </label>
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-2 gap-4">
                 {[
-                  { id: 'economico', label: '💚 Económico', desc: '3 meses garantía' },
-                  { id: 'standard', label: '💛 Standard', desc: '6 meses garantía' },
-                  { id: 'premium', label: '❤️ Premium', desc: '12 meses garantía' }
+                  { id: 'original', label: '⭐ Original', desc: 'Marca oficial del vehículo' },
+                  { id: 'generico', label: '🔧 Genérico', desc: 'Marca alternativa' }
                 ].map(tipo => (
                   <label
                     key={tipo.id}

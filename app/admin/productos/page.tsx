@@ -49,9 +49,8 @@ export default function AdminProductosPage() {
 
   const getTypeBadge = (type: string) => {
     const styles = {
-      economico: 'bg-green-100 text-green-700',
-      standard: 'bg-yellow-100 text-yellow-700',
-      premium: 'bg-red-100 text-red-700'
+      original: 'bg-[#E10600] text-white',
+      generico: 'bg-gray-200 text-gray-700'
     }
     return styles[type as keyof typeof styles] || 'bg-gray-100 text-gray-700'
   }
@@ -139,8 +138,8 @@ export default function AdminProductosPage() {
                       </td>
                       <td className="py-4 px-4 text-sm text-gray-600 font-mono">{product.sku}</td>
                       <td className="py-4 px-4">
-                        <span className={`px-2 py-1 rounded-full text-xs font-bold uppercase ${getTypeBadge(product.type)}`}>
-                          {product.type}
+                        <span className={`px-2 py-1 rounded-full text-xs font-bold ${getTypeBadge(product.type)}`}>
+                          {product.type === 'original' ? 'Original' : 'Genérico'}
                         </span>
                       </td>
                       <td className="py-4 px-4">

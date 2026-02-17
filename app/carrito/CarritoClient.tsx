@@ -91,11 +91,9 @@ export default function CarritoClient() {
                   </p>
                   <div className="flex items-center gap-2 mt-2">
                     <span className={`text-xs px-2 py-1 rounded uppercase font-bold ${
-                      item.product.type === 'economico' ? 'bg-green-100 text-green-700' :
-                      item.product.type === 'standard' ? 'bg-yellow-100 text-yellow-700' :
-                      'bg-red-100 text-red-700'
+                      item.product.type === 'original' ? 'bg-[#E10600] text-white' : 'bg-gray-200 text-gray-700'
                     }`}>
-                      {item.product.type}
+                      {item.product.type === 'original' ? 'Original' : 'Genérico'}
                     </span>
                     {item.product.stock < 5 && (
                       <span className="text-xs text-orange-600 font-medium">
