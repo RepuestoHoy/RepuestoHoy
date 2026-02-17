@@ -74,11 +74,11 @@ export const DELIVERY_ZONES = [
 export const SAMPLE_PRODUCTS: Product[] = [
   {
     id: '1',
-    name: 'Filtro de Aceite Toyota Corolla',
-    description: 'Filtro de aceite de alta calidad para Toyota Corolla. Compatible con modelos 2008-2020. Filtración óptima hasta 10,000 km.',
+    name: 'Filtro de Aceite Toyota Corolla - FRAM',
+    description: 'Filtro de aceite de alta calidad FRAM para Toyota Corolla. Compatible con modelos 2008-2020. Filtración óptima hasta 10,000 km.',
     category: 'filtros',
     brand: 'FRAM',
-    type: 'standard',
+    type: 'generico',
     price: 18.50,
     originalPrice: 25.00,
     stock: 15,
@@ -89,16 +89,16 @@ export const SAMPLE_PRODUCTS: Product[] = [
   },
   {
     id: '2',
-    name: 'Filtro de Aceite Toyota Corolla - Económico',
+    name: 'Filtro de Aceite Toyota Corolla - Genérico',
     description: 'Opción económica para cambios frecuentes. Cambio recomendado cada 5,000 km.',
     category: 'filtros',
     brand: 'Genérico',
-    type: 'economico',
+    type: 'generico',
     price: 12.00,
     stock: 20,
     images: [],
     compatible: [{ brand: 'Toyota', model: 'Corolla', years: '2008-2020' }],
-    features: ['Garantía 3 meses', 'Cambio cada 5,000 km'],
+    features: ['Buena calidad', 'Cambio cada 5,000 km'],
     sku: 'GEN-PH3614'
   },
   {
@@ -107,7 +107,7 @@ export const SAMPLE_PRODUCTS: Product[] = [
     description: 'Filtro original Toyota OEM. Máxima calidad y durabilidad.',
     category: 'filtros',
     brand: 'Toyota',
-    type: 'premium',
+    type: 'original',
     price: 35.00,
     stock: 8,
     images: [],

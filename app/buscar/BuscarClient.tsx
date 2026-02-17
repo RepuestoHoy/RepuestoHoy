@@ -77,9 +77,8 @@ function BuscarContent() {
                     onClick={() => setSelectedType(null)}
                     className="bg-[#E10600] text-white px-4 py-2 rounded-full font-medium text-sm whitespace-nowrap flex-shrink-0 flex items-center gap-2 active:scale-95 transition-transform"
                   >
-                    {selectedType === 'economico' && '💚 Económico ✕'}
-                    {selectedType === 'standard' && '💛 Standard ✕'}
-                    {selectedType === 'premium' && '❤️ Premium ✕'}
+                    {selectedType === 'original' && '⭐ Original ✕'}
+                    {selectedType === 'generico' && '🔧 Genérico ✕'}
                   </button>
                 )}
                 <button
@@ -129,14 +128,13 @@ function BuscarContent() {
                 </div>
               </div>
 
-              {/* Type Filter */}
+              {/* Type Filter - Marca */}
               <div>
-                <h4 className="font-bold text-[#111111] mb-3 text-sm uppercase">Calidad</h4>
+                <h4 className="font-bold text-[#111111] mb-3 text-sm uppercase">Marca</h4>
                 <div className="flex flex-col gap-2">
                   {[
-                    { id: 'economico', label: '💚 Económico', desc: '3 meses' },
-                    { id: 'standard', label: '💛 Standard', desc: '6 meses' },
-                    { id: 'premium', label: '❤️ Premium', desc: '12 meses' }
+                    { id: 'original', label: '⭐ Original', desc: 'Marca oficial del carro' },
+                    { id: 'generico', label: '🔧 Genérico', desc: 'Marca alternativa calidad' }
                   ].map(type => (
                     <button
                       key={type.id}
@@ -214,11 +212,10 @@ function BuscarContent() {
                       )}
                       {/* Type Badge */}
                       <div className={`absolute top-2 left-2 px-2 py-1 rounded-lg text-xs font-bold ${
-                        product.type === 'economico' ? 'bg-green-100 text-green-700' :
-                        product.type === 'standard' ? 'bg-yellow-100 text-yellow-700' :
-                        'bg-[#E10600] text-white'
+                        product.type === 'original' ? 'bg-[#E10600] text-white' :
+                        'bg-gray-200 text-gray-700'
                       }`}>
-                        {product.type}
+                        {product.type === 'original' ? 'Original' : 'Genérico'}
                       </div>
                     </div>
 

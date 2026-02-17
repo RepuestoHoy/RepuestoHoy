@@ -13,7 +13,7 @@ import WhatsAppButton from '@/components/WhatsAppButton'
 import { Check, AlertCircle } from 'lucide-react'
 
 const PAYMENT_METHODS = [
-  { id: 'pago_movil', name: 'Pago Móvil', description: 'Transferencia inmediata', icon: '📱' },
+  { id: 'pago_movil', name: 'Pago Móvil', description: 'Transferencia inmediata a Mercantil', icon: '📱', primary: true },
   { id: 'zelle', name: 'Zelle', description: 'Pago desde USA', icon: '🇺🇸' },
   { id: 'efectivo', name: 'Efectivo', description: 'Al recibir el pedido', icon: '💵' },
 ]

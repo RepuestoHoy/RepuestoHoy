@@ -149,13 +149,10 @@ export default function ProductoClient({ productId }: ProductoClientProps) {
               )}
               {/* Type Badge */}
               <div className={`absolute top-4 left-4 px-4 py-2 rounded-lg text-sm font-bold uppercase tracking-wider ${
-                product.type === 'economico' ? 'bg-white text-[#2A2A2A] border border-[#E0E0E0]' :
-                product.type === 'standard' ? 'bg-[#111111] text-white' :
-                'bg-[#E10600] text-white'
+                product.type === 'original' ? 'bg-[#E10600] text-white' :
+                'bg-gray-200 text-gray-700'
               }`}>
-                {product.type === 'economico' && '💚 Económico'}
-                {product.type === 'standard' && '💛 Standard'}
-                {product.type === 'premium' && '❤️ Premium'}
+                {product.type === 'original' ? '⭐ Original' : '🔧 Genérico'}
               </div>
             </div>
 
