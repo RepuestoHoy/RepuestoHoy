@@ -188,7 +188,7 @@ export default function HomePage() {
               <div className="step-number">2</div>
               <h3 className="text-xl font-bold text-[#111111] mb-3">Compara Precios</h3>
               <p className="text-[#6B7280]">
-                Elige entre Original o Generico. Siempre el mejor precio garantizado.
+                Elige entre Original o Generico.
               </p>
             </div>
 
