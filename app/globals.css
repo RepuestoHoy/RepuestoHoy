@@ -2,15 +2,19 @@
 @tailwind components;
 @tailwind utilities;
 
-/* PALETA OFICIAL REPUESTO HOY */
+/* PALETA OFICIAL REPUESTO HOY - MEJORADA */
 :root {
   --rojo: #E10600;
   --rojo-hover: #B00500;
+  --rojo-claro: #FFF5F5;
   --negro: #111111;
-  --gris: #2A2A2A;
+  --gris-oscuro: #2A2A2A;
+  --gris: #6B7280;
   --blanco: #FFFFFF;
-  --gris-claro: #F5F5F5;
-  --gris-borde: #E0E0E0;
+  --gris-claro: #F9FAFB;
+  --gris-borde: #E5E7EB;
+  --amarillo: #FEF3C7;
+  --verde: #D1FAE5;
 }
 
 @layer base {
@@ -20,37 +24,48 @@
 }
 
 @layer components {
-  /* Botón principal - ROJO */
+  /* Botón principal - ROJO CON GRADIENTE */
   .btn-primary {
-    @apply w-full px-6 py-4 bg-[#E10600] text-white font-bold uppercase tracking-wide rounded-lg shadow-lg transition-all;
+    @apply w-full px-6 py-4 bg-gradient-to-r from-[#E10600] to-[#B00500] text-white font-bold uppercase tracking-wide rounded-xl shadow-lg shadow-red-500/30 transition-all transform;
   }
   .btn-primary:hover {
-    @apply bg-[#B00500];
+    @apply shadow-xl shadow-red-500/40 -translate-y-0.5;
+  }
+  .btn-primary:active {
+    @apply translate-y-0 shadow-lg;
   }
   .btn-primary:disabled {
-    @apply opacity-50 cursor-not-allowed;
+    @apply opacity-50 cursor-not-allowed translate-y-0 shadow-none;
   }
   
-  /* Botón secundario - BLANCO CON BORDE */
+  /* Botón secundario - CON BORDE Y HOVER ANIMADO */
   .btn-secondary {
-    @apply w-full px-6 py-3 bg-white text-[#111111] font-semibold rounded-lg border-2 border-[#E0E0E0] transition-all;
+    @apply w-full px-6 py-3 bg-white text-[#111111] font-semibold rounded-xl border-2 border-[#E5E7EB] transition-all;
   }
   .btn-secondary:hover {
-    @apply border-[#111111];
+    @apply border-[#111111] shadow-lg;
   }
   
-  /* Card limpia */
+  /* Card mejorada - CON SOMBRA Y HOVER */
   .card {
-    @apply bg-white rounded-lg border border-[#E0E0E0] shadow-sm;
+    @apply bg-white rounded-xl border border-[#E5E7EB] shadow-sm transition-all duration-300;
+  }
+  .card:hover {
+    @apply shadow-xl border-[#111111]/10;
   }
   
-  /* Inputs */
+  /* Card destacada */
+  .card-featured {
+    @apply bg-white rounded-xl border-2 border-[#E10600]/20 shadow-lg shadow-red-500/10;
+  }
+  
+  /* Inputs mejorados */
   .input {
-    @apply w-full px-4 py-3 border-2 border-[#E0E0E0] rounded-lg text-[#111111] bg-white focus:border-[#111111] outline-none transition-all;
+    @apply w-full px-4 py-3 border-2 border-[#E5E7EB] rounded-xl text-[#111111] bg-white focus:border-[#E10600] focus:ring-4 focus:ring-red-500/10 outline-none transition-all;
   }
   
   .select {
-    @apply w-full px-4 py-3 border-2 border-[#E0E0E0] rounded-lg text-[#111111] bg-white focus:border-[#111111] outline-none transition-all appearance-none;
+    @apply w-full px-4 py-3 border-2 border-[#E5E7EB] rounded-xl text-[#111111] bg-white focus:border-[#E10600] focus:ring-4 focus:ring-red-500/10 outline-none transition-all appearance-none;
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%232A2A2A' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
     background-position: right 12px center;
     background-repeat: no-repeat;
@@ -58,28 +73,99 @@
     padding-right: 40px;
   }
   
-  /* Header y footer negro */
+  /* Header con gradiente sutil */
   .header-dark {
-    @apply bg-[#111111] text-white;
+    @apply bg-gradient-to-r from-[#111111] to-[#1a1a1a] text-white;
   }
   
+  /* Footer mejorado */
   .footer-dark {
-    @apply bg-[#111111] text-white;
+    @apply bg-gradient-to-b from-[#111111] to-[#0a0a0a] text-white;
   }
   
-  /* Precios en rojo */
+  /* Precios con efecto */
   .price-red {
     @apply text-[#E10600] font-extrabold;
+  }
+  
+  /* Badge de calidad */
+  .badge-quality {
+    @apply px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider;
+  }
+  .badge-economico {
+    @apply badge-quality bg-[#D1FAE5] text-green-700 border border-green-200;
+  }
+  .badge-standard {
+    @apply badge-quality bg-[#FEF3C7] text-yellow-700 border border-yellow-200;
+  }
+  .badge-premium {
+    @apply badge-quality bg-[#E10600] text-white;
+  }
+  
+  /* Hero con fondo */
+  .hero-section {
+    @apply relative overflow-hidden;
+    background: linear-gradient(135deg, #ffffff 0%, #f9fafb 50%, #ffffff 100%);
+  }
+  
+  /* Sección con patrón */
+  .section-pattern {
+    background-color: #f9fafb;
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23e5e7eb' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
   }
   
   /* Links */
   .link-dark {
     @apply text-[#111111] hover:text-[#E10600] transition-colors;
   }
+  
+  /* Botón flotante WhatsApp mejorado */
+  .whatsapp-float {
+    @apply fixed bottom-6 right-6 z-50 w-14 h-14 bg-green-500 rounded-full shadow-2xl shadow-green-500/40 flex items-center justify-center text-white transition-all transform hover:scale-110 hover:shadow-green-500/60;
+  }
+  
+  /* Toast notification */
+  .toast-success {
+    @apply fixed bottom-6 left-6 z-50 px-6 py-4 bg-[#111111] text-white rounded-xl shadow-2xl flex items-center gap-3 transform transition-all;
+  }
+  
+  /* Barra de búsqueda destacada */
+  .search-box {
+    @apply bg-white rounded-2xl p-8 shadow-2xl shadow-black/10 border border-[#E5E7EB];
+  }
+  
+  /* Stats/Features con icono */
+  .feature-card {
+    @apply card p-6 text-center hover:shadow-xl transition-all duration-300 hover:-translate-y-1;
+  }
+  
+  /* Step indicator */
+  .step-number {
+    @apply w-10 h-10 bg-[#E10600] text-white rounded-full flex items-center justify-center font-bold text-lg mx-auto -mt-8 mb-3 border-4 border-white shadow-lg;
+  }
+  
+  /* Etiqueta de stock */
+  .stock-low {
+    @apply absolute top-3 right-3 px-3 py-1 bg-orange-500 text-white text-xs font-bold rounded-full shadow-lg;
+  }
+  
+  /* Tag de oferta */
+  .tag-sale {
+    @apply absolute top-3 left-3 px-3 py-1 bg-[#E10600] text-white text-xs font-bold rounded-full shadow-lg;
+  }
 }
 
 @layer utilities {
   .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-[#111111] to-[#2A2A2A];
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-[#111111] to-[#E10600];
+  }
+  
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-out;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 }
