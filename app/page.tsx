@@ -233,24 +233,24 @@ export default function HomePage() {
               <div className="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:bg-green-100 transition-colors">
                 <span className="text-2xl">💰</span>
               </div>
-              <h4 className="font-bold text-[#111111] mb-2">Mejor Precio</h4>
-              <p className="text-sm text-[#6B7280]">Garantizado o devolvemos la diferencia</p>
+              <h4 className="font-bold text-[#111111] mb-2">Precio justo</h4>
+              <p className="text-sm text-[#6B7280]">Transparente y competitivo</p>
             </div>
 
             <div className="card p-6 text-center group hover:border-[#E10600] transition-colors">
               <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:bg-blue-100 transition-colors">
                 <span className="text-2xl">✓</span>
               </div>
-              <h4 className="font-bold text-[#111111] mb-2">Compatibilidad</h4>
-              <p className="text-sm text-[#6B7280]">Si no le queda, lo cambiamos gratis</p>
+              <h4 className="font-bold text-[#111111] mb-2">Verificación experta</h4>
+              <p className="text-sm text-[#6B7280]">Confirmamos la pieza exacta antes de enviar</p>
             </div>
 
             <div className="card p-6 text-center group hover:border-[#E10600] transition-colors">
               <div className="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:bg-purple-100 transition-colors">
                 <span className="text-2xl">💬</span>
               </div>
-              <h4 className="font-bold text-[#111111] mb-2">WhatsApp Directo</h4>
-              <p className="text-sm text-[#6B7280]">Atención personalizada en minutos</p>
+              <h4 className="font-bold text-[#111111] mb-2">WhatsApp con expertos</h4>
+              <p className="text-sm text-[#6B7280]">Asesoría rápida para comprar la pieza correcta</p>
             </div>
           </div>
         </div>
