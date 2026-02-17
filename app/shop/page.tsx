@@ -4,17 +4,54 @@ import { Suspense } from 'react'
 import { useEffect, useState } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { CARS, CATEGORIES } from '@/lib/data'
+import { CATEGORIES } from '@/lib/data'
 import { supabase } from '@/lib/supabase'
-import { Wrench, Sparkles, ArrowRight, MessageCircle, AlertCircle } from 'lucide-react'
+import { 
+  Wrench, Sparkles, ArrowRight, MessageCircle, AlertCircle,
+  Disc, Battery, Zap, Droplets, CircleDot, Wind, Thermometer,
+  Settings, Radio, Lightbulb, Armchair, Home, Shield, Tool
+} from 'lucide-react'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import WhatsAppButton from '@/components/WhatsAppButton'
 
-// Categorías por prioridad
-const ESSENTIAL_CATEGORIES = ['frenos', 'filtros', 'bateria', 'aceites', 'bujias', 'neumaticos', 'parabrisas']
-const REPAIR_CATEGORIES = ['suspension', 'enfriamiento', 'motor', 'sensores', 'escape', 'direccion', 'transmision']
-const UPGRADE_CATEGORIES = ['audio', 'iluminacion', 'interior', 'exterior', 'herramientas', 'seguridad']
+// Categorías con íconos grandes estilo CARiD
+const CATEGORY_GROUPS = [
+  {
+    title: 'Mantenimiento Esencial',
+    description: 'Lo que tu carro necesita regularmente',
+    items: [
+      { id: 'frenos', name: 'Frenos', icon: Disc, color: 'from-red-500 to-red-600', desc: 'Pastillas, discos' },
+      { id: 'filtros', name: 'Filtros', icon: Wind, color: 'from-blue-500 to-blue-600', desc: 'Aceite, aire, gasolina' },
+      { id: 'bateria', name: 'Batería', icon: Battery, color: 'from-green-500 to-green-600', desc: 'Baterías y cables' },
+      { id: 'aceites', name: 'Aceites', icon: Droplets, color: 'from-amber-500 to-amber-600', desc: 'Motor, caja' },
+      { id: 'bujias', name: 'Bujías', icon: Zap, color: 'from-purple-500 to-purple-600', desc: 'Encendido' },
+      { id: 'neumaticos', name: 'Neumáticos', icon: CircleDot, color: 'from-gray-600 to-gray-700', desc: 'Cauchos' },
+    ]
+  },
+  {
+    title: 'Reparación',
+    description: 'Cuando algo necesita arreglo',
+    items: [
+      { id: 'suspension', name: 'Suspensión', icon: Settings, color: 'from-slate-500 to-slate-600', desc: 'Amortiguadores' },
+      { id: 'enfriamiento', name: 'Enfriamiento', icon: Thermometer, color: 'from-cyan-500 to-cyan-600', desc: 'Radiador' },
+      { id: 'motor', name: 'Motor', icon: Wrench, color: 'from-orange-500 to-orange-600', desc: 'Correas, juntas' },
+      { id: 'sensores', name: 'Sensores', icon: Radio, color: 'from-indigo-500 to-indigo-600', desc: 'Check engine' },
+    ]
+  },
+  {
+    title: 'Mejoras & Accesorios',
+    description: 'Personalizá tu carro',
+    items: [
+      { id: 'audio', name: 'Audio', icon: Radio, color: 'from-pink-500 to-pink-600', desc: 'Parlantes, radio' },
+      { id: 'iluminacion', name: 'Iluminación', icon: Lightbulb, color: 'from-yellow-400 to-yellow-500', desc: 'LED, faros' },
+      { id: 'interior', name: 'Interior', icon: Armchair, color: 'from-teal-500 to-teal-600', desc: 'Cubreasientos' },
+      { id: 'exterior', name: 'Exterior', icon: Home, color: 'from-emerald-500 to-emerald-600', desc: 'Estribos, spoilers' },
+      { id: 'seguridad', name: 'Seguridad', icon: Shield, color: 'from-rose-500 to-rose-600', desc: 'Cámaras, alarmas' },
+      { id: 'herramientas', name: 'Herramientas', icon: Tool, color: 'from-stone-500 to-stone-600', desc: 'Kit de emergencia' },
+    ]
+  }
+]
 
 function ShopContent() {
   const router = useRouter()
@@ -29,13 +66,11 @@ function ShopContent() {
   const vehicleName = brand && model ? `${brand} ${model} ${year}` : 'Tu carro'
   
   useEffect(() => {
-    // Si no hay vehículo seleccionado, redirigir al home
     if (!brand || !model || !year) {
       router.push('/')
       return
     }
     
-    // Contar productos por categoría para este vehículo
     const fetchCounts = async () => {
       try {
         const { data, error } = await supabase
@@ -52,7 +87,7 @@ function ShopContent() {
           setCategoryCounts(counts)
         }
       } catch (err) {
-        console.error('Error fetching counts:', err)
+        console.error('Error:', err)
       }
       setLoading(false)
     }
@@ -60,47 +95,21 @@ function ShopContent() {
     fetchCounts()
   }, [brand, model, year, router])
   
-  // Filtrar categorías que tienen productos
-  const getCategoriesWithProducts = (categoryIds: string[]) => {
-    return CATEGORIES.filter(cat => 
-      categoryIds.includes(cat.id) && 
-      (categoryCounts[cat.id] > 0 || loading)
-    )
-  }
-  
-  const essentials = getCategoriesWithProducts(ESSENTIAL_CATEGORIES)
-  const repairs = getCategoriesWithProducts(REPAIR_CATEGORIES)
-  const upgrades = getCategoriesWithProducts(UPGRADE_CATEGORIES)
-  
   const handleCategoryClick = (categoryId: string) => {
     router.push(`/buscar?brand=${brand}&model=${model}&year=${year}&category=${categoryId}`)
   }
   
-  const handleFixItNow = () => {
+  const handleBrowseAll = () => {
     router.push(`/buscar?brand=${brand}&model=${model}&year=${year}`)
   }
   
-  const handleUpgrades = () => {
-    const firstUpgrade = upgrades[0]
-    if (firstUpgrade) {
-      router.push(`/buscar?brand=${brand}&model=${model}&year=${year}&category=${firstUpgrade.id}`)
-    } else {
-      router.push(`/buscar?brand=${brand}&model=${model}&year=${year}`)
-    }
-  }
-  
-  // Si no hay vehículo, mostrar mensaje
   if (!brand || !model || !year) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center p-8">
           <div className="text-6xl mb-4">🚗</div>
           <h1 className="text-2xl font-bold text-[#111111] mb-4">Seleccioná tu carro</h1>
-          <p className="text-gray-600 mb-6">Para ver los repuestos disponibles</p>
-          <Link 
-            href="/"
-            className="bg-[#E10600] text-white px-8 py-4 rounded-xl font-bold inline-block"
-          >
+          <Link href="/" className="bg-[#E10600] text-white px-8 py-4 rounded-xl font-bold inline-block">
             Ir al inicio
           </Link>
         </div>
@@ -110,190 +119,156 @@ function ShopContent() {
   
   return (
     <>
-      {/* Barra sticky con vehículo */}
-      <div className="sticky top-0 z-40 bg-[#111111] text-white py-3 px-4">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <span className="text-xl">🚗</span>
-            <span className="font-bold">{vehicleName}</span>
+      {/* Header estilo CARiD con vehículo */}
+      <div className="bg-[#111111] text-white">
+        <div className="max-w-6xl mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center">
+                <span className="text-2xl">🚗</span>
+              </div>
+              <div>
+                <p className="text-gray-400 text-sm">Mostrando repuestos para:</p>
+                <p className="font-bold text-xl">{vehicleName}</p>
+              </div>
+            </div>
+            <Link href="/" className="text-sm text-gray-400 hover:text-white underline">
+              Cambiar vehículo
+            </Link>
           </div>
-          <Link 
-            href="/" 
-            className="text-sm text-gray-400 hover:text-white underline"
-          >
-            Cambiar
-          </Link>
+        </div>
+      </div>
+      
+      {/* Barra de navegación rápida */}
+      <div className="bg-white border-b sticky top-0 z-40">
+        <div className="max-w-6xl mx-auto px-4 py-3">
+          <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide">
+            <button 
+              onClick={handleBrowseAll}
+              className="bg-[#E10600] text-white px-5 py-2 rounded-full text-sm font-bold whitespace-nowrap"
+            >
+              Ver Todo
+            </button>
+            {CATEGORY_GROUPS.map(group => (
+              <a 
+                key={group.title}
+                href={`#${group.title.toLowerCase().replace(/\s+/g, '-')}`}
+                className="bg-gray-100 hover:bg-gray-200 text-[#111111] px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors"
+              >
+                {group.title}
+              </a>
+            ))}
+          </div>
         </div>
       </div>
       
       <main className="max-w-6xl mx-auto px-4 py-8">
-        {/* Hero con CTAs principales */}
-        <div className="text-center mb-10">
-          <h1 className="text-3xl md:text-4xl font-extrabold text-[#111111] mb-3">
-            ¿Qué necesitás para tu {vehicleName}?
-          </h1>
-          <p className="text-gray-600 mb-8">
-            Tenemos {loading ? '...' : 'repuestos'} con entrega el mismo día en Caracas
-          </p>
-          
-          {/* Dos CTAs grandes */}
-          <div className="grid md:grid-cols-2 gap-4 max-w-3xl mx-auto">
-            {/* Arreglalo ya - Rojo */}
-            <button
-              onClick={handleFixItNow}
-              className="bg-gradient-to-br from-[#E10600] to-[#B00500] text-white p-6 rounded-2xl shadow-xl hover:shadow-2xl transition-all active:scale-95 text-left"
-            >
-              <div className="flex items-start gap-4">
-                <div className="w-14 h-14 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <Wrench className="w-7 h-7" />
-                </div>
-                <div>
-                  <h2 className="text-2xl font-bold mb-1">🔧 Arreglalo ya</h2>
-                  <p className="text-white/90 text-sm">
-                    Frenos, batería, filtros<br/>
-                    Seguridad primero
-                  </p>
-                  <div className="flex items-center gap-1 mt-3 text-sm font-semibold">
-                    Ver repuestos <ArrowRight className="w-4 h-4" />
-                  </div>
-                </div>
+        {/* Banner de ayuda */}
+        <div className="bg-gradient-to-r from-[#E10600] to-[#B00500] rounded-2xl p-6 mb-8 text-white">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 bg-white/20 rounded-xl flex items-center justify-center">
+                <MessageCircle className="w-7 h-7" />
               </div>
-            </button>
+              <div>
+                <h3 className="font-bold text-lg">¿No sabés qué necesitás?</h3>
+                <p className="text-white/90">Escribinos por WhatsApp y te ayudamos</p>
+              </div>
+            </div>
+            <a
+              href={`https://wa.me/584122223775?text=Hola! Tengo un ${vehicleName} y necesito ayuda para encontrar un repuesto.`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-white text-[#E10600] px-6 py-3 rounded-xl font-bold hover:bg-gray-100 transition-colors whitespace-nowrap"
+            >
+              Consultar ahora
+            </a>
+          </div>
+        </div>
+        
+        {/* Grupos de categorías estilo CARiD */}
+        {CATEGORY_GROUPS.map((group) => (
+          <section 
+            key={group.title}
+            id={group.title.toLowerCase().replace(/\s+/g, '-')}
+            className="mb-12"
+          >
+            <div className="mb-6">
+              <h2 className="text-2xl font-bold text-[#111111]">{group.title}</h2>
+              <p className="text-gray-500">{group.description}</p>
+            </div>
             
-            {/* Mejoras - Negro */}
-            <button
-              onClick={handleUpgrades}
-              className="bg-gradient-to-br from-[#111111] to-[#2A2A2A] text-white p-6 rounded-2xl shadow-xl hover:shadow-2xl transition-all active:scale-95 text-left"
-            >
-              <div className="flex items-start gap-4">
-                <div className="w-14 h-14 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <Sparkles className="w-7 h-7" />
-                </div>
-                <div>
-                  <h2 className="text-2xl font-bold mb-1">✨ Mejoras</h2>
-                  <p className="text-white/90 text-sm">
-                    Audio, luces, accesorios<br/>
-                    Dale tu estilo
-                  </p>
-                  <div className="flex items-center gap-1 mt-3 text-sm font-semibold">
-                    Ver mejoras <ArrowRight className="w-4 h-4" />
-                  </div>
-                </div>
-              </div>
-            </button>
-          </div>
-        </div>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+              {group.items.map((item) => {
+                const count = categoryCounts[item.id] || 0
+                const Icon = item.icon
+                const hasProducts = count > 0 || loading
+                
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => handleCategoryClick(item.id)}
+                    disabled={!hasProducts}
+                    className={`group text-left transition-all ${!hasProducts ? 'opacity-50 cursor-not-allowed' : 'active:scale-95'}`}
+                  >
+                    <div className={`aspect-square rounded-2xl bg-gradient-to-br ${item.color} p-4 mb-3 flex flex-col justify-between relative overflow-hidden ${hasProducts ? 'group-hover:shadow-xl group-hover:scale-[1.02]' : ''} transition-all`}>
+                      {/* Background pattern */}
+                      <div className="absolute inset-0 opacity-10">
+                        <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-white rounded-full"></div>
+                      </div>
+                      
+                      {/* Icon */}
+                      <div className="relative z-10">
+                        <Icon className="w-10 h-10 text-white" strokeWidth={1.5} />
+                      </div>
+                      
+                      {/* Product count badge */}
+                      {!loading && count > 0 && (
+                        <div className="relative z-10">
+                          <span className="bg-white/20 text-white text-xs font-bold px-2 py-1 rounded-full">
+                            {count} productos
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                    
+                    <h3 className="font-bold text-[#111111] group-hover:text-[#E10600] transition-colors">
+                      {item.name}
+                    </h3>
+                    <p className="text-sm text-gray-500">{item.desc}</p>
+                  </button>
+                )
+              })}
+            </div>
+          </section>
+        ))}
         
-        {/* Buscador por problema */}
-        <div className="bg-[#F5F5F5] rounded-2xl p-6 mb-10">
-          <div className="flex items-center gap-3 mb-4">
-            <AlertCircle className="w-5 h-5 text-[#E10600]" />
-            <h3 className="font-bold text-[#111111]">¿Tenés un problema?</h3>
-          </div>
-          <p className="text-gray-600 mb-4">
-            Describí qué le pasa a tu carro y te ayudamos a encontrar el repuesto
+        {/* CTA Final */}
+        <div className="bg-gray-50 rounded-2xl p-8 text-center">
+          <h3 className="text-xl font-bold text-[#111111] mb-3">
+            ¿No encontrás lo que buscás?
+          </h3>
+          <p className="text-gray-600 mb-6">
+            Tenemos más repuestos disponibles. Escribinos y te conseguimos lo que necesitás.
           </p>
-          <a
-            href={`https://wa.me/584122223775?text=Hola! Tengo un ${vehicleName} y tengo este problema: `}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-xl font-semibold transition-colors"
-          >
-            <MessageCircle className="w-5 h-5" />
-            Consultar por WhatsApp
-          </a>
-        </div>
-        
-        {/* Essentials - Lo más importante */}
-        {essentials.length > 0 && (
-          <section className="mb-10">
-            <div className="flex items-center justify-between mb-5">
-              <h2 className="text-xl font-bold text-[#111111]">Lo más importante</h2>
-              <span className="text-sm text-gray-500">Seguridad y mantenimiento</span>
-            </div>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-              {essentials.map(cat => (
-                <button
-                  key={cat.id}
-                  onClick={() => handleCategoryClick(cat.id)}
-                  className="bg-white border-2 border-gray-100 hover:border-[#E10600] rounded-xl p-4 text-center transition-all active:scale-95"
-                >
-                  <span className="text-3xl mb-2 block">{cat.emoji}</span>
-                  <span className="font-semibold text-sm text-[#111111]">{cat.name}</span>
-                  {!loading && categoryCounts[cat.id] > 0 && (
-                    <span className="text-xs text-gray-500 block mt-1">
-                      {categoryCounts[cat.id]} productos
-                    </span>
-                  )}
-                </button>
-              ))}
-            </div>
-          </section>
-        )}
-        
-        {/* Reparación */}
-        {repairs.length > 0 && (
-          <section className="mb-10">
-            <div className="flex items-center justify-between mb-5">
-              <h2 className="text-xl font-bold text-[#111111]">Reparación</h2>
-              <span className="text-sm text-gray-500">Sistemas mecánicos</span>
-            </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              {repairs.map(cat => (
-                <button
-                  key={cat.id}
-                  onClick={() => handleCategoryClick(cat.id)}
-                  className="bg-white border-2 border-gray-100 hover:border-[#111111] rounded-xl p-4 text-center transition-all active:scale-95"
-                >
-                  <span className="text-3xl mb-2 block">{cat.emoji}</span>
-                  <span className="font-semibold text-sm text-[#111111]">{cat.name}</span>
-                  {!loading && categoryCounts[cat.id] > 0 && (
-                    <span className="text-xs text-gray-500 block mt-1">
-                      {categoryCounts[cat.id]} productos
-                    </span>
-                  )}
-                </button>
-              ))}
-            </div>
-          </section>
-        )}
-        
-        {/* Mejoras y accesorios */}
-        {upgrades.length > 0 && (
-          <section className="mb-10">
-            <div className="flex items-center justify-between mb-5">
-              <h2 className="text-xl font-bold text-[#111111]">Mejoras y accesorios</h2>
-              <span className="text-sm text-gray-500">Personalización</span>
-            </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              {upgrades.map(cat => (
-                <button
-                  key={cat.id}
-                  onClick={() => handleCategoryClick(cat.id)}
-                  className="bg-white border-2 border-gray-100 hover:border-[#111111] rounded-xl p-4 text-center transition-all active:scale-95"
-                >
-                  <span className="text-3xl mb-2 block">{cat.emoji}</span>
-                  <span className="font-semibold text-sm text-[#111111]">{cat.name}</span>
-                  {!loading && categoryCounts[cat.id] > 0 && (
-                    <span className="text-xs text-gray-500 block mt-1">
-                      {categoryCounts[cat.id]} productos
-                    </span>
-                  )}
-                </button>
-              ))}
-            </div>
-          </section>
-        )}
-        
-        {/* Ver todo */}
-        <div className="text-center">
-          <button
-            onClick={handleFixItNow}
-            className="inline-flex items-center gap-2 bg-[#111111] text-white px-8 py-4 rounded-xl font-bold hover:bg-black transition-colors"
-          >
-            Ver todos los repuestos
-            <ArrowRight className="w-5 h-5" />
-          </button>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <button
+              onClick={handleBrowseAll}
+              className="inline-flex items-center justify-center gap-2 bg-[#111111] text-white px-6 py-3 rounded-xl font-bold hover:bg-black transition-colors"
+            >
+              Ver todos los repuestos
+              <ArrowRight className="w-5 h-5" />
+            </button>
+            <a
+              href={`https://wa.me/584122223775?text=Hola! Busco un repuesto para mi ${vehicleName}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2 bg-green-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-green-700 transition-colors"
+            >
+              <MessageCircle className="w-5 h-5" />
+              Escribir por WhatsApp
+            </a>
+          </div>
         </div>
       </main>
     </>
