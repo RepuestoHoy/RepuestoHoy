@@ -290,7 +290,7 @@ export default function ProductoClient({ productId }: ProductoClientProps) {
             <div className="grid grid-cols-3 gap-4 pt-6 border-t border-[#E0E0E0]">
               <div className="text-center">
                 <Shield className="w-6 h-6 mx-auto mb-2 text-[#E10600]" />
-                <p className="text-xs font-medium text-[#2A2A2A]">Calidad asegurada</p>
+                <p className="text-xs font-medium text-[#2A2A2A]">Pieza verificada</p>
               </div>
               <div className="text-center">
                 <Truck className="w-6 h-6 mx-auto mb-2 text-[#E10600]" />
@@ -298,7 +298,7 @@ export default function ProductoClient({ productId }: ProductoClientProps) {
               </div>
               <div className="text-center">
                 <RotateCcw className="w-6 h-6 mx-auto mb-2 text-[#E10600]" />
-                <p className="text-xs font-medium text-[#2A2A2A]">Cambio gratis</p>
+                <p className="text-xs font-medium text-[#2A2A2A]">Compatibilidad</p>
               </div>
             </div>
           </div>
