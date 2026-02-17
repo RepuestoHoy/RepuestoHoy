@@ -217,7 +217,7 @@ export default function HomePage() {
               <div className="step-number">1</div>
               <h3 className="text-xl font-bold text-[#111111] mb-3">Tu Vehiculo</h3>
               <p className="text-[#6B7280]">
-                Selecciona tu carro o moto. Guardamos tu vehiculo para que no tengas que repetirlo.
+                Selecciona tu carro o moto. Si creas cuenta, guardamos tu vehiculo para agilizar proximas compras.
               </p>
             </div>
 
