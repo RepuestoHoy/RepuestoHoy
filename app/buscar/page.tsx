@@ -15,6 +15,7 @@ export const metadata: Metadata = {
   },
 }
 
+// Sistema: Original / Genérico
 export default function BuscarPage() {
   return <BuscarClient />
 }
