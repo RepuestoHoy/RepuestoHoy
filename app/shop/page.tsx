@@ -9,7 +9,7 @@ import { supabase } from '@/lib/supabase'
 import { 
   Wrench, Sparkles, ArrowRight, MessageCircle, AlertCircle,
   Disc, Battery, Zap, Droplets, CircleDot, Wind, Thermometer,
-  Settings, Radio, Lightbulb, Armchair, Home, Shield, Tool
+  Settings, Radio, Lightbulb, Armchair, Home, Shield, Wrench
 } from 'lucide-react'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
@@ -48,7 +48,7 @@ const CATEGORY_GROUPS = [
       { id: 'interior', name: 'Interior', icon: Armchair, color: 'from-teal-500 to-teal-600', desc: 'Cubreasientos' },
       { id: 'exterior', name: 'Exterior', icon: Home, color: 'from-emerald-500 to-emerald-600', desc: 'Estribos, spoilers' },
       { id: 'seguridad', name: 'Seguridad', icon: Shield, color: 'from-rose-500 to-rose-600', desc: 'Cámaras, alarmas' },
-      { id: 'herramientas', name: 'Herramientas', icon: Tool, color: 'from-stone-500 to-stone-600', desc: 'Kit de emergencia' },
+      { id: 'herramientas', name: 'Herramientas', icon: Wrench, color: 'from-stone-500 to-stone-600', desc: 'Kit de emergencia' },
     ]
   }
 ]

@@ -10,7 +10,7 @@ export interface Product {
   description: string
   category: string
   brand: string
-  type: 'economico' | 'standard' | 'premium'
+  type: 'original' | 'generico'
   price: number
   originalPrice?: number
   stock: number
