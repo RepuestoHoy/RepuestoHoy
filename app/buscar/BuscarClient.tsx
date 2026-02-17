@@ -1,12 +1,11 @@
 'use client'
 
-import { Suspense } from 'react'
-import { useEffect, useState } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { Suspense, useEffect, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { useSearchParams } from 'next/navigation'
 import { SAMPLE_PRODUCTS, CATEGORIES } from '@/lib/data'
-import { Filter, Check, AlertCircle } from 'lucide-react'
+import { Filter, Check, AlertCircle, X } from 'lucide-react'
 import Header from '@/components/Header'
 import ProductSkeleton from '@/components/ProductSkeleton'
 
@@ -15,19 +14,27 @@ function BuscarContent() {
   const [products, setProducts] = useState(SAMPLE_PRODUCTS)
   const [loading, setLoading] = useState(false)
   const [selectedType, setSelectedType] = useState<string | null>(null)
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
 
   const brand = searchParams.get('brand') || ''
   const model = searchParams.get('model') || ''
   const year = searchParams.get('year') || ''
-  const category = searchParams.get('category') || ''
+  const urlCategory = searchParams.get('category') || ''
+
+  // Inicializar categoría desde URL
+  useEffect(() => {
+    if (urlCategory) {
+      setSelectedCategory(urlCategory)
+    }
+  }, [urlCategory])
 
   useEffect(() => {
     setLoading(true)
     setTimeout(() => {
       let filtered = SAMPLE_PRODUCTS
       
-      if (category) {
-        filtered = filtered.filter(p => p.category === category)
+      if (selectedCategory) {
+        filtered = filtered.filter(p => p.category === selectedCategory)
       }
       
       if (selectedType) {
@@ -36,16 +43,22 @@ function BuscarContent() {
 
       setProducts(filtered)
       setLoading(false)
-    }, 500)
-  }, [category, selectedType])
+    }, 300)
+  }, [selectedCategory, selectedType])
 
-  const selectedCategory = CATEGORIES.find(c => c.id === category)
-  const hasActiveFilters = category || selectedType
+  const categoryObj = CATEGORIES.find(c => c.id === selectedCategory)
+  const hasActiveFilters = selectedCategory || selectedType
+
+  // Función para limpiar todos los filtros
+  const clearAllFilters = () => {
+    setSelectedCategory(null)
+    setSelectedType(null)
+  }
 
   return (
     <>
       {/* Search Context */}
-      {(brand || category) && (
+      {(brand || selectedCategory) && (
         <div className="bg-[#F5F5F5] border-b border-[#E0E0E0]">
           <div className="max-w-6xl mx-auto px-4 py-4">
             <div className="flex items-center gap-2 text-sm flex-wrap">
@@ -54,16 +67,20 @@ function BuscarContent() {
                   {brand} {model} {year}
                 </span>
               )}
-              {selectedCategory && (
-                <span className="bg-white border border-[#E0E0E0] text-[#111111] px-4 py-2 rounded-lg font-medium">
-                  {selectedCategory.emoji} {selectedCategory.name}
-                </span>
+              {categoryObj && (
+                <button
+                  onClick={() => setSelectedCategory(null)}
+                  className="bg-white border border-[#E0E0E0] text-[#111111] px-4 py-2 rounded-lg font-medium flex items-center gap-2 hover:border-[#E10600] transition-colors"
+                >
+                  {categoryObj.emoji} {categoryObj.name}
+                  <X className="w-3 h-3" />
+                </button>
               )}
               <Link 
                 href="/"
-                className="text-[#E10600] hover:text-[#B00500] text-sm font-medium underline"
+                className="text-[#E10600] hover:text-[#B00500] text-sm font-medium underline ml-auto"
               >
-                Cambiar
+                Cambiar carro
               </Link>
             </div>
           </div>
@@ -75,72 +92,73 @@ function BuscarContent() {
           {/* Sidebar Filters */}
           <aside className="lg:w-64 flex-shrink-0">
             <div className="card p-6 sticky top-4 bg-white">
-              <h3 className="font-bold text-[#111111] mb-6 flex items-center gap-2 uppercase text-sm tracking-wider">
-                <Filter className="w-5 h-5" />
-                Filtrar por
-              </h3>
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="font-bold text-[#111111] flex items-center gap-2 uppercase text-sm tracking-wider">
+                  <Filter className="w-5 h-5" />
+                  Filtrar por
+                </h3>
+                {hasActiveFilters && (
+                  <button
+                    onClick={clearAllFilters}
+                    className="text-xs text-[#E10600] hover:underline font-medium"
+                  >
+                    Limpiar todo
+                  </button>
+                )}
+              </div>
 
-              {/* Type Filter */}
+              {/* Categories */}
               <div className="mb-8">
-                <div className="flex items-center justify-between mb-4">
-                  <h4 className="font-bold text-[#111111] text-sm uppercase tracking-wider">Calidad</h4>
-                  {selectedType && (
+                <h4 className="font-bold text-[#111111] mb-4 text-sm uppercase tracking-wider">Categoría</h4>
+                <div className="space-y-2">
+                  {CATEGORIES.map(cat => (
                     <button
-                      onClick={() => setSelectedType(null)}
-                      className="text-xs text-[#E10600] hover:underline font-medium"
-                    >
-                      Quitar filtro ✕
-                    </button>
-                  )}
-                </div>
-                <div className="space-y-3">
-                  {['economico', 'standard', 'premium'].map(type => (
-                    <button
-                      key={type}
-                      onClick={() => setSelectedType(selectedType === type ? null : type)}
-                      className={`w-full flex items-center gap-3 p-4 rounded-lg border-2 transition-all text-left ${
-                        selectedType === type
-                          ? 'border-[#111111] bg-[#F5F5F5]'
-                          : 'border-[#E0E0E0] hover:border-[#2A2A2A]'
+                      key={cat.id}
+                      onClick={() => setSelectedCategory(selectedCategory === cat.id ? null : cat.id)}
+                      className={`w-full flex items-center gap-3 p-3 rounded-lg text-sm transition-all text-left ${
+                        selectedCategory === cat.id
+                          ? 'bg-[#111111] text-white'
+                          : 'hover:bg-[#F5F5F5] text-[#2A2A2A]'
                       }`}
                     >
-                      <div className="flex-1">
-                        <div className="font-bold text-[#111111] text-sm uppercase">
-                          {type === 'economico' && '💚 Económico'}
-                          {type === 'standard' && '💛 Standard'}
-                          {type === 'premium' && '❤️ Premium'}
-                        </div>
-                        <div className="text-xs text-[#2A2A2A] mt-1">
-                          {type === 'economico' && 'Garantía 3 meses'}
-                          {type === 'standard' && 'Garantía 6 meses'}
-                          {type === 'premium' && 'Garantía 12 meses'}
-                        </div>
-                      </div>
-                      {selectedType === type && (
-                        <Check className="w-5 h-5 text-[#111111]" />
+                      <span className="text-lg">{cat.emoji}</span>
+                      <span className="font-medium flex-1">{cat.name}</span>
+                      {selectedCategory === cat.id && (
+                        <Check className="w-4 h-4" />
                       )}
                     </button>
                   ))}
                 </div>
               </div>
 
-              {/* Categories */}
+              {/* Type Filter */}
               <div>
-                <h4 className="font-bold text-[#111111] mb-4 text-sm uppercase tracking-wider">Categoría</h4>
-                <div className="space-y-1">
-                  {CATEGORIES.map(cat => (
-                    <Link
-                      key={cat.id}
-                      href={`/buscar?category=${cat.id}`}
-                      className={`flex items-center gap-3 p-3 rounded-lg text-sm transition-colors ${
-                        category === cat.id 
-                          ? 'bg-[#111111] text-white' 
-                          : 'hover:bg-[#F5F5F5] text-[#2A2A2A]'
+                <h4 className="font-bold text-[#111111] mb-4 text-sm uppercase tracking-wider">Calidad</h4>
+                <div className="space-y-3">
+                  {[
+                    { id: 'economico', label: '💚 Económico', desc: 'Garantía 3 meses' },
+                    { id: 'standard', label: '💛 Standard', desc: 'Garantía 6 meses' },
+                    { id: 'premium', label: '❤️ Premium', desc: 'Garantía 12 meses' }
+                  ].map(type => (
+                    <button
+                      key={type.id}
+                      onClick={() => setSelectedType(selectedType === type.id ? null : type.id)}
+                      className={`w-full p-4 rounded-lg border-2 transition-all text-left ${
+                        selectedType === type.id
+                          ? 'border-[#111111] bg-[#F5F5F5]'
+                          : 'border-[#E0E0E0] hover:border-[#2A2A2A]'
                       }`}
                     >
-                      <span>{cat.emoji}</span>
-                      <span className="font-medium">{cat.name}</span>
-                    </Link>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <div className="font-bold text-[#111111] text-sm">{type.label}</div>
+                          <div className="text-xs text-[#2A2A2A] mt-1">{type.desc}</div>
+                        </div>
+                        {selectedType === type.id && (
+                          <Check className="w-5 h-5 text-[#111111]" />
+                        )}
+                      </div>
+                    </button>
                   ))}
                 </div>
               </div>
@@ -150,26 +168,43 @@ function BuscarContent() {
           {/* Results */}
           <main className="flex-1">
             <div className="mb-8">
-              <h2 className="text-2xl font-extrabold text-[#111111] tracking-tight uppercase">
-                {selectedCategory ? selectedCategory.name : 'Todos los repuestos'}
-              </h2>
-              <p className="text-[#2A2A2A] mt-2">
-                {products.length} productos encontrados
-                {brand && ` para ${brand} ${model}`}
-                {selectedType && ` • ${selectedType === 'economico' ? 'Económico' : selectedType === 'standard' ? 'Standard' : 'Premium'}`}
-              </p>
-              {/* Mobile filter indicator */}
-              {selectedType && (
-                <button
-                  onClick={() => setSelectedType(null)}
-                  className="mt-3 inline-flex items-center gap-2 px-4 py-2 bg-[#111111] text-white text-sm font-medium rounded-full lg:hidden"
-                >
-                  {selectedType === 'economico' && '💚 Económico'}
-                  {selectedType === 'standard' && '💛 Standard'}
-                  {selectedType === 'premium' && '❤️ Premium'}
-                  <span className="text-white/70">✕</span>
-                </button>
-              )}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <h2 className="text-2xl font-extrabold text-[#111111] tracking-tight uppercase">
+                    {categoryObj ? categoryObj.name : 'Todos los repuestos'}
+                  </h2>
+                  <p className="text-[#2A2A2A] mt-2">
+                    {products.length} productos encontrados
+                    {brand && ` para ${brand} ${model}`}
+                  </p>
+                </div>
+                
+                {/* Active filters badges */}
+                {hasActiveFilters && (
+                  <div className="flex flex-wrap gap-2">
+                    {selectedCategory && categoryObj && (
+                      <button
+                        onClick={() => setSelectedCategory(null)}
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-[#111111] text-white text-sm font-medium rounded-full"
+                      >
+                        {categoryObj.emoji} {categoryObj.name}
+                        <X className="w-4 h-4" />
+                      </button>
+                    )}
+                    {selectedType && (
+                      <button
+                        onClick={() => setSelectedType(null)}
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-[#E10600] text-white text-sm font-medium rounded-full"
+                      >
+                        {selectedType === 'economico' && '💚 Económico'}
+                        {selectedType === 'standard' && '💛 Standard'}
+                        {selectedType === 'premium' && '❤️ Premium'}
+                        <X className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
 
             {loading ? (
@@ -186,25 +221,15 @@ function BuscarContent() {
                     <h3 className="text-xl font-bold text-[#111111] mb-2">
                       No encontramos repuestos con estos filtros
                     </h3>
-                    <div className="flex items-center justify-center gap-2 mb-4">
-                      <AlertCircle className="w-5 h-5 text-orange-500" />
-                      <p className="text-[#2A2A2A]">
-                        Intentá con otros filtros o categorías
-                      </p>
-                    </div>
-                    <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                      {selectedType && (
-                        <button
-                          onClick={() => setSelectedType(null)}
-                          className="btn-secondary"
-                        >
-                          Quitar filtro de calidad
-                        </button>
-                      )}
-                      <Link href="/buscar" className="btn-primary inline-block">
-                        Ver todos los productos
-                      </Link>
-                    </div>
+                    <p className="text-[#2A2A2A] mb-6">
+                      Probá quitando algunos filtros
+                    </p>
+                    <button
+                      onClick={clearAllFilters}
+                      className="btn-primary inline-block px-8"
+                    >
+                      Ver todos los productos
+                    </button>
                   </>
                 ) : (
                   <>
@@ -245,9 +270,9 @@ function BuscarContent() {
                         </div>
                       )}
                       {/* Type Badge */}
-                      <div className={`absolute top-3 left-3 px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wider ${
-                        product.type === 'economico' ? 'bg-[#F5F5F5] text-[#2A2A2A] border border-[#E0E0E0]' :
-                        product.type === 'standard' ? 'bg-[#111111] text-white' :
+                      <div className={`absolute top-3 left-3 px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider ${
+                        product.type === 'economico' ? 'bg-green-100 text-green-700 border border-green-200' :
+                        product.type === 'standard' ? 'bg-yellow-100 text-yellow-700 border border-yellow-200' :
                         'bg-[#E10600] text-white'
                       }`}>
                         {product.type === 'economico' && 'Económico'}
@@ -256,7 +281,7 @@ function BuscarContent() {
                       </div>
                       {/* Low Stock Indicator */}
                       {product.stock < 5 && (
-                        <div className="absolute top-3 right-3 px-2 py-1 bg-orange-500 text-white text-xs font-bold rounded">
+                        <div className="absolute top-3 right-3 px-3 py-1 bg-orange-500 text-white text-xs font-bold rounded-full">
                           ¡{product.stock} disp!
                         </div>
                       )}
@@ -264,13 +289,13 @@ function BuscarContent() {
 
                     {/* Content */}
                     <div className="p-5">
-                      <div className="text-xs font-bold text-[#2A2A2A] uppercase tracking-wider mb-1">
+                      <div className="text-xs font-bold text-[#6B7280] uppercase tracking-wider mb-1">
                         {product.brand} • SKU: {product.sku}
                       </div>
-                      <h3 className="font-bold text-[#111111] mb-3 line-clamp-2">
+                      <h3 className="font-bold text-[#111111] mb-2 line-clamp-2">
                         {product.name}
                       </h3>
-                      <p className="text-sm text-[#2A2A2A] mb-4 line-clamp-2">
+                      <p className="text-sm text-[#6B7280] mb-4 line-clamp-2">
                         {product.description}
                       </p>
 
@@ -278,7 +303,7 @@ function BuscarContent() {
                       <div className="flex items-end justify-between pt-4 border-t border-[#E0E0E0]">
                         <div>
                           {product.originalPrice && (
-                            <div className="text-sm text-[#2A2A2A] line-through">
+                            <div className="text-sm text-[#6B7280] line-through">
                               ${product.originalPrice.toFixed(2)}
                             </div>
                           )}
@@ -286,8 +311,8 @@ function BuscarContent() {
                             ${product.price.toFixed(2)}
                           </div>
                         </div>
-                        <span className="text-sm text-[#2A2A2A] font-medium flex items-center gap-1">
-                          <span className="w-2 h-2 bg-[#E10600] rounded-full"></span>
+                        <span className="text-sm text-green-600 font-medium flex items-center gap-1">
+                          <span className="w-2 h-2 bg-green-500 rounded-full"></span>
                           En stock
                         </span>
                       </div>
