@@ -31,7 +31,7 @@ export type Product = {
   description: string | null
   category_id: string | null
   brand: string | null
-  type: 'economico' | 'standard' | 'premium'
+  type: 'original' | 'generico'
   sale_price: number
   stock: number
   is_available: boolean
