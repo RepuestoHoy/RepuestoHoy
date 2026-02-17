@@ -49,7 +49,7 @@ export default function Header({
       {/* Banner promocional */}
       {showBanner && (
         <div className="bg-[#E10600] text-white text-center py-2 px-4 text-sm font-medium">
-          <span className="hidden sm:inline">🚗 Entrega el mismo día en Caracas • </span>
+          <span className="hidden sm:inline">Entrega el mismo día en Caracas • </span>
           <span>WhatsApp: +58 412-2223775</span>
           <button 
             onClick={() => setShowBanner(false)}
