@@ -1,5 +1,6 @@
 'use client'
 
+import { Suspense } from 'react'
 import { useEffect, useState } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
@@ -15,15 +16,15 @@ const ESSENTIAL_CATEGORIES = ['frenos', 'filtros', 'bateria', 'aceites', 'bujias
 const REPAIR_CATEGORIES = ['suspension', 'enfriamiento', 'motor', 'sensores', 'escape', 'direccion', 'transmision']
 const UPGRADE_CATEGORIES = ['audio', 'iluminacion', 'interior', 'exterior', 'herramientas', 'seguridad']
 
-export default function ShopPage() {
+function ShopContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [categoryCounts, setCategoryCounts] = useState<Record<string, number>>({})
   const [loading, setLoading] = useState(true)
   
-  const brand = searchParams.get('brand') || ''
-  const model = searchParams.get('model') || ''
-  const year = searchParams.get('year') || ''
+  const brand = searchParams?.get('brand') || ''
+  const model = searchParams?.get('model') || ''
+  const year = searchParams?.get('year') || ''
   
   const vehicleName = brand && model ? `${brand} ${model} ${year}` : 'Tu carro'
   
@@ -36,18 +37,22 @@ export default function ShopPage() {
     
     // Contar productos por categoría para este vehículo
     const fetchCounts = async () => {
-      const { data, error } = await supabase
-        .from('products')
-        .select('category_id, count')
-        .eq('is_available', true)
-        .gt('stock', 0)
-      
-      if (!error && data) {
-        const counts: Record<string, number> = {}
-        data.forEach((p: any) => {
-          counts[p.category_id] = (counts[p.category_id] || 0) + 1
-        })
-        setCategoryCounts(counts)
+      try {
+        const { data, error } = await supabase
+          .from('products')
+          .select('category_id')
+          .eq('is_available', true)
+          .gt('stock', 0)
+        
+        if (!error && data) {
+          const counts: Record<string, number> = {}
+          data.forEach((p: any) => {
+            counts[p.category_id] = (counts[p.category_id] || 0) + 1
+          })
+          setCategoryCounts(counts)
+        }
+      } catch (err) {
+        console.error('Error fetching counts:', err)
       }
       setLoading(false)
     }
@@ -72,12 +77,10 @@ export default function ShopPage() {
   }
   
   const handleFixItNow = () => {
-    // Ir a buscar con filtro de categorías esenciales (mostrar todas)
     router.push(`/buscar?brand=${brand}&model=${model}&year=${year}`)
   }
   
   const handleUpgrades = () => {
-    // Ir a buscar mostrando categorías de upgrade
     const firstUpgrade = upgrades[0]
     if (firstUpgrade) {
       router.push(`/buscar?brand=${brand}&model=${model}&year=${year}&category=${firstUpgrade.id}`)
@@ -86,10 +89,27 @@ export default function ShopPage() {
     }
   }
   
+  // Si no hay vehículo, mostrar mensaje
+  if (!brand || !model || !year) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center p-8">
+          <div className="text-6xl mb-4">🚗</div>
+          <h1 className="text-2xl font-bold text-[#111111] mb-4">Seleccioná tu carro</h1>
+          <p className="text-gray-600 mb-6">Para ver los repuestos disponibles</p>
+          <Link 
+            href="/"
+            className="bg-[#E10600] text-white px-8 py-4 rounded-xl font-bold inline-block"
+          >
+            Ir al inicio
+          </Link>
+        </div>
+      </div>
+    )
+  }
+  
   return (
-    <div className="min-h-screen bg-white">
-      <Header />
-      
+    <>
       {/* Barra sticky con vehículo */}
       <div className="sticky top-0 z-40 bg-[#111111] text-white py-3 px-4">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
@@ -276,7 +296,24 @@ export default function ShopPage() {
           </button>
         </div>
       </main>
-      
+    </>
+  )
+}
+
+export default function ShopPage() {
+  return (
+    <div className="min-h-screen bg-white">
+      <Header />
+      <Suspense fallback={
+        <div className="min-h-screen bg-white flex items-center justify-center">
+          <div className="text-center">
+            <div className="w-10 h-10 border-4 border-[#E10600] border-t-transparent rounded-full animate-spin mx-auto"></div>
+            <p className="mt-4 text-gray-600">Cargando...</p>
+          </div>
+        </div>
+      }>
+        <ShopContent />
+      </Suspense>
       <Footer />
       <WhatsAppButton />
     </div>
