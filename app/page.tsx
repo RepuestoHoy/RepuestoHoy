@@ -175,20 +175,7 @@ export default function HomePage() {
               <div className="step-number">1</div>
               <h3 className="text-xl font-bold text-[#111111] mb-3">Tu Carro</h3>
               <p className="text-[#6B7280]">
-                Selecciona tu marca, modelo y año. Guardamos tu vehículo para que no tengas que repetirlo.
-              </p>
-            </div>
-
-            <div className="feature-card">
-              <div className="w-14 h-14 bg-gradient-to-br from-[#111111] to-[#2A2A2A] rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-xl">
-                <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                </svg>
-              </div>
-              <div className="step-number">2</div>
-              <h3 className="text-xl font-bold text-[#111111] mb-3">Chequeo Express</h3>
-              <p className="text-[#6B7280]">
-                Te indicamos exactamente qué necesita según los kilómetros y el último mantenimiento.
+                Selecciona tu marca, modelo y año. Guardamos tu vehiculo para que no tengas que repetirlo.
               </p>
             </div>
 
@@ -198,10 +185,23 @@ export default function HomePage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                 </svg>
               </div>
-              <div className="step-number">3</div>
-              <h3 className="text-xl font-bold text-[#111111] mb-3">Compará Precios</h3>
+              <div className="step-number">2</div>
+              <h3 className="text-xl font-bold text-[#111111] mb-3">Compara Precios</h3>
               <p className="text-[#6B7280]">
-                Elige entre Original o Genérico. Siempre el mejor precio garantizado.
+                Elige entre Original o Generico. Siempre el mejor precio garantizado.
+              </p>
+            </div>
+
+            <div className="feature-card">
+              <div className="w-14 h-14 bg-gradient-to-br from-[#111111] to-[#2A2A2A] rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-xl">
+                <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+              </div>
+              <div className="step-number">3</div>
+              <h3 className="text-xl font-bold text-[#111111] mb-3">Entrega Rapida</h3>
+              <p className="text-[#6B7280]">
+                Pagas y recibes el mismo dia.
               </p>
             </div>
           </div>
