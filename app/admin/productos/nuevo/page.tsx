@@ -161,7 +161,7 @@ export default function NuevoProductoPage() {
                 onChange={handleChange}
                 required
                 rows={3}
-                placeholder="Describe el producto: qué incluye, duración, garantía, compatibilidad..."
+                placeholder="Describe el producto: qué incluye, duración, compatibilidad..."
                 className="input"
               />
             </div>
@@ -362,7 +362,7 @@ export default function NuevoProductoPage() {
           <h3 className="font-bold text-blue-900 mb-3">💡 Tips para agregar productos</h3>
           <ul className="space-y-2 text-sm text-blue-800">
             <li>• El SKU debe ser único (no repetirse con otros productos)</li>
-            <li>• En la descripción incluye: duración, garantía, y compatibilidad exacta</li>
+            <li>• En la descripción incluye: duración y compatibilidad exacta</li>
             <li>• Precio venta siempre mayor que precio costo</li>
             <li>• Actualiza el stock cuando vendas para no vender productos agotados</li>
             <li>• Las fotos aumentan las ventas significativamente</li>

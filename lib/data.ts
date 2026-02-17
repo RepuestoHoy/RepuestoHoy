@@ -112,7 +112,7 @@ export const SAMPLE_PRODUCTS: Product[] = [
     stock: 8,
     images: [],
     compatible: [{ brand: 'Toyota', model: 'Corolla', years: '2008-2020' }],
-    features: ['Original OEM', 'Garantía 12 meses', '15,000 km duración'],
+    features: ['Original OEM', 'Alta durabilidad', '15,000 km duración'],
     sku: 'TOY-90915-YZZF1'
   }
 ]

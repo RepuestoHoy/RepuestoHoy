@@ -141,7 +141,7 @@ export default function HomePage() {
           <div className="flex flex-wrap justify-center gap-8 mt-10 text-sm text-[#6B7280]">
             <div className="flex items-center gap-2">
               <Shield className="w-4 h-4 text-[#E10600]" />
-              <span>Garantía en todos los productos</span>
+              <span>Calidad asegurada</span>
             </div>
             <div className="flex items-center gap-2">
               <Clock className="w-4 h-4 text-[#E10600]" />
@@ -163,7 +163,7 @@ export default function HomePage() {
               Cómo funciona
             </h3>
             <p className="text-[#6B7280] max-w-2xl mx-auto">
-              En 3 simples pasos consigues el repuesto que necesitas, con la garantía de que le va a quedar perfecto a tu vehículo.
+              En 3 simples pasos consigues el repuesto que necesitas, asegurado de que le va a quedar perfecto a tu vehículo.
             </p>
           </div>
           

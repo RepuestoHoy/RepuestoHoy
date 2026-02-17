@@ -23,7 +23,7 @@ export default function Footer() {
                 <Shield className="w-5 h-5 text-[#E10600]" />
               </div>
               <div>
-                <p className="font-semibold text-sm">Garantía Real</p>
+                <p className="font-semibold text-sm">Calidad Real</p>
                 <p className="text-xs text-gray-500">Cambios sin problema</p>
               </div>
             </div>
@@ -65,7 +65,7 @@ export default function Footer() {
             </div>
             <p className="text-gray-400 text-sm mb-4">
               Repuestos de calidad para tu carro con entrega el mismo día en Caracas. 
-              Precios justos, garantía real.
+              Precios justos, calidad real.
             </p>
           </div>
 
