@@ -82,25 +82,28 @@ function BuscarContent() {
 
               {/* Type Filter */}
               <div className="mb-8">
-                <h4 className="font-bold text-[#111111] mb-4 text-sm uppercase tracking-wider">Calidad</h4>
+                <div className="flex items-center justify-between mb-4">
+                  <h4 className="font-bold text-[#111111] text-sm uppercase tracking-wider">Calidad</h4>
+                  {selectedType && (
+                    <button
+                      onClick={() => setSelectedType(null)}
+                      className="text-xs text-[#E10600] hover:underline font-medium"
+                    >
+                      Quitar filtro ✕
+                    </button>
+                  )}
+                </div>
                 <div className="space-y-3">
                   {['economico', 'standard', 'premium'].map(type => (
-                    <label 
+                    <button
                       key={type}
-                      className={`flex items-center gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all ${
-                        selectedType === type 
-                          ? 'border-[#111111] bg-[#F5F5F5]' 
+                      onClick={() => setSelectedType(selectedType === type ? null : type)}
+                      className={`w-full flex items-center gap-3 p-4 rounded-lg border-2 transition-all text-left ${
+                        selectedType === type
+                          ? 'border-[#111111] bg-[#F5F5F5]'
                           : 'border-[#E0E0E0] hover:border-[#2A2A2A]'
                       }`}
                     >
-                      <input
-                        type="radio"
-                        name="type"
-                        value={type}
-                        checked={selectedType === type}
-                        onChange={(e) => setSelectedType(e.target.value)}
-                        className="hidden"
-                      />
                       <div className="flex-1">
                         <div className="font-bold text-[#111111] text-sm uppercase">
                           {type === 'economico' && '💚 Económico'}
@@ -116,7 +119,7 @@ function BuscarContent() {
                       {selectedType === type && (
                         <Check className="w-5 h-5 text-[#111111]" />
                       )}
-                    </label>
+                    </button>
                   ))}
                 </div>
               </div>
@@ -153,7 +156,20 @@ function BuscarContent() {
               <p className="text-[#2A2A2A] mt-2">
                 {products.length} productos encontrados
                 {brand && ` para ${brand} ${model}`}
+                {selectedType && ` • ${selectedType === 'economico' ? 'Económico' : selectedType === 'standard' ? 'Standard' : 'Premium'}`}
               </p>
+              {/* Mobile filter indicator */}
+              {selectedType && (
+                <button
+                  onClick={() => setSelectedType(null)}
+                  className="mt-3 inline-flex items-center gap-2 px-4 py-2 bg-[#111111] text-white text-sm font-medium rounded-full lg:hidden"
+                >
+                  {selectedType === 'economico' && '💚 Económico'}
+                  {selectedType === 'standard' && '💛 Standard'}
+                  {selectedType === 'premium' && '❤️ Premium'}
+                  <span className="text-white/70">✕</span>
+                </button>
+              )}
             </div>
 
             {loading ? (
