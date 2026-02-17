@@ -1,4 +1,4 @@
-import { Car, Product } from '@/types'
+import { Car, Motorcycle, Product } from '@/types'
 
 export const CARS: Car[] = [
   {
@@ -30,6 +30,39 @@ export const CARS: Car[] = [
     brand: 'Hyundai',
     models: ['Accent', 'Elantra', 'Tucson', 'Santa Fe', 'Getz'],
     years: Array.from({ length: 21 }, (_, i) => 2005 + i)
+  }
+]
+
+export const MOTORCYCLES: Motorcycle[] = [
+  {
+    brand: 'Yamaha',
+    models: ['FZ', 'FZ-S', 'FZ-2.0', 'R15', 'MT-03', 'MT-07', 'XTZ', 'Crypton', 'BWS', 'NMax'],
+    years: Array.from({ length: 16 }, (_, i) => 2010 + i)
+  },
+  {
+    brand: 'Honda',
+    models: ['CB190R', 'CB300', 'CB500', 'CBR', 'XRE', 'XR', 'Tornado', 'Wave', 'Dio', 'Click'],
+    years: Array.from({ length: 16 }, (_, i) => 2010 + i)
+  },
+  {
+    brand: 'Suzuki',
+    models: ['GSX', 'Gixxer', 'Hayate', 'Best', 'Address', 'Axelo', 'Step'],
+    years: Array.from({ length: 16 }, (_, i) => 2010 + i)
+  },
+  {
+    brand: 'Bajaj',
+    models: ['Boxer', 'Pulsar', 'Discover', 'Platina', 'Avenger'],
+    years: Array.from({ length: 16 }, (_, i) => 2010 + i)
+  },
+  {
+    brand: 'Kawasaki',
+    models: ['Ninja', 'Z', 'Versys', 'Vulcan'],
+    years: Array.from({ length: 16 }, (_, i) => 2010 + i)
+  },
+  {
+    brand: 'Ducati',
+    models: ['Monster', 'Panigale', 'Scrambler', 'Multistrada'],
+    years: Array.from({ length: 16 }, (_, i) => 2010 + i)
   }
 ]
 

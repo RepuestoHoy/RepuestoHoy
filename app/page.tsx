@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { CARS, CATEGORIES } from '@/lib/data'
+import { CARS, MOTORCYCLES, CATEGORIES } from '@/lib/data'
 import { Search, HelpCircle, Car, Shield, Clock, Award, ChevronRight } from 'lucide-react'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
@@ -10,19 +10,21 @@ import WhatsAppButton from '@/components/WhatsAppButton'
 
 export default function HomePage() {
   const router = useRouter()
+  const [vehicleType, setVehicleType] = useState<'car' | 'motorcycle'>('car')
   const [brand, setBrand] = useState('')
   const [model, setModel] = useState('')
   const [year, setYear] = useState('')
   const [isAnimating, setIsAnimating] = useState(false)
 
-  const selectedCar = CARS.find(c => c.brand === brand)
+  const vehicleList = vehicleType === 'car' ? CARS : MOTORCYCLES
+  const selectedVehicle = vehicleList.find(v => v.brand === brand)
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
     if (brand && model && year) {
       setIsAnimating(true)
       setTimeout(() => {
-        router.push(`/shop?brand=${brand}&model=${model}&year=${year}`)
+        router.push(`/shop?type=${vehicleType}&brand=${brand}&model=${model}&year=${year}`)
       }, 300)
     }
   }
@@ -47,15 +49,55 @@ export default function HomePage() {
           </div>
           
           <h2 className="text-4xl md:text-6xl font-extrabold text-[#111111] mb-4 tracking-tight">
-            ¿Cuál es tu <span className="text-[#E10600]">carro</span>?
+            ¿Cual es tu <span className="text-[#E10600]">vehiculo</span>?
           </h2>
           <p className="text-xl text-[#6B7280] mb-10 max-w-2xl mx-auto">
-            Seleccioná tu marca, modelo y año. Te mostramos exactamente qué repuestos necesita tu carro en minutos.
+            Selecciona tu marca, modelo y año. Te mostramos exactamente que repuestos necesita tu vehiculo.
           </p>
 
           {/* Search Box Mejorado */}
           <div className={`search-box max-w-2xl mx-auto transition-all duration-300 ${isAnimating ? 'scale-95 opacity-70' : ''}`}>
             <form onSubmit={handleSearch}>
+              {/* Vehicle Type Selector */}
+              <div className="flex justify-center gap-4 mb-6">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setVehicleType('car')
+                    setBrand('')
+                    setModel('')
+                    setYear('')
+                  }}
+                  className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all ${
+                    vehicleType === 'car'
+                      ? 'bg-[#E10600] text-white'
+                      : 'bg-gray-100 text-[#6B7280] hover:bg-gray-200'
+                  }`}
+                >
+                  <Car className="w-5 h-5" />
+                  Carro
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setVehicleType('motorcycle')
+                    setBrand('')
+                    setModel('')
+                    setYear('')
+                  }}
+                  className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all ${
+                    vehicleType === 'motorcycle'
+                      ? 'bg-[#E10600] text-white'
+                      : 'bg-gray-100 text-[#6B7280] hover:bg-gray-200'
+                  }`}
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  Moto
+                </button>
+              </div>
+
               <div className="grid md:grid-cols-3 gap-4 mb-6">
                 {/* Brand */}
                 <div className="relative">
@@ -70,9 +112,9 @@ export default function HomePage() {
                     }}
                     className="select"
                   >
-                    <option value="">Seleccioná</option>
-                    {CARS.map(car => (
-                      <option key={car.brand} value={car.brand}>{car.brand}</option>
+                    <option value="">Selecciona</option>
+                    {vehicleList.map(v => (
+                      <option key={v.brand} value={v.brand}>{v.brand}</option>
                     ))}
                   </select>
                 </div>
@@ -88,8 +130,8 @@ export default function HomePage() {
                     disabled={!brand}
                     className="select disabled:bg-gray-100 disabled:cursor-not-allowed"
                   >
-                    <option value="">Seleccioná</option>
-                    {selectedCar?.models.map(m => (
+                    <option value="">Selecciona</option>
+                    {selectedVehicle?.models.map(m => (
                       <option key={m} value={m}>{m}</option>
                     ))}
                   </select>
@@ -106,8 +148,8 @@ export default function HomePage() {
                     disabled={!model}
                     className="select disabled:bg-gray-100 disabled:cursor-not-allowed"
                   >
-                    <option value="">Seleccioná</option>
-                    {selectedCar?.years.slice().reverse().map(y => (
+                    <option value="">Selecciona</option>
+                    {selectedVehicle?.years.slice().reverse().map(y => (
                       <option key={y} value={y}>{y}</option>
                     ))}
                   </select>
@@ -173,9 +215,9 @@ export default function HomePage() {
                 <Car className="w-7 h-7 text-white" />
               </div>
               <div className="step-number">1</div>
-              <h3 className="text-xl font-bold text-[#111111] mb-3">Tu Carro</h3>
+              <h3 className="text-xl font-bold text-[#111111] mb-3">Tu Vehiculo</h3>
               <p className="text-[#6B7280]">
-                Selecciona tu marca, modelo y año. Guardamos tu vehiculo para que no tengas que repetirlo.
+                Selecciona tu carro o moto. Guardamos tu vehiculo para que no tengas que repetirlo.
               </p>
             </div>
 

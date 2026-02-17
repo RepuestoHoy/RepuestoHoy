@@ -4,6 +4,12 @@ export interface Car {
   years: number[]
 }
 
+export interface Motorcycle {
+  brand: string
+  models: string[]
+  years: number[]
+}
+
 export interface Product {
   id: string
   name: string
