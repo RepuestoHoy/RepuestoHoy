@@ -198,7 +198,7 @@ export default function HomePage() {
 
             <div className="card p-6 text-center hover:border-[#111111] transition-colors">
               <div className="text-3xl mb-3">✓</div>
-              <h4 className="font-bold text-[#111111] mb-1">Fitment Garantizado</h4>
+              <h4 className="font-bold text-[#111111] mb-1">Compatibilidad Garantizada</h4>
               <p className="text-sm text-[#2A2A2A]">Si no le queda, lo cambiamos gratis</p>
             </div>
 

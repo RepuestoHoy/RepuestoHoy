@@ -6,7 +6,7 @@ import { BUSINESS_CONFIG } from '@/lib/config'
 
 export const metadata: Metadata = {
   title: 'Repuesto Hoy | Repuestos para tu carro en Caracas',
-  description: 'Encuentra repuestos para tu carro al mejor precio. Entrega same-day en Caracas. Toyota, Chevrolet, Ford, Jeep, Chery y más.',
+  description: 'Encuentra repuestos para tu carro al mejor precio. Entrega el mismo día en Caracas. Toyota, Chevrolet, Ford, Jeep, Chery y más.',
   keywords: 'repuestos, Caracas, Toyota, Corolla, Chevrolet, Aveo, autopartes, repuestos carros Venezuela',
   openGraph: {
     title: 'Repuesto Hoy',

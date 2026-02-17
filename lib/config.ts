@@ -38,7 +38,7 @@ export const BUSINESS_CONFIG = {
   
   // Metadata
   name: 'Repuesto Hoy',
-  tagline: 'Caracas • Entrega same-day',
+  tagline: 'Caracas • Entrega el mismo día',
   year: new Date().getFullYear()
 }
 

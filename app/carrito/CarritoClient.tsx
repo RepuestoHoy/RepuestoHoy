@@ -179,7 +179,7 @@ export default function CarritoClient() {
                 </div>
                 <div className="flex justify-between text-[#2A2A2A]">
                   <span>Envío</span>
-                  <span className="text-sm">Se calculará en checkout</span>
+                  <span className="text-sm">Se calculará al pagar</span>
                 </div>
                 <div className="flex justify-between text-xl font-extrabold text-[#111111] pt-3 border-t border-[#E0E0E0]">
                   <span>Subtotal</span>
@@ -226,7 +226,7 @@ export default function CarritoClient() {
                   <svg className="w-5 h-5 text-[#E10600]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
-                  <span>Entrega same-day en Caracas</span>
+                  <span>Entrega el mismo día en Caracas</span>
                 </div>
               </div>
             </div>

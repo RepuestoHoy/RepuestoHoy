@@ -43,7 +43,7 @@ export default function CheckoutClient() {
   // Track page view
   useEffect(() => {
     trackEvent('page_view', { 
-      page_title: 'Checkout',
+      page_title: 'Finalizar compra',
       page_location: '/checkout'
     })
   }, [])

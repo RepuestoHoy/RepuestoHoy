@@ -63,7 +63,7 @@ export default function Header({
               </div>
               <div className="hidden sm:block">
                 <h1 className="text-lg font-bold tracking-tight">REPUESTO HOY</h1>
-                <p className="text-xs text-gray-400">Caracas • Entrega same-day</p>
+                <p className="text-xs text-gray-400">Caracas • Entrega el mismo día</p>
               </div>
             </Link>
           )}
