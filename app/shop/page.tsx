@@ -9,7 +9,7 @@ import { supabase } from '@/lib/supabase'
 import { 
   Wrench, Sparkles, ArrowRight, MessageCircle, AlertCircle,
   Disc, Battery, Zap, Droplets, CircleDot, Wind, Thermometer,
-  Settings, Radio, Lightbulb, Armchair, Home, Shield, Wrench
+  Settings, Radio, Lightbulb, Armchair, Home, Shield
 } from 'lucide-react'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
