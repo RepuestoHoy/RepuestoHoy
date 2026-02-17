@@ -22,7 +22,7 @@ export default function HomePage() {
     if (brand && model && year) {
       setIsAnimating(true)
       setTimeout(() => {
-        router.push(`/buscar?brand=${brand}&model=${model}&year=${year}`)
+        router.push(`/shop?brand=${brand}&model=${model}&year=${year}`)
       }, 300)
     }
   }
