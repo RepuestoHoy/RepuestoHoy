@@ -3,7 +3,7 @@ export const BUSINESS_CONFIG = {
   // Contacto
   phone: '+58 412-2223775',
   whatsapp: '584122223775',
-  email: 'hola@repuestohoy.com',
+  email: 'ventas@repuestohoy.com',
   
   // Pago Móvil
   payment: {
@@ -14,7 +14,7 @@ export const BUSINESS_CONFIG = {
       name: 'Repuesto Hoy CA'
     },
     zelle: {
-      email: 'pagos@repuestohoy.com',
+      email: 'ventas@repuestohoy.com',
       name: 'Repuesto Hoy CA'
     }
   },
