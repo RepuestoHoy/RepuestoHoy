@@ -224,7 +224,7 @@ function ShopContent() {
                       
                       {/* Icon */}
                       <div className="relative z-10">
-                        <Icon className="w-10 h-10 text-white" strokeWidth={1.5} />
+                        <Icon className="w-10 h-10 text-white" />
                       </div>
                       
                       {/* Product count badge */}
