@@ -23,8 +23,8 @@ export default function Footer() {
                 <Shield className="w-5 h-5 text-[#E10600]" />
               </div>
               <div>
-                <p className="font-semibold text-sm">Calidad Real</p>
-                <p className="text-xs text-gray-500">Cambios sin problema</p>
+                <p className="font-semibold text-sm">Piezas verificadas</p>
+                <p className="text-xs text-gray-500">Marcas confiables seleccionadas</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -32,8 +32,8 @@ export default function Footer() {
                 <RefreshCw className="w-5 h-5 text-[#E10600]" />
               </div>
               <div>
-                <p className="font-semibold text-sm">Fitment Garantizado</p>
-                <p className="text-xs text-gray-500">Si no le queda, cambio gratis</p>
+                <p className="font-semibold text-sm">Asesoria tecnica</p>
+                <p className="text-xs text-gray-500">Confirmamos compatibilidad antes de enviar</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
