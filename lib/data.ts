@@ -36,32 +36,52 @@ export const CARS: Car[] = [
 export const MOTORCYCLES: Motorcycle[] = [
   {
     brand: 'Yamaha',
-    models: ['FZ', 'FZ-S', 'FZ-2.0', 'R15', 'MT-03', 'MT-07', 'XTZ', 'Crypton', 'BWS', 'NMax'],
-    years: Array.from({ length: 16 }, (_, i) => 2010 + i)
+    models: ['FZ', 'FZ-S', 'FZ-2.0', 'R15', 'MT-03', 'MT-07', 'XTZ', 'Crypton', 'BWS', 'NMax', 'Mio', 'Fino', 'Fz25'],
+    years: Array.from({ length: 21 }, (_, i) => 2005 + i)
   },
   {
     brand: 'Honda',
-    models: ['CB190R', 'CB300', 'CB500', 'CBR', 'XRE', 'XR', 'Tornado', 'Wave', 'Dio', 'Click'],
-    years: Array.from({ length: 16 }, (_, i) => 2010 + i)
+    models: ['CB190R', 'CB300', 'CB500', 'CBR', 'XRE', 'XR150', 'XR190', 'XR250', 'Tornado', 'Wave', 'Dio', 'Click', 'Elite', 'Lead'],
+    years: Array.from({ length: 21 }, (_, i) => 2005 + i)
   },
   {
     brand: 'Suzuki',
-    models: ['GSX', 'Gixxer', 'Hayate', 'Best', 'Address', 'Axelo', 'Step'],
-    years: Array.from({ length: 16 }, (_, i) => 2010 + i)
+    models: ['GSX', 'Gixxer', 'Hayate', 'Best', 'Address', 'Axelo', 'Step', 'V-Strom'],
+    years: Array.from({ length: 21 }, (_, i) => 2005 + i)
   },
   {
     brand: 'Bajaj',
-    models: ['Boxer', 'Pulsar', 'Discover', 'Platina', 'Avenger'],
+    models: ['Boxer', 'Pulsar', 'Discover', 'Platina', 'Avenger', 'Dominar'],
+    years: Array.from({ length: 21 }, (_, i) => 2005 + i)
+  },
+  {
+    brand: 'Empire',
+    models: ['Keeway', 'Arsen', 'Outlook', 'Target', 'RKV', 'RK'],
     years: Array.from({ length: 16 }, (_, i) => 2010 + i)
   },
   {
-    brand: 'Kawasaki',
-    models: ['Ninja', 'Z', 'Versys', 'Vulcan'],
+    brand: 'Sym',
+    models: ['Crox', 'Fiddle', 'Jet', 'Orbit', 'Citycom'],
     years: Array.from({ length: 16 }, (_, i) => 2010 + i)
   },
   {
-    brand: 'Ducati',
-    models: ['Monster', 'Panigale', 'Scrambler', 'Multistrada'],
+    brand: 'Kymco',
+    models: ['Agility', 'Like', 'Downtown', 'Xciting'],
+    years: Array.from({ length: 16 }, (_, i) => 2010 + i)
+  },
+  {
+    brand: 'Genesis',
+    models: ['Vmax', 'Gxt', 'Gxt200'],
+    years: Array.from({ length: 16 }, (_, i) => 2010 + i)
+  },
+  {
+    brand: 'Um',
+    models: ['Dsr', 'Renegade', 'Max', 'Velocity'],
+    years: Array.from({ length: 16 }, (_, i) => 2010 + i)
+  },
+  {
+    brand: 'Mondial',
+    models: ['Rd', 'Td', 'Enduro', 'Custom'],
     years: Array.from({ length: 16 }, (_, i) => 2010 + i)
   }
 ]
