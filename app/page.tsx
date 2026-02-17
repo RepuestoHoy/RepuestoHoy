@@ -163,7 +163,7 @@ export default function HomePage() {
               Cómo funciona
             </h3>
             <p className="text-[#6B7280] max-w-2xl mx-auto">
-              En 3 simples pasos conseguís el repuesto que necesitás, con la garantía de que le va a quedar perfecto a tu carro.
+              En 3 simples pasos consigues el repuesto que necesitas, con la garantía de que le va a quedar perfecto a tu vehículo.
             </p>
           </div>
           
@@ -175,7 +175,7 @@ export default function HomePage() {
               <div className="step-number">1</div>
               <h3 className="text-xl font-bold text-[#111111] mb-3">Tu Carro</h3>
               <p className="text-[#6B7280]">
-                Seleccioná tu marca, modelo y año. Guardamos tu carro para que no tengas que repetirlo.
+                Selecciona tu marca, modelo y año. Guardamos tu vehículo para que no tengas que repetirlo.
               </p>
             </div>
 
@@ -188,7 +188,7 @@ export default function HomePage() {
               <div className="step-number">2</div>
               <h3 className="text-xl font-bold text-[#111111] mb-3">Chequeo Express</h3>
               <p className="text-[#6B7280]">
-                Te decimos exactamente qué necesita según los kilómetros y el último mantenimiento.
+                Te indicamos exactamente qué necesita según los kilómetros y el último mantenimiento.
               </p>
             </div>
 
@@ -201,7 +201,7 @@ export default function HomePage() {
               <div className="step-number">3</div>
               <h3 className="text-xl font-bold text-[#111111] mb-3">Compará Precios</h3>
               <p className="text-[#6B7280]">
-                Elegí entre Económico, Estándar o Premium. Siempre el mejor precio garantizado.
+                Elige entre Original o Genérico. Siempre el mejor precio garantizado.
               </p>
             </div>
           </div>
@@ -290,10 +290,10 @@ export default function HomePage() {
       <section className="py-16 bg-gradient-to-r from-[#111111] to-[#2A2A2A]">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h3 className="text-3xl font-bold text-white mb-4">
-            ¿No sabés qué repuesto necesitás?
+            ¿No sabes qué repuesto necesitas?
           </h3>
           <p className="text-gray-400 mb-8 max-w-2xl mx-auto">
-            Contanos por WhatsApp qué le pasa a tu carro. Nuestros expertos te van a ayudar a encontrar exactamente lo que necesitás.
+            Escríbenos por WhatsApp qué le pasa a tu vehículo. Nuestros expertos te van a ayudar a encontrar exactamente lo que necesitas.
           </p>
           <a
             href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP || '584122223775'}`}

@@ -41,7 +41,7 @@ const CATEGORY_GROUPS = [
   },
   {
     title: 'Mejoras & Accesorios',
-    description: 'Personalizá tu carro',
+    description: 'Personaliza tu carro',
     items: [
       { id: 'audio', name: 'Audio', icon: Radio, color: 'from-pink-500 to-pink-600', desc: 'Parlantes, radio' },
       { id: 'iluminacion', name: 'Iluminación', icon: Lightbulb, color: 'from-yellow-400 to-yellow-500', desc: 'LED, faros' },
@@ -63,7 +63,7 @@ function ShopContent() {
   const model = searchParams?.get('model') || ''
   const year = searchParams?.get('year') || ''
   
-  const vehicleName = brand && model ? `${brand} ${model} ${year}` : 'Tu carro'
+  const vehicleName = brand && model ? `${brand} ${model} ${year}` : 'tu vehículo'
   
   useEffect(() => {
     if (!brand || !model || !year) {
@@ -108,7 +108,7 @@ function ShopContent() {
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center p-8">
           <div className="text-6xl mb-4">🚗</div>
-          <h1 className="text-2xl font-bold text-[#111111] mb-4">Seleccioná tu carro</h1>
+          <h1 className="text-2xl font-bold text-[#111111] mb-4">Selecciona tu vehículo</h1>
           <Link href="/" className="bg-[#E10600] text-white px-8 py-4 rounded-xl font-bold inline-block">
             Ir al inicio
           </Link>
@@ -171,8 +171,8 @@ function ShopContent() {
                 <MessageCircle className="w-7 h-7" />
               </div>
               <div>
-                <h3 className="font-bold text-lg">¿No sabés qué necesitás?</h3>
-                <p className="text-white/90">Escribinos por WhatsApp y te ayudamos</p>
+                <h3 className="font-bold text-lg">¿No sabes qué necesitas?</h3>
+                <p className="text-white/90">Escríbenos por WhatsApp y te ayudamos</p>
               </div>
             </div>
             <a
@@ -246,10 +246,10 @@ function ShopContent() {
         {/* CTA Final */}
         <div className="bg-gray-50 rounded-2xl p-8 text-center">
           <h3 className="text-xl font-bold text-[#111111] mb-3">
-            ¿No encontrás lo que buscás?
+            ¿No encuentras lo que buscas?
           </h3>
           <p className="text-gray-600 mb-6">
-            Tenemos más repuestos disponibles. Escribinos y te conseguimos lo que necesitás.
+            Tenemos más repuestos disponibles. Escríbenos y te conseguimos lo que necesitas.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <button
