@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import { SAMPLE_PRODUCTS, CATEGORIES } from '@/lib/data'
+import { categoryIcons } from '@/components/CategoryIcons'
 import { BUSINESS_CONFIG, trackEvent } from '@/lib/config'
 import { useCart } from '@/components/CartContext'
 import Header from '@/components/Header'
@@ -144,7 +145,10 @@ export default function ProductoClient({ productId }: ProductoClientProps) {
                 />
               ) : (
                 <div className="text-center">
-                  <span className="text-8xl">{category?.emoji || '🔧'}</span>
+                  {(() => {
+                    const IconComponent = category ? categoryIcons[category.icon] : null
+                    return IconComponent ? <IconComponent className="w-20 h-20 text-gray-400" /> : <span className="text-8xl">🔧</span>
+                  })()}
                 </div>
               )}
               {/* Type Badge */}
@@ -178,7 +182,10 @@ export default function ProductoClient({ productId }: ProductoClientProps) {
                         onError={() => handleImageError(idx)}
                       />
                     ) : (
-                      <span className="text-2xl flex items-center justify-center h-full">{category?.emoji || '🔧'}</span>
+                      {(() => {
+                    const IconComponent = category ? categoryIcons[category.icon] : null
+                    return IconComponent ? <IconComponent className="w-8 h-8 text-gray-400" /> : <span className="text-2xl">🔧</span>
+                  })()}
                     )}
                   </button>
                 ))}
@@ -364,7 +371,10 @@ export default function ProductoClient({ productId }: ProductoClientProps) {
                         className="object-cover group-hover:scale-105 transition-transform"
                       />
                     ) : (
-                      <span className="text-4xl">{category?.emoji || '🔧'}</span>
+                      {(() => {
+                    const IconComponent = category ? categoryIcons[category.icon] : null
+                    return IconComponent ? <IconComponent className="w-10 h-10 text-gray-400" /> : <span className="text-4xl">🔧</span>
+                  })()}
                     )}
                   </div>
                   <div className="p-4">

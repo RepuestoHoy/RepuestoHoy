@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { CATEGORIES } from '@/lib/data'
+import { categoryIcons } from '@/components/CategoryIcons'
 import { Upload, Plus, Check, AlertCircle, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 
@@ -180,11 +181,14 @@ export default function NuevoProductoPage() {
                   className="select"
                 >
                   <option value="">Selecciona categoría</option>
-                  {CATEGORIES.map(cat => (
-                    <option key={cat.id} value={cat.id}>
-                      {cat.emoji} {cat.name}
-                    </option>
-                  ))}
+                  {CATEGORIES.map(cat => {
+                    const IconComponent = categoryIcons[cat.icon]
+                    return (
+                      <option key={cat.id} value={cat.id}>
+                        {cat.name}
+                      </option>
+                    )
+                  })}
                 </select>
               </div>
 

@@ -86,32 +86,39 @@ export const MOTORCYCLES: Motorcycle[] = [
   }
 ]
 
-export const CATEGORIES = [
+export interface Category {
+  id: string
+  name: string
+  icon: string // ID del icono en CategoryIcons
+  description: string
+}
+
+export const CATEGORIES: Category[] = [
   // Essentials - Seguridad y mantenimiento básico
-  { id: 'frenos', name: 'Frenos', emoji: '🛑', description: 'Pastillas, discos, líquido de frenos' },
-  { id: 'filtros', name: 'Filtros', emoji: '🔧', description: 'Aceite, aire, gasolina, habitáculo' },
-  { id: 'bateria', name: 'Batería', emoji: '🔋', description: 'Baterías y sistema eléctrico' },
-  { id: 'aceites', name: 'Aceites', emoji: '🛢️', description: 'Aceite motor, transmisión, dirección' },
-  { id: 'bujias', name: 'Bujías', emoji: '⚡', description: 'Bujías y sistema de encendido' },
-  { id: 'neumaticos', name: 'Neumáticos', emoji: '🛞', description: 'Cauchos y válvulas' },
-  { id: 'parabrisas', name: 'Parabrisas', emoji: '🌧️', description: 'Limpia parabrisas y escobillas' },
+  { id: 'frenos', name: 'Frenos', icon: 'frenos', description: 'Pastillas, discos, líquido de frenos' },
+  { id: 'filtros', name: 'Filtros', icon: 'filtros', description: 'Aceite, aire, gasolina, habitáculo' },
+  { id: 'bateria', name: 'Batería', icon: 'bateria', description: 'Baterías y sistema eléctrico' },
+  { id: 'aceites', name: 'Aceites', icon: 'aceites', description: 'Aceite motor, transmisión, dirección' },
+  { id: 'bujias', name: 'Bujías', icon: 'bujias', description: 'Bujías y sistema de encendido' },
+  { id: 'neumaticos', name: 'Neumáticos', icon: 'neumaticos', description: 'Cauchos y válvulas' },
+  { id: 'parabrisas', name: 'Parabrisas', icon: 'parabrisas', description: 'Limpia parabrisas y escobillas' },
   
   // Reparación - Sistemas mecánicos
-  { id: 'suspension', name: 'Suspensión', emoji: '⬆️', description: 'Amortiguadores, terminales, bujes' },
-  { id: 'enfriamiento', name: 'Enfriamiento', emoji: '🌡️', description: 'Radiador, bomba de agua, termostato' },
-  { id: 'motor', name: 'Motor', emoji: '⚙️', description: 'Correas, tensores, juntas' },
-  { id: 'sensores', name: 'Sensores', emoji: '📡', description: 'Sensores O2, temperatura, check engine' },
-  { id: 'escape', name: 'Escape', emoji: '🔊', description: 'Tubo de escape y catalizador' },
-  { id: 'direccion', name: 'Dirección', emoji: '🔄', description: 'Bombas, rack, terminales' },
-  { id: 'transmision', name: 'Transmisión', emoji: '⚙️', description: 'Embrague, aceite de caja, CV' },
+  { id: 'suspension', name: 'Suspensión', icon: 'suspension', description: 'Amortiguadores, terminales, bujes' },
+  { id: 'enfriamiento', name: 'Enfriamiento', icon: 'enfriamiento', description: 'Radiador, bomba de agua, termostato' },
+  { id: 'motor', name: 'Motor', icon: 'motor', description: 'Correas, tensores, juntas' },
+  { id: 'sensores', name: 'Sensores', icon: 'sensores', description: 'Sensores O2, temperatura, check engine' },
+  { id: 'escape', name: 'Escape', icon: 'escape', description: 'Tubo de escape y catalizador' },
+  { id: 'direccion', name: 'Dirección', icon: 'direccion', description: 'Bombas, rack, terminales' },
+  { id: 'transmision', name: 'Transmisión', icon: 'transmision', description: 'Embrague, aceite de caja, CV' },
   
   // Mejoras - Accesorios y personalización
-  { id: 'audio', name: 'Audio', emoji: '🎵', description: 'Parlantes, radio, amplificadores' },
-  { id: 'iluminacion', name: 'Iluminación', emoji: '💡', description: 'Luces LED, bombillos, faros' },
-  { id: 'interior', name: 'Interior', emoji: '🪑', description: 'Cubreasientos, alfombras, organizadores' },
-  { id: 'exterior', name: 'Exterior', emoji: '🏠', description: 'Defensas, estribos, spoilers' },
-  { id: 'herramientas', name: 'Herramientas', emoji: '🧰', description: 'Kit de emergencia, gatas, crucetas' },
-  { id: 'seguridad', name: 'Seguridad', emoji: '🛡️', description: 'Cámaras, alarmas, seguros' }
+  { id: 'audio', name: 'Audio', icon: 'audio', description: 'Parlantes, radio, amplificadores' },
+  { id: 'iluminacion', name: 'Iluminación', icon: 'iluminacion', description: 'Luces LED, bombillos, faros' },
+  { id: 'interior', name: 'Interior', icon: 'interior', description: 'Cubreasientos, alfombras, organizadores' },
+  { id: 'exterior', name: 'Exterior', icon: 'exterior', description: 'Defensas, estribos, spoilers' },
+  { id: 'herramientas', name: 'Herramientas', icon: 'herramientas', description: 'Kit de emergencia, gatas, crucetas' },
+  { id: 'seguridad', name: 'Seguridad', icon: 'seguridad', description: 'Cámaras, alarmas, seguros' }
 ]
 
 export const DELIVERY_ZONES = [

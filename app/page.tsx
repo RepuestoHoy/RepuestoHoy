@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { CARS, MOTORCYCLES, CATEGORIES } from '@/lib/data'
+import { categoryIcons } from '@/components/CategoryIcons'
 import { Search, HelpCircle, Car, Shield, Clock, Award, ChevronRight } from 'lucide-react'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
@@ -311,19 +312,22 @@ export default function HomePage() {
           </div>
           
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            {CATEGORIES.map(cat => (
-              <a
-                key={cat.id}
-                href={`/buscar?category=${cat.id}`}
-                className="card p-5 text-center hover:border-[#E10600] hover:shadow-xl transition-all group"
-              >
-                <span className="text-4xl mb-3 block group-hover:scale-110 transition-transform">
-                  {cat.emoji}
-                </span>
-                <h4 className="font-bold text-[#111111] text-sm uppercase mb-1">{cat.name}</h4>
-                <p className="text-xs text-[#6B7280]">{cat.description}</p>
-              </a>
-            ))}
+            {CATEGORIES.map(cat => {
+              const IconComponent = categoryIcons[cat.icon]
+              return (
+                <a
+                  key={cat.id}
+                  href={`/buscar?category=${cat.id}`}
+                  className="card p-5 text-center hover:border-[#E10600] hover:shadow-xl transition-all group"
+                >
+                  <div className="w-12 h-12 mx-auto mb-3 flex items-center justify-center text-[#E10600] group-hover:scale-110 transition-transform">
+                    {IconComponent && <IconComponent className="w-10 h-10" />}
+                  </div>
+                  <h4 className="font-bold text-[#111111] text-sm uppercase mb-1">{cat.name}</h4>
+                  <p className="text-xs text-[#6B7280]">{cat.description}</p>
+                </a>
+              )
+            })}
           </div>
         </div>
       </section>

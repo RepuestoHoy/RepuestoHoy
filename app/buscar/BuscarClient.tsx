@@ -5,6 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useSearchParams } from 'next/navigation'
 import { SAMPLE_PRODUCTS, CATEGORIES } from '@/lib/data'
+import { categoryIcons } from '@/components/CategoryIcons'
 import { AlertCircle, X } from 'lucide-react'
 import Header from '@/components/Header'
 import ProductSkeleton from '@/components/ProductSkeleton'
@@ -69,7 +70,10 @@ function BuscarContent() {
                     onClick={() => setSelectedCategory(null)}
                     className="bg-[#E10600] text-white px-4 py-2 rounded-full font-medium text-sm whitespace-nowrap flex-shrink-0 flex items-center gap-2 active:scale-95 transition-transform"
                   >
-                    {categoryObj.emoji} {categoryObj.name} ✕
+                    {(() => {
+              const IconComponent = categoryIcons[categoryObj?.icon || 'filtros']
+              return IconComponent ? <IconComponent className="w-4 h-4" /> : null
+            })()} {categoryObj.name} ✕
                   </button>
                 )}
                 {selectedType && (
@@ -111,20 +115,23 @@ function BuscarContent() {
               <div className="mb-6">
                 <h4 className="font-bold text-[#111111] mb-3 text-sm uppercase">Categorías</h4>
                 <div className="flex flex-wrap gap-2 lg:flex-col lg:gap-2">
-                  {CATEGORIES.map(cat => (
-                    <button
-                      key={cat.id}
-                      onClick={() => setSelectedCategory(selectedCategory === cat.id ? null : cat.id)}
-                      className={`px-4 py-3 rounded-xl text-sm font-medium transition-all flex items-center gap-2 flex-1 lg:w-full justify-center lg:justify-start ${
-                        selectedCategory === cat.id
-                          ? 'bg-[#111111] text-white shadow-lg'
-                          : 'bg-gray-100 text-[#2A2A2A] hover:bg-gray-200'
-                      }`}
-                    >
-                      <span className="text-xl">{cat.emoji}</span>
-                      <span>{cat.name}</span>
-                    </button>
-                  ))}
+                  {CATEGORIES.map(cat => {
+                    const IconComponent = categoryIcons[cat.icon]
+                    return (
+                      <button
+                        key={cat.id}
+                        onClick={() => setSelectedCategory(selectedCategory === cat.id ? null : cat.id)}
+                        className={`px-4 py-3 rounded-xl text-sm font-medium transition-all flex items-center gap-2 flex-1 lg:w-full justify-center lg:justify-start ${
+                          selectedCategory === cat.id
+                            ? 'bg-[#111111] text-white shadow-lg'
+                            : 'bg-gray-100 text-[#2A2A2A] hover:bg-gray-200'
+                        }`}
+                      >
+                        <span className="text-xl">{IconComponent && <IconComponent className="w-5 h-5" />}</span>
+                        <span>{cat.name}</span>
+                      </button>
+                    )
+                  })}
                 </div>
               </div>
 
@@ -207,7 +214,11 @@ function BuscarContent() {
                         />
                       ) : (
                         <span className="text-5xl">
-                          {CATEGORIES.find(c => c.id === product.category)?.emoji || '🔧'}
+                          {(() => {
+                            const category = CATEGORIES.find(c => c.id === product.category)
+                            const IconComponent = category ? categoryIcons[category.icon] : null
+                            return IconComponent ? <IconComponent className="w-12 h-12 text-gray-400" /> : '🔧'
+                          })()}
                         </span>
                       )}
                       {/* Type Badge */}
