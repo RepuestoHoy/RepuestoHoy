@@ -14,7 +14,7 @@ interface Product {
   sale_price: number
   stock: number
   is_available: boolean
-  category: { name: string } | null
+  category: { name: string } | null | any
 }
 
 export default function AdminProductosPage() {
