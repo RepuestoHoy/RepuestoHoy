@@ -7,48 +7,51 @@ import Link from 'next/link'
 import { CATEGORIES } from '@/lib/data'
 import { supabase } from '@/lib/supabase'
 import { 
-  Wrench, Sparkles, ArrowRight, MessageCircle, AlertCircle,
-  Disc, Battery, Zap, Droplets, CircleDot, Wind, Thermometer,
-  Settings, Radio, Lightbulb, Armchair, Home, Shield
+  Wrench, Sparkles, ArrowRight, MessageCircle, AlertCircle
 } from 'lucide-react'
+import { 
+  BrakeIcon, FilterIcon, BatteryIcon, OilIcon, SparkPlugIcon, TireIcon,
+  SuspensionIcon, CoolingIcon, EngineIcon, SensorIcon, AudioIcon, LightIcon,
+  InteriorIcon, ExteriorIcon, SecurityIcon, ToolIcon
+} from '@/components/CategoryIcons'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import WhatsAppButton from '@/components/WhatsAppButton'
 
-// Categorías con íconos grandes estilo CARiD
+// Categorías con íconos SVG personalizados
 const CATEGORY_GROUPS = [
   {
     title: 'Mantenimiento Esencial',
     description: 'Lo que tu carro necesita regularmente',
     items: [
-      { id: 'frenos', name: 'Frenos', icon: Disc, color: 'from-red-500 to-red-600', desc: 'Pastillas, discos' },
-      { id: 'filtros', name: 'Filtros', icon: Wind, color: 'from-blue-500 to-blue-600', desc: 'Aceite, aire, gasolina' },
-      { id: 'bateria', name: 'Batería', icon: Battery, color: 'from-green-500 to-green-600', desc: 'Baterías y cables' },
-      { id: 'aceites', name: 'Aceites', icon: Droplets, color: 'from-amber-500 to-amber-600', desc: 'Motor, caja' },
-      { id: 'bujias', name: 'Bujías', icon: Zap, color: 'from-purple-500 to-purple-600', desc: 'Encendido' },
-      { id: 'neumaticos', name: 'Neumáticos', icon: CircleDot, color: 'from-gray-600 to-gray-700', desc: 'Cauchos' },
+      { id: 'frenos', name: 'Frenos', icon: BrakeIcon, color: 'from-red-500 to-red-600', desc: 'Pastillas, discos' },
+      { id: 'filtros', name: 'Filtros', icon: FilterIcon, color: 'from-blue-500 to-blue-600', desc: 'Aceite, aire, gasolina' },
+      { id: 'bateria', name: 'Batería', icon: BatteryIcon, color: 'from-green-500 to-green-600', desc: 'Baterías y cables' },
+      { id: 'aceites', name: 'Aceites', icon: OilIcon, color: 'from-amber-500 to-amber-600', desc: 'Motor, caja' },
+      { id: 'bujias', name: 'Bujías', icon: SparkPlugIcon, color: 'from-purple-500 to-purple-600', desc: 'Encendido' },
+      { id: 'neumaticos', name: 'Neumáticos', icon: TireIcon, color: 'from-gray-600 to-gray-700', desc: 'Cauchos' },
     ]
   },
   {
     title: 'Reparación',
     description: 'Cuando algo necesita arreglo',
     items: [
-      { id: 'suspension', name: 'Suspensión', icon: Settings, color: 'from-slate-500 to-slate-600', desc: 'Amortiguadores' },
-      { id: 'enfriamiento', name: 'Enfriamiento', icon: Thermometer, color: 'from-cyan-500 to-cyan-600', desc: 'Radiador' },
-      { id: 'motor', name: 'Motor', icon: Wrench, color: 'from-orange-500 to-orange-600', desc: 'Correas, juntas' },
-      { id: 'sensores', name: 'Sensores', icon: Radio, color: 'from-indigo-500 to-indigo-600', desc: 'Check engine' },
+      { id: 'suspension', name: 'Suspensión', icon: SuspensionIcon, color: 'from-slate-500 to-slate-600', desc: 'Amortiguadores' },
+      { id: 'enfriamiento', name: 'Enfriamiento', icon: CoolingIcon, color: 'from-cyan-500 to-cyan-600', desc: 'Radiador' },
+      { id: 'motor', name: 'Motor', icon: EngineIcon, color: 'from-orange-500 to-orange-600', desc: 'Correas, juntas' },
+      { id: 'sensores', name: 'Sensores', icon: SensorIcon, color: 'from-indigo-500 to-indigo-600', desc: 'Check engine' },
     ]
   },
   {
     title: 'Mejoras & Accesorios',
     description: 'Personaliza tu carro',
     items: [
-      { id: 'audio', name: 'Audio', icon: Radio, color: 'from-pink-500 to-pink-600', desc: 'Parlantes, radio' },
-      { id: 'iluminacion', name: 'Iluminación', icon: Lightbulb, color: 'from-yellow-400 to-yellow-500', desc: 'LED, faros' },
-      { id: 'interior', name: 'Interior', icon: Armchair, color: 'from-teal-500 to-teal-600', desc: 'Cubreasientos' },
-      { id: 'exterior', name: 'Exterior', icon: Home, color: 'from-emerald-500 to-emerald-600', desc: 'Estribos, spoilers' },
-      { id: 'seguridad', name: 'Seguridad', icon: Shield, color: 'from-rose-500 to-rose-600', desc: 'Cámaras, alarmas' },
-      { id: 'herramientas', name: 'Herramientas', icon: Wrench, color: 'from-stone-500 to-stone-600', desc: 'Kit de emergencia' },
+      { id: 'audio', name: 'Audio', icon: AudioIcon, color: 'from-pink-500 to-pink-600', desc: 'Parlantes, radio' },
+      { id: 'iluminacion', name: 'Iluminación', icon: LightIcon, color: 'from-yellow-400 to-yellow-500', desc: 'LED, faros' },
+      { id: 'interior', name: 'Interior', icon: InteriorIcon, color: 'from-teal-500 to-teal-600', desc: 'Cubreasientos' },
+      { id: 'exterior', name: 'Exterior', icon: ExteriorIcon, color: 'from-emerald-500 to-emerald-600', desc: 'Estribos, spoilers' },
+      { id: 'seguridad', name: 'Seguridad', icon: SecurityIcon, color: 'from-rose-500 to-rose-600', desc: 'Cámaras, alarmas' },
+      { id: 'herramientas', name: 'Herramientas', icon: ToolIcon, color: 'from-stone-500 to-stone-600', desc: 'Kit de emergencia' },
     ]
   }
 ]
@@ -107,8 +110,10 @@ function ShopContent() {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center p-8">
-          <div className="text-6xl mb-4">🚗</div>
-          <h1 className="text-2xl font-bold text-[#111111] mb-4">Selecciona tu vehículo</h1>
+          <div className="w-20 h-20 mx-auto mb-4 flex items-center justify-center text-[#E10600]">
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg>
+          </div>
+          <h1 className="text-2xl font-bold text-[#111111] mb-4">Selecciona tu vehiculo</h1>
           <Link href="/" className="bg-[#E10600] text-white px-8 py-4 rounded-xl font-bold inline-block">
             Ir al inicio
           </Link>
@@ -125,7 +130,7 @@ function ShopContent() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center">
-                <span className="text-2xl">🚗</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6 text-white"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg>
               </div>
               <div>
                 <p className="text-gray-400 text-sm">Mostrando repuestos para:</p>
