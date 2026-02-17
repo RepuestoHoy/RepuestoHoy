@@ -266,7 +266,7 @@ export default function HomePage() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             <div className="card p-6 text-center group hover:border-[#E10600] transition-colors">
               <div className="w-12 h-12 bg-red-50 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:bg-red-100 transition-colors">
-                <span className="text-2xl">⚡</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-7 h-7 text-[#E10600]"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
               </div>
               <h4 className="font-bold text-[#111111] mb-2">Entrega Hoy</h4>
               <p className="text-sm text-[#6B7280]">En Chacao, Baruta y alrededores</p>
@@ -274,7 +274,7 @@ export default function HomePage() {
 
             <div className="card p-6 text-center group hover:border-[#E10600] transition-colors">
               <div className="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:bg-green-100 transition-colors">
-                <span className="text-2xl">💰</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-7 h-7 text-green-600"><circle cx="12" cy="12" r="10"/><path d="M16 8h-6a2 2 0 00-2 2v4a2 2 0 002 2h6a2 2 0 002-2v-4a2 2 0 00-2-2z"/><path d="M12 12v.01"/></svg>
               </div>
               <h4 className="font-bold text-[#111111] mb-2">Precio justo</h4>
               <p className="text-sm text-[#6B7280]">Transparente y competitivo</p>
@@ -282,7 +282,7 @@ export default function HomePage() {
 
             <div className="card p-6 text-center group hover:border-[#E10600] transition-colors">
               <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:bg-blue-100 transition-colors">
-                <span className="text-2xl">✓</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-7 h-7 text-blue-600"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
               </div>
               <h4 className="font-bold text-[#111111] mb-2">Verificación experta</h4>
               <p className="text-sm text-[#6B7280]">Confirmamos la pieza exacta antes de enviar</p>
@@ -290,7 +290,7 @@ export default function HomePage() {
 
             <div className="card p-6 text-center group hover:border-[#E10600] transition-colors">
               <div className="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:bg-purple-100 transition-colors">
-                <span className="text-2xl">💬</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-7 h-7 text-purple-600"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
               </div>
               <h4 className="font-bold text-[#111111] mb-2">WhatsApp con expertos</h4>
               <p className="text-sm text-[#6B7280]">Asesoría rápida para comprar la pieza correcta</p>
