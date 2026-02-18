@@ -265,33 +265,27 @@ function ShopContent() {
                     key={item.id}
                     onClick={() => handleCategoryClick(item.id)}
                     disabled={!hasProducts}
-                    className={`group text-left transition-all ${!hasProducts ? 'opacity-50 cursor-not-allowed' : 'active:scale-95'}`}
+                    className={`card p-5 text-center hover:border-[#E10600] hover:shadow-xl transition-all group bg-white ${!hasProducts ? 'opacity-50 cursor-not-allowed' : ''}`}
                   >
-                    <div className={`aspect-square rounded-2xl bg-gradient-to-br ${item.color} p-4 mb-3 flex flex-col justify-between relative overflow-hidden ${hasProducts ? 'group-hover:shadow-xl group-hover:scale-[1.02]' : ''} transition-all`}>
-                      {/* Background pattern */}
-                      <div className="absolute inset-0 opacity-10">
-                        <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-white rounded-full"></div>
-                      </div>
-                      
-                      {/* Icon */}
-                      <div className="relative z-10">
-                        <Icon className="w-10 h-10 text-white" />
-                      </div>
-                      
-                      {/* Product count badge */}
-                      {!loading && count > 0 && (
-                        <div className="relative z-10">
-                          <span className="bg-white/20 text-white text-xs font-bold px-2 py-1 rounded-full">
-                            {count} productos
-                          </span>
-                        </div>
-                      )}
+                    {/* Icono en rojo como el landing page */}
+                    <div className="w-12 h-12 mx-auto mb-3 flex items-center justify-center text-[#E10600] group-hover:scale-110 transition-transform">
+                      <Icon className="w-10 h-10" />
                     </div>
                     
-                    <h3 className="font-bold text-[#111111] group-hover:text-[#E10600] transition-colors">
+                    {/* Nombre de la categoría */}
+                    <h3 className="font-bold text-[#111111] text-sm uppercase mb-1 group-hover:text-[#E10600] transition-colors">
                       {item.name}
                     </h3>
-                    <p className="text-sm text-gray-500">{item.desc}</p>
+                    
+                    {/* Descripción */}
+                    <p className="text-xs text-[#6B7280]">{item.desc}</p>
+                    
+                    {/* Contador de productos (opcional, debajo) */}
+                    {!loading && count > 0 && (
+                      <span className="inline-block mt-2 text-xs text-[#E10600] font-semibold">
+                        {count} productos
+                      </span>
+                    )}
                   </button>
                 )
               })}
