@@ -30,6 +30,7 @@ export default function CheckoutClient() {
     address: '',
     notes: ''
   })
+  const [countryCode, setCountryCode] = useState('+58')
 
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [selectedZone, setSelectedZone] = useState('')
@@ -49,12 +50,24 @@ export default function CheckoutClient() {
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (user) {
         setUser(user)
-        setFormData(prev => ({
-          ...prev,
-          email: user.email || '',
-          name: user.user_metadata?.full_name || '',
-          phone: user.user_metadata?.phone || '',
-        }))
+        const savedPhone = user.user_metadata?.phone || ''
+        // Extraer código de país si existe
+        if (savedPhone.startsWith('+58')) {
+          setCountryCode('+58')
+          setFormData(prev => ({
+            ...prev,
+            email: user.email || '',
+            name: user.user_metadata?.full_name || '',
+            phone: savedPhone.replace('+58', ''),
+          }))
+        } else {
+          setFormData(prev => ({
+            ...prev,
+            email: user.email || '',
+            name: user.user_metadata?.full_name || '',
+            phone: savedPhone,
+          }))
+        }
       }
     })
     trackEvent('page_view', { page_title: 'Finalizar compra' })
@@ -63,7 +76,7 @@ export default function CheckoutClient() {
   const validateField = (name: string, value: string): string => {
     switch (name) {
       case 'phone':
-        return value && !validatePhone(value) ? 'Formato: 0412-1234567' : ''
+        return value && value.length < 10 ? 'Debe tener 10 dígitos (ej: 4121234567)' : ''
       case 'email':
         return value && !validateEmail(value) ? 'Email inválido' : ''
       default:
@@ -71,8 +84,26 @@ export default function CheckoutClient() {
     }
   }
 
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Solo permitir números
+    let rawValue = e.target.value.replace(/\D/g, '')
+    // Si empieza con 0, lo quitamos (el código de país ya está en el dropdown)
+    if (rawValue.startsWith('0')) {
+      rawValue = rawValue.slice(1)
+    }
+    // Limitar a 10 dígitos
+    const limitedValue = rawValue.slice(0, 10)
+    setFormData(prev => ({ ...prev, phone: limitedValue }))
+    const error = validateField('phone', limitedValue)
+    setErrors(prev => ({ ...prev, phone: error }))
+  }
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
+    if (name === 'phone') {
+      // Phone is handled separately
+      return
+    }
     setFormData(prev => ({ ...prev, [name]: value }))
     const error = validateField(name, value)
     setErrors(prev => ({ ...prev, [name]: error }))
@@ -82,7 +113,7 @@ export default function CheckoutClient() {
     return (
       formData.name.trim() &&
       formData.phone.trim() &&
-      validatePhone(formData.phone) &&
+      formData.phone.length >= 10 &&
       validateEmail(formData.email) &&
       formData.address.trim() &&
       selectedZone &&
@@ -99,12 +130,13 @@ export default function CheckoutClient() {
     setSubmitError('')
 
     try {
+      const fullPhone = `${countryCode}${formData.phone}`
       const res = await fetch('/api/ordenes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           customerName: formData.name,
-          customerPhone: formData.phone,
+          customerPhone: fullPhone,
           customerEmail: formData.email || undefined,
           items,
           subtotal,
@@ -129,7 +161,7 @@ export default function CheckoutClient() {
           ...data.order,
           id: data.order.order_number,
           customerName: formData.name,
-          customerPhone: formData.phone,
+          customerPhone: fullPhone,
           customerEmail: formData.email,
           items,
           subtotal,
@@ -245,17 +277,39 @@ export default function CheckoutClient() {
                   <label htmlFor="phone" className="block text-sm font-bold text-[#111111] mb-2 uppercase">
                     Teléfono *
                   </label>
-                  <input
-                    id="phone"
-                    type="tel"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleInputChange}
-                    required
-                    className={`input ${errors.phone ? 'border-red-500' : ''}`}
-                    placeholder="Ej: 0412-1234567"
-                  />
-                  {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
+                  <div className="flex gap-2">
+                    <select
+                      value={countryCode}
+                      onChange={(e) => setCountryCode(e.target.value)}
+                      className={`input w-28 flex-shrink-0 ${errors.phone ? 'border-red-500' : ''}`}
+                    >
+                      <option value="+58">🇻🇪 +58</option>
+                      <option value="+1">🇺🇸 +1</option>
+                      <option value="+57">🇨🇴 +57</option>
+                      <option value="+51">🇵🇪 +51</option>
+                      <option value="+54">🇦🇷 +54</option>
+                      <option value="+56">🇨🇱 +56</option>
+                      <option value="+52">🇲🇽 +52</option>
+                      <option value="+44">🇬🇧 +44</option>
+                      <option value="+34">🇪🇸 +34</option>
+                    </select>
+                    <input
+                      id="phone"
+                      type="tel"
+                      name="phone"
+                      inputMode="numeric"
+                      value={formData.phone}
+                      onChange={handlePhoneChange}
+                      required
+                      className={`input flex-1 ${errors.phone ? 'border-red-500' : ''}`}
+                      placeholder="4121234567"
+                    />
+                  </div>
+                  {errors.phone ? (
+                    <p className="text-red-500 text-xs mt-1">{errors.phone}</p>
+                  ) : (
+                    <p className="text-xs text-gray-400 mt-1">10 dígitos sin el 0 inicial</p>
+                  )}
                 </div>
                 <div>
                   <label htmlFor="email" className="block text-sm font-bold text-[#111111] mb-2 uppercase">
