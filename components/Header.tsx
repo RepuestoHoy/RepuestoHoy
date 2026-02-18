@@ -216,10 +216,16 @@ export default function Header({
                     Cerrar sesión
                   </button>
                 ) : (
-                  <Link href="/login" onClick={() => setMobileMenuOpen(false)} className="py-3 px-2 text-gray-300 hover:text-white transition-colors font-medium rounded-lg hover:bg-white/5 flex items-center gap-2">
-                    <User className="w-4 h-4" />
-                    Iniciar sesión
-                  </Link>
+                  <>
+                    <Link href="/login" onClick={() => setMobileMenuOpen(false)} className="py-3 px-2 text-gray-300 hover:text-white transition-colors font-medium rounded-lg hover:bg-white/5 flex items-center gap-2">
+                      <User className="w-4 h-4" />
+                      Iniciar sesión
+                    </Link>
+                    <Link href="/registro" onClick={() => setMobileMenuOpen(false)} className="py-3 px-2 text-[#E10600] hover:text-[#ff1a1a] transition-colors font-medium rounded-lg hover:bg-white/5 flex items-center gap-2">
+                      <User className="w-4 h-4" />
+                      Crear cuenta gratis
+                    </Link>
+                  </>
                 )}
                 <a
                   href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP || '584122223775'}`}
