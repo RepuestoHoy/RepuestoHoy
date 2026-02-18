@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { CARS, MOTORCYCLES, CATEGORIES } from '@/lib/data'
 import { categoryIcons } from '@/components/CategoryIcons'
@@ -16,6 +16,17 @@ export default function HomePage() {
   const [model, setModel] = useState('')
   const [year, setYear] = useState('')
   const [isAnimating, setIsAnimating] = useState(false)
+  const [categorySearch, setCategorySearch] = useState('')
+
+  // Filtrar categorías basado en la búsqueda
+  const filteredCategories = useMemo(() => {
+    if (!categorySearch.trim()) return CATEGORIES
+    const query = categorySearch.toLowerCase()
+    return CATEGORIES.filter(cat =>
+      cat.name.toLowerCase().includes(query) ||
+      cat.description.toLowerCase().includes(query)
+    )
+  }, [categorySearch])
 
   const vehicleList = vehicleType === 'car' ? CARS : MOTORCYCLES
   const selectedVehicle = vehicleList.find(v => v.brand === brand)
@@ -251,6 +262,80 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Categories Section - MOVIDA AQUÍ CON SEARCHBAR */}
+      <section className="py-16 bg-gray-50">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="text-center mb-8">
+            <h3 className="text-3xl font-bold text-[#111111] mb-4">
+              Buscar por categoría
+            </h3>
+            <p className="text-[#6B7280] mb-6">
+              Todo lo que tu carro necesita, organizado por sistema.
+            </p>
+
+            {/* Search Bar */}
+            <div className="max-w-md mx-auto mb-8">
+              <div className="relative">
+                <input
+                  type="text"
+                  value={categorySearch}
+                  onChange={(e) => setCategorySearch(e.target.value)}
+                  placeholder="Buscar categoría... (ej: cauchos, frenos)"
+                  className="w-full px-5 py-3 pl-12 bg-white border-2 border-gray-200 rounded-xl text-[#111111] placeholder-gray-400 focus:outline-none focus:border-[#E10600] transition-colors"
+                />
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                {categorySearch && (
+                  <button
+                    onClick={() => setCategorySearch('')}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                )}
+              </div>
+              {categorySearch && (
+                <p className="text-sm text-gray-500 mt-2">
+                  {filteredCategories.length} categorías encontradas
+                </p>
+              )}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            {filteredCategories.map(cat => {
+              const IconComponent = categoryIcons[cat.icon]
+              return (
+                <a
+                  key={cat.id}
+                  href={`/buscar?category=${cat.id}`}
+                  className="card p-5 text-center hover:border-[#E10600] hover:shadow-xl transition-all group bg-white"
+                >
+                  <div className="w-12 h-12 mx-auto mb-3 flex items-center justify-center text-[#E10600] group-hover:scale-110 transition-transform">
+                    {IconComponent && <IconComponent className="w-10 h-10" />}
+                  </div>
+                  <h4 className="font-bold text-[#111111] text-sm uppercase mb-1">{cat.name}</h4>
+                  <p className="text-xs text-[#6B7280]">{cat.description}</p>
+                </a>
+              )
+            })}
+          </div>
+
+          {filteredCategories.length === 0 && (
+            <div className="text-center py-8">
+              <p className="text-gray-500">No se encontraron categorías con "{categorySearch}"</p>
+              <button
+                onClick={() => setCategorySearch('')}
+                className="mt-2 text-[#E10600] hover:underline"
+              >
+                Limpiar búsqueda
+              </button>
+            </div>
+          )}
+        </div>
+      </section>
+
       {/* Trust Section */}
       <section className="py-16 border-b border-[#E5E7EB]">
         <div className="max-w-6xl mx-auto px-4">
@@ -295,39 +380,6 @@ export default function HomePage() {
               <h4 className="font-bold text-[#111111] mb-2">WhatsApp con expertos</h4>
               <p className="text-sm text-[#6B7280]">Asesoría rápida para comprar la pieza correcta</p>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Categories Section */}
-      <section className="py-16">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="text-center mb-12">
-            <h3 className="text-3xl font-bold text-[#111111] mb-4">
-              Buscar por categoría
-            </h3>
-            <p className="text-[#6B7280]">
-              Todo lo que tu carro necesita, organizado por sistema.
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            {CATEGORIES.map(cat => {
-              const IconComponent = categoryIcons[cat.icon]
-              return (
-                <a
-                  key={cat.id}
-                  href={`/buscar?category=${cat.id}`}
-                  className="card p-5 text-center hover:border-[#E10600] hover:shadow-xl transition-all group"
-                >
-                  <div className="w-12 h-12 mx-auto mb-3 flex items-center justify-center text-[#E10600] group-hover:scale-110 transition-transform">
-                    {IconComponent && <IconComponent className="w-10 h-10" />}
-                  </div>
-                  <h4 className="font-bold text-[#111111] text-sm uppercase mb-1">{cat.name}</h4>
-                  <p className="text-xs text-[#6B7280]">{cat.description}</p>
-                </a>
-              )
-            })}
           </div>
         </div>
       </section>
