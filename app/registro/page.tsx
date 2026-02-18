@@ -14,6 +14,7 @@ function RegistroForm() {
   const redirect = searchParams.get('redirect') || '/'
 
   const [formData, setFormData] = useState({ name: '', email: '', phone: '', password: '', confirmPassword: '' })
+  const [countryCode, setCountryCode] = useState('+58')
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -30,6 +31,22 @@ function RegistroForm() {
     setError('')
   }
 
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Solo permitir números
+    const rawValue = e.target.value.replace(/\D/g, '')
+    // Limitar a 10 dígitos (sin código de país)
+    const limitedValue = rawValue.slice(0, 10)
+    setFormData(prev => ({ ...prev, phone: limitedValue }))
+    setError('')
+  }
+
+  const formatPhoneDisplay = (phone: string) => {
+    if (!phone) return ''
+    // Formato: 0412-1234567
+    if (phone.length <= 4) return phone
+    return `${phone.slice(0, 4)}-${phone.slice(4)}`
+  }
+
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
@@ -42,8 +59,8 @@ function RegistroForm() {
       setError('La contraseña debe tener al menos 6 caracteres')
       return
     }
-    if (formData.phone && !validatePhone(formData.phone)) {
-      setError('Formato de teléfono inválido: 0412-1234567')
+    if (formData.phone && formData.phone.length < 10) {
+      setError('El teléfono debe tener 10 dígitos (ej: 04121234567)')
       return
     }
 
@@ -143,7 +160,32 @@ function RegistroForm() {
             </div>
             <div>
               <label className="block text-sm font-bold text-[#111111] mb-2">Teléfono <span className="text-gray-400 font-normal">(opcional)</span></label>
-              <input name="phone" type="tel" value={formData.phone} onChange={handleChange} className="input" placeholder="0412-1234567" />
+              <div className="flex gap-2">
+                <select
+                  value={countryCode}
+                  onChange={(e) => setCountryCode(e.target.value)}
+                  className="input w-28 flex-shrink-0"
+                >
+                  <option value="+58">🇻🇪 +58</option>
+                  <option value="+1">🇺🇸 +1</option>
+                  <option value="+57">🇨🇴 +57</option>
+                  <option value="+51">🇵🇪 +51</option>
+                  <option value="+54">🇦🇷 +54</option>
+                  <option value="+56">🇨🇱 +56</option>
+                  <option value="+52">🇲🇽 +52</option>
+                  <option value="+44">🇬🇧 +44</option>
+                  <option value="+34">🇪🇸 +34</option>
+                </select>
+                <input
+                  name="phone"
+                  type="tel"
+                  value={formatPhoneDisplay(formData.phone)}
+                  onChange={handlePhoneChange}
+                  className="input flex-1"
+                  placeholder="0412-1234567"
+                />
+              </div>
+              <p className="mt-1 text-xs text-gray-400">Ingresa tu número sin el código de país</p>
             </div>
             <div>
               <label className="block text-sm font-bold text-[#111111] mb-2">Contraseña *</label>
