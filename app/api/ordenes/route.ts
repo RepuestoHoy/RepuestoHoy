@@ -166,6 +166,17 @@ function emailTemplateCliente(order: any) {
     ${order.comprobante_url ? '<p style="color: #2e7d32; margin: 10px 0 0;">✓ Comprobante recibido</p>' : ''}
   </div>
 
+  <!-- Spam Warning -->
+  <div style="background: #fff8e1; border: 2px solid #ffc107; padding: 15px; border-radius: 8px; margin: 20px 0;">
+    <p style="margin: 0; color: #856404; font-weight: bold; text-align: center;">
+      📧 ¿No ves este email en tu bandeja de entrada?
+    </p>
+    <p style="margin: 10px 0 0 0; color: #856404; text-align: center; font-size: 14px;">
+      Revisa tu carpeta de <strong>Spam</strong> o <strong>Promociones</strong>. 
+      Añade <em>ventas@repuestohoy.com</em> a tus contactos para recibir nuestros emails sin problemas.
+    </p>
+  </div>
+
   <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 2px solid #eee;">
     <p style="color: #666;">Nos pondremos en contacto contigo para coordinar la entrega.</p>
     <p style="color: #666;">¿Tienes dudas? Escríbenos por WhatsApp: +58 412-2223775</p>

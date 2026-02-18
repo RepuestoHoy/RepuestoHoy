@@ -165,6 +165,32 @@ export default function GraciasClient() {
           </p>
         </div>
 
+        {/* Email Warning */}
+        {order.customerEmail && (
+          <div className="card p-4 mb-6 bg-amber-50 border-amber-200">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
+                <svg className="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <p className="font-bold text-amber-800 mb-1">
+                  📧 Revisa tu correo electrónico
+                </p>
+                <p className="text-sm text-amber-700">
+                  Te enviamos un email de confirmación a <strong>{order.customerEmail}</strong>
+                </p>
+                <p className="text-sm text-amber-700 mt-2">
+                  <span className="font-semibold">Importante:</span> Si no lo ves en tu bandeja de entrada, 
+                  revisa la carpeta de <strong>Spam</strong> o <strong>Promociones</strong>. 
+                  A veces los emails llegan allí.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Order Number */}
         <div className="card p-6 mb-6 bg-[#F5F5F5] border-[#111111]">
           <div className="text-center">
