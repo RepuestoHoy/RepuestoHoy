@@ -3,6 +3,7 @@ import './globals.css'
 import { CartProvider } from '@/components/CartContext'
 import ToastContainer from '@/components/ToastContainer'
 import { BUSINESS_CONFIG } from '@/lib/config'
+import Script from 'next/script'
 
 export const metadata: Metadata = {
   title: 'Repuesto Hoy | Repuestos para tu carro en Caracas',
@@ -28,6 +29,45 @@ export const metadata: Metadata = {
   },
 }
 
+// Schema.org - Organization
+const organizationSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'Repuesto Hoy',
+  url: 'https://repuestohoy.com',
+  logo: 'https://repuestohoy.com/logo.png',
+  description: 'Repuestos para carros y motos en Caracas. Entrega el mismo día.',
+  address: {
+    '@type': 'PostalAddress',
+    addressLocality: 'Caracas',
+    addressRegion: 'Distrito Capital',
+    addressCountry: 'VE'
+  },
+  contactPoint: {
+    '@type': 'ContactPoint',
+    telephone: '+58-412-2223775',
+    contactType: 'customer service',
+    availableLanguage: ['Spanish']
+  },
+  sameAs: [
+    'https://instagram.com/repuestohoy',
+    'https://facebook.com/repuestohoy'
+  ]
+}
+
+// Schema.org - WebSite
+const websiteSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'Repuesto Hoy',
+  url: 'https://repuestohoy.com',
+  potentialAction: {
+    '@type': 'SearchAction',
+    target: 'https://repuestohoy.com/buscar?q={search_term_string}',
+    'query-input': 'required name=search_term_string'
+  }
+}
+
 export default function RootLayout({
   children,
 }: {
@@ -47,6 +87,20 @@ export default function RootLayout({
               gtag('config', '${BUSINESS_CONFIG.analytics?.gaId || 'G-XXXXXXXXXX'}');
             `
           }}
+        />
+        
+        {/* Schema.org - Organization */}
+        <Script
+          id="organization-schema"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+        />
+        
+        {/* Schema.org - WebSite */}
+        <Script
+          id="website-schema"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
         />
       </head>
       <body className="min-h-screen bg-gray-50">

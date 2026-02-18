@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import GraciasClient from './GraciasClient'
+import Script from 'next/script'
 
 export const metadata: Metadata = {
   title: 'Pedido confirmado | Repuesto Hoy',
@@ -11,5 +12,9 @@ export const metadata: Metadata = {
 }
 
 export default function GraciasPage() {
-  return <GraciasClient />
+  return (
+    <>
+      <GraciasClient />
+    </>
+  )
 }
