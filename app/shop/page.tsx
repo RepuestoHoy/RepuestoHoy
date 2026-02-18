@@ -10,7 +10,7 @@ import {
   Wrench, Sparkles, ArrowRight, MessageCircle, AlertCircle
 } from 'lucide-react'
 import { 
-  BrakeIcon, FilterIcon, BatteryIcon, OilIcon, SparkPlugIcon, TireIcon,
+  BrakeIcon, FilterIcon, BatteryIcon, OilIcon, SparkPlugIcon, TireIcon, WiperIcon,
   SuspensionIcon, CoolingIcon, EngineIcon, SensorIcon, AudioIcon, LightIcon,
   InteriorIcon, ExteriorIcon, SecurityIcon, ToolIcon
 } from '@/components/CategoryIcons'
@@ -30,6 +30,7 @@ const CATEGORY_GROUPS = [
       { id: 'aceites', name: 'Aceites', icon: OilIcon, color: 'from-[#E10600] to-[#B00500]', desc: 'Motor, caja' },
       { id: 'bujias', name: 'Bujías', icon: SparkPlugIcon, color: 'from-[#E10600] to-[#B00500]', desc: 'Encendido' },
       { id: 'neumaticos', name: 'Neumáticos', icon: TireIcon, color: 'from-[#E10600] to-[#B00500]', desc: 'Cauchos' },
+      { id: 'parabrisas', name: 'Parabrisas', icon: WiperIcon, color: 'from-[#E10600] to-[#B00500]', desc: 'Limpia parabrisas' },
     ]
   },
   {
