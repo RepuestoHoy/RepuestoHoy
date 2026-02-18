@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Lock, LogIn } from 'lucide-react'
 import Link from 'next/link'
-import { Car } from 'lucide-react'
 
 export default function AdminLoginPage() {
   const router = useRouter()
@@ -19,23 +18,32 @@ export default function AdminLoginPage() {
     }
   }, [router])
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setError('')
 
-    // Check against env or fallback
-    const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'repuestohoy2024'
+    try {
+      const res = await fetch('/api/admin-auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password })
+      })
 
-    setTimeout(() => {
-      if (password === ADMIN_PASSWORD) {
+      const data = await res.json()
+
+      if (res.ok && data.success) {
         sessionStorage.setItem('rh-admin-auth', 'true')
+        sessionStorage.setItem('rh-admin-token', data.token)
         router.push('/admin/dashboard')
       } else {
-        setError('Contraseña incorrecta')
+        setError(data.error || 'Contraseña incorrecta')
         setLoading(false)
       }
-    }, 500)
+    } catch (err) {
+      setError('Error de conexión. Intenta de nuevo.')
+      setLoading(false)
+    }
   }
 
   return (
