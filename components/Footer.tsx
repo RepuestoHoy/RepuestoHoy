@@ -55,9 +55,20 @@ export default function Footer() {
           {/* Brand */}
           <div className="md:col-span-1">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-11 h-11 bg-gradient-to-br from-[#E10600] to-[#B00500] rounded-xl flex items-center justify-center shadow-lg">
-                <Car className="w-6 h-6" />
-              </div>
+              <span style={{
+                background: '#E8181A',
+                color: '#FFFFFF',
+                fontFamily: "'Futura', 'Trebuchet MS', 'Arial Black', Arial, sans-serif",
+                fontWeight: 900,
+                fontStyle: 'italic',
+                fontSize: '18px',
+                letterSpacing: '-0.5px',
+                padding: '6px 14px 8px',
+                borderRadius: '3px',
+                lineHeight: 1,
+                whiteSpace: 'nowrap',
+                display: 'inline-block',
+              }}>repuestohoy</span>
               <div>
                 <h4 className="font-bold text-lg">{BUSINESS_CONFIG.name}</h4>
                 <p className="text-xs text-gray-500">{BUSINESS_CONFIG.tagline}</p>

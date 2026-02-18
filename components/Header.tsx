@@ -65,7 +65,7 @@ export default function Header({
     <>
       {/* Banner promocional */}
       {showBanner && (
-        <div className="bg-[#E10600] text-white text-center py-2 px-4 text-sm font-medium relative">
+        <div className="bg-[#25D366] text-white text-center py-2 px-4 text-sm font-medium relative">
           <span className="hidden sm:inline">Entrega el mismo día en Caracas • </span>
           <span>WhatsApp: +58 412-2223775</span>
           <button
@@ -93,27 +93,22 @@ export default function Header({
               </button>
             ) : (
               <Link href="/" className="flex items-center group">
-                <svg
-                  viewBox="0 0 420 100"
-                  height="40"
-                  xmlns="http://www.w3.org/2000/svg"
-                  aria-label="repuestohoy"
-                  style={{ display: 'block' }}
-                  className="transition-transform group-hover:-translate-y-0.5"
-                >
-                  <rect x="0" y="0" width="420" height="100" rx="3" fill="#E8181A"/>
-                  <text
-                    x="210"
-                    y="76"
-                    textAnchor="middle"
-                    fontFamily="'Futura', 'Trebuchet MS', Arial, sans-serif"
-                    fontWeight="bold"
-                    fontStyle="italic"
-                    fontSize="74"
-                    letterSpacing="-1"
-                    fill="#FFFFFF"
-                  >repuestohoy</text>
-                </svg>
+                <span
+                  className="transition-transform group-hover:-translate-y-0.5 inline-block"
+                  style={{
+                    background: '#E8181A',
+                    color: '#FFFFFF',
+                    fontFamily: "'Futura', 'Trebuchet MS', 'Arial Black', Arial, sans-serif",
+                    fontWeight: 900,
+                    fontStyle: 'italic',
+                    fontSize: '26px',
+                    letterSpacing: '-0.5px',
+                    padding: '8px 22px 10px',
+                    borderRadius: '3px',
+                    lineHeight: 1,
+                    whiteSpace: 'nowrap',
+                  }}
+                >repuestohoy</span>
               </Link>
             )}
 

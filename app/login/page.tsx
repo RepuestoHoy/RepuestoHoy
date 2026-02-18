@@ -45,10 +45,22 @@ function LoginForm() {
         {/* Logo */}
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-3">
-            <div className="w-12 h-12 bg-[#E10600] rounded-xl flex items-center justify-center">
-              <Car className="w-7 h-7 text-white" />
-            </div>
-            <span className="text-2xl font-bold text-[#111111]">REPUESTO HOY</span>
+            <span
+              style={{
+                background: '#E8181A',
+                color: '#FFFFFF',
+                fontFamily: "'Futura', 'Trebuchet MS', 'Arial Black', Arial, sans-serif",
+                fontWeight: 900,
+                fontStyle: 'italic',
+                fontSize: '26px',
+                letterSpacing: '-0.5px',
+                padding: '8px 22px 10px',
+                borderRadius: '3px',
+                lineHeight: 1,
+                whiteSpace: 'nowrap',
+                display: 'inline-block',
+              }}
+            >repuestohoy</span>
           </Link>
           <h1 className="mt-6 text-2xl font-bold text-[#111111]">Iniciar sesión</h1>
           <p className="mt-2 text-gray-600">¿No tienes cuenta?{' '}
