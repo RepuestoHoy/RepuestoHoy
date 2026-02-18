@@ -44,7 +44,7 @@ export default function ProductoClient({ productId }: ProductoClientProps) {
   // Find related products (same category, different id)
   const relatedProducts = SAMPLE_PRODUCTS.filter(
     p => p.category === product?.category && p.id !== productId
-  ).slice(0, 3)
+  ).slice(0, 4)
 
   if (!product) {
     return (
@@ -158,6 +158,13 @@ export default function ProductoClient({ productId }: ProductoClientProps) {
               }`}>
                 {product.type === 'original' ? '⭐ Original' : '🔧 Genérico'}
               </div>
+
+              {/* Low Stock Badge */}
+              {isLowStock && (
+                <div className="absolute top-4 right-4 bg-orange-500 text-white px-4 py-2 rounded-lg text-sm font-bold uppercase tracking-wider animate-pulse">
+                  ¡Solo {product.stock} disponibles!
+                </div>
+              )}
             </div>
 
             {/* Thumbnails */}
@@ -357,39 +364,59 @@ export default function ProductoClient({ productId }: ProductoClientProps) {
             <h2 className="text-xl font-bold text-[#111111] mb-6 uppercase tracking-tight">
               Productos relacionados
             </h2>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {relatedProducts.map(relatedProduct => (
-                <Link
-                  key={relatedProduct.id}
-                  href={`/producto/${relatedProduct.id}`}
-                  className="card overflow-hidden hover:shadow-lg transition-all group"
-                >
-                  <div className="aspect-[4/3] bg-[#F5F5F5] flex items-center justify-center relative">
-                    {relatedProduct.images[0] ? (
-                      <Image 
-                        src={relatedProduct.images[0]} 
-                        alt={relatedProduct.name}
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform"
-                      />
-                    ) : (
-                      <div className="flex items-center justify-center h-full">
-                        {(() => {
-                          const IconComponent = category ? categoryIcons[category.icon] : null
-                          return IconComponent ? <IconComponent className="w-10 h-10 text-gray-400" /> : <span className="text-4xl">🔧</span>
-                        })()}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              {relatedProducts.map(relatedProduct => {
+                const relatedCategory = CATEGORIES.find(c => c.id === relatedProduct.category)
+                const relatedLowStock = relatedProduct.stock < 5 && relatedProduct.stock > 0
+
+                return (
+                  <Link
+                    key={relatedProduct.id}
+                    href={`/producto/${relatedProduct.id}`}
+                    className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-all group"
+                  >
+                    <div className="aspect-square bg-[#F5F5F5] flex items-center justify-center relative">
+                      {relatedProduct.images[0] ? (
+                        <Image
+                          src={relatedProduct.images[0]}
+                          alt={relatedProduct.name}
+                          fill
+                          className="object-cover group-hover:scale-105 transition-transform"
+                        />
+                      ) : (
+                        <div className="flex items-center justify-center h-full">
+                          {(() => {
+                            const IconComponent = relatedCategory ? categoryIcons[relatedCategory.icon] : null
+                            return IconComponent ? <IconComponent className="w-10 h-10 text-gray-400" /> : <span className="text-4xl">🔧</span>
+                          })()}
+                        </div>
+                      )}
+
+                      {/* Type Badge */}
+                      <div className={`absolute top-2 left-2 px-2 py-1 rounded-lg text-xs font-bold ${
+                        relatedProduct.type === 'original' ? 'bg-[#E10600] text-white' :
+                        'bg-gray-200 text-gray-700'
+                      }`}>
+                        {relatedProduct.type === 'original' ? 'Original' : 'Genérico'}
                       </div>
-                    )}
-                  </div>
-                  <div className="p-4">
-                    <div className="text-xs font-bold text-[#2A2A2A] uppercase">{relatedProduct.brand}</div>
-                    <h3 className="font-bold text-[#111111] text-sm mt-1 line-clamp-2">{relatedProduct.name}</h3>
-                    <div className="text-lg font-extrabold text-[#E10600] mt-2">
-                      ${relatedProduct.price.toFixed(2)}
+
+                      {/* Low Stock Badge */}
+                      {relatedLowStock && (
+                        <div className="absolute top-2 right-2 bg-orange-500 text-white px-2 py-1 rounded-lg text-xs font-bold">
+                          Solo {relatedProduct.stock}
+                        </div>
+                      )}
                     </div>
-                  </div>
-                </Link>
-              ))}
+                    <div className="p-3">
+                      <div className="text-xs text-gray-500 mb-1">{relatedProduct.brand}</div>
+                      <h3 className="font-bold text-[#111111] text-sm line-clamp-2 mb-2">{relatedProduct.name}</h3>
+                      <div className="text-lg font-extrabold text-[#E10600]">
+                        ${relatedProduct.price.toFixed(2)}
+                      </div>
+                    </div>
+                  </Link>
+                )
+              })}
             </div>
           </div>
         )}

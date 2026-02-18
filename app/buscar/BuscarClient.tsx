@@ -6,16 +6,20 @@ import Image from 'next/image'
 import { useSearchParams } from 'next/navigation'
 import { SAMPLE_PRODUCTS, CATEGORIES } from '@/lib/data'
 import { categoryIcons } from '@/components/CategoryIcons'
-import { AlertCircle, X } from 'lucide-react'
+import { AlertCircle, X, Plus, Check } from 'lucide-react'
 import Header from '@/components/Header'
 import ProductSkeleton from '@/components/ProductSkeleton'
+import { useCart } from '@/components/CartContext'
 
 function BuscarContent() {
   const searchParams = useSearchParams()
+  const { addToCart, showToast } = useCart()
   const [products, setProducts] = useState(SAMPLE_PRODUCTS)
   const [loading, setLoading] = useState(false)
   const [selectedType, setSelectedType] = useState<string | null>(null)
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
+  const [sortOrder, setSortOrder] = useState<'relevance' | 'price-asc' | 'price-desc'>('relevance')
+  const [quickAddedId, setQuickAddedId] = useState<string | null>(null)
 
   const brand = searchParams.get('brand') || ''
   const model = searchParams.get('model') || ''
@@ -33,22 +37,41 @@ function BuscarContent() {
     setLoading(true)
     setTimeout(() => {
       let filtered = SAMPLE_PRODUCTS
-      
+
       if (selectedCategory) {
         filtered = filtered.filter(p => p.category === selectedCategory)
       }
-      
+
       if (selectedType) {
         filtered = filtered.filter(p => p.type === selectedType)
+      }
+
+      // Sort products
+      if (sortOrder === 'price-asc') {
+        filtered = [...filtered].sort((a, b) => a.price - b.price)
+      } else if (sortOrder === 'price-desc') {
+        filtered = [...filtered].sort((a, b) => b.price - a.price)
       }
 
       setProducts(filtered)
       setLoading(false)
     }, 300)
-  }, [selectedCategory, selectedType])
+  }, [selectedCategory, selectedType, sortOrder])
 
   const categoryObj = CATEGORIES.find(c => c.id === selectedCategory)
   const hasActiveFilters = selectedCategory || selectedType
+
+  const handleQuickAdd = (e: React.MouseEvent, product: typeof SAMPLE_PRODUCTS[0]) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (product.stock < 1) {
+      showToast('Producto agotado', 'error')
+      return
+    }
+    addToCart(product, 1)
+    setQuickAddedId(product.id)
+    setTimeout(() => setQuickAddedId(null), 1500)
+  }
 
   return (
     <>
@@ -163,14 +186,30 @@ function BuscarContent() {
 
           {/* Results */}
           <main className="flex-1">
-            <div className="mb-6">
-              <h2 className="text-xl font-bold text-[#111111]">
-                {categoryObj ? categoryObj.name : 'Todos los repuestos'}
-              </h2>
-              <p className="text-gray-500 text-sm mt-1">
-                {products.length} productos
-                {brand && ` para ${brand} ${model}`}
-              </p>
+            <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div>
+                <h2 className="text-xl font-bold text-[#111111]">
+                  {categoryObj ? categoryObj.name : 'Todos los repuestos'}
+                </h2>
+                <p className="text-gray-500 text-sm mt-1">
+                  {products.length} productos
+                  {brand && ` para ${brand} ${model}`}
+                </p>
+              </div>
+
+              {/* Sort Dropdown */}
+              <div className="flex items-center gap-2">
+                <label className="text-sm text-gray-600 whitespace-nowrap">Ordenar:</label>
+                <select
+                  value={sortOrder}
+                  onChange={(e) => setSortOrder(e.target.value as typeof sortOrder)}
+                  className="px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#E10600] focus:border-transparent cursor-pointer"
+                >
+                  <option value="relevance">Relevancia</option>
+                  <option value="price-asc">Menor precio</option>
+                  <option value="price-desc">Mayor precio</option>
+                </select>
+              </div>
             </div>
 
             {loading ? (
@@ -197,53 +236,95 @@ function BuscarContent() {
               </div>
             ) : (
               <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
-                {products.map(product => (
-                  <Link
-                    key={product.id}
-                    href={`/producto/${product.id}`}
-                    className="bg-white rounded-xl border border-gray-200 overflow-hidden active:scale-95 transition-transform"
-                  >
-                    {/* Image */}
-                    <div className="aspect-square bg-gray-100 flex items-center justify-center relative">
-                      {product.images[0] ? (
-                        <Image 
-                          src={product.images[0]} 
-                          alt={product.name}
-                          fill
-                          className="object-cover"
-                        />
-                      ) : (
-                        <span className="text-5xl">
-                          {(() => {
-                            const category = CATEGORIES.find(c => c.id === product.category)
-                            const IconComponent = category ? categoryIcons[category.icon] : null
-                            return IconComponent ? <IconComponent className="w-12 h-12 text-gray-400" /> : '🔧'
-                          })()}
-                        </span>
-                      )}
-                      {/* Type Badge */}
-                      <div className={`absolute top-2 left-2 px-2 py-1 rounded-lg text-xs font-bold ${
-                        product.type === 'original' ? 'bg-[#E10600] text-white' :
-                        'bg-gray-200 text-gray-700'
-                      }`}>
-                        {product.type === 'original' ? 'Original' : 'Genérico'}
-                      </div>
-                    </div>
+                {products.map(product => {
+                  const isLowStock = product.stock < 5 && product.stock > 0
+                  const isOutOfStock = product.stock === 0
+                  const isQuickAdded = quickAddedId === product.id
 
-                    {/* Content */}
-                    <div className="p-3">
-                      <div className="text-xs text-gray-500 mb-1">
-                        {product.brand}
+                  return (
+                    <Link
+                      key={product.id}
+                      href={`/producto/${product.id}`}
+                      className="bg-white rounded-xl border border-gray-200 overflow-hidden active:scale-95 transition-transform group relative"
+                    >
+                      {/* Image */}
+                      <div className="aspect-square bg-gray-100 flex items-center justify-center relative">
+                        {product.images[0] ? (
+                          <Image
+                            src={product.images[0]}
+                            alt={product.name}
+                            fill
+                            className="object-cover"
+                          />
+                        ) : (
+                          <span className="text-5xl">
+                            {(() => {
+                              const category = CATEGORIES.find(c => c.id === product.category)
+                              const IconComponent = category ? categoryIcons[category.icon] : null
+                              return IconComponent ? <IconComponent className="w-12 h-12 text-gray-400" /> : '🔧'
+                            })()}
+                          </span>
+                        )}
+
+                        {/* Type Badge */}
+                        <div className={`absolute top-2 left-2 px-2 py-1 rounded-lg text-xs font-bold ${
+                          product.type === 'original' ? 'bg-[#E10600] text-white' :
+                          'bg-gray-200 text-gray-700'
+                        }`}>
+                          {product.type === 'original' ? 'Original' : 'Genérico'}
+                        </div>
+
+                        {/* Low Stock Badge */}
+                        {isLowStock && (
+                          <div className="absolute top-2 right-2 bg-orange-500 text-white px-2 py-1 rounded-lg text-xs font-bold">
+                            Solo {product.stock}
+                          </div>
+                        )}
+
+                        {/* Out of Stock Badge */}
+                        {isOutOfStock && (
+                          <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                            <span className="bg-gray-800 text-white px-3 py-1 rounded-lg text-sm font-bold">
+                              Agotado
+                            </span>
+                          </div>
+                        )}
+
+                        {/* Quick Add Button */}
+                        {!isOutOfStock && (
+                          <button
+                            onClick={(e) => handleQuickAdd(e, product)}
+                            className={`absolute bottom-2 right-2 w-10 h-10 rounded-full flex items-center justify-center shadow-lg transition-all transform hover:scale-110 active:scale-95 ${
+                              isQuickAdded
+                                ? 'bg-green-500 text-white'
+                                : 'bg-[#E10600] text-white hover:bg-[#B00500]'
+                            }`}
+                            aria-label={isQuickAdded ? 'Agregado' : 'Agregar al carrito'}
+                          >
+                            {isQuickAdded ? (
+                              <Check className="w-5 h-5" />
+                            ) : (
+                              <Plus className="w-5 h-5" />
+                            )}
+                          </button>
+                        )}
                       </div>
-                      <h3 className="font-bold text-[#111111] text-sm line-clamp-2 mb-2">
-                        {product.name}
-                      </h3>
-                      <div className="text-lg font-extrabold text-[#E10600]">
-                        ${product.price.toFixed(2)}
+
+                      {/* Content */}
+                      <div className="p-3">
+                        <div className="text-xs text-gray-500 mb-1">
+                          {product.brand}
+                        </div>
+                        <h3 className="font-bold text-[#111111] text-sm line-clamp-2 mb-2">
+                          {product.name}
+                        </h3>
+                        <div className="text-lg font-extrabold text-[#E10600]">
+                          ${product.price.toFixed(2)}
+                        </div>
                       </div>
-                    </div>
-                  </Link>
-                ))}
+                    </Link>
+                  )
+                })}
               </div>
             )}
           </main>
