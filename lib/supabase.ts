@@ -52,8 +52,10 @@ export type Order = {
   delivery_cost: number
   total: number
   payment_method: string
-  status: 'pendiente' | 'confirmado' | 'en_camino' | 'entregado' | 'cancelado'
+  status: 'draft' | 'pending_payment' | 'confirmed' | 'cancelled' | 'pendiente' | 'confirmado' | 'en_camino' | 'entregado'
   notes: string | null
+  comprobante_url: string | null
+  comprobante_subido_at: string | null
   created_at: string
 }
 

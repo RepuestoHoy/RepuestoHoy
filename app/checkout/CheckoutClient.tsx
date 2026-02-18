@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -10,7 +10,7 @@ import { useCart } from '@/components/CartContext'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import WhatsAppButton from '@/components/WhatsAppButton'
-import { Check, AlertCircle, User, LogIn } from 'lucide-react'
+import { Check, AlertCircle, User, LogIn, Upload, FileText, X, Eye } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 
 const PAYMENT_METHODS = [
@@ -19,9 +19,21 @@ const PAYMENT_METHODS = [
   { id: 'efectivo', name: 'Efectivo', description: 'Al recibir el pedido', icon: '💵' },
 ]
 
+// Tipos de archivo permitidos
+const ALLOWED_FILE_TYPES = [
+  'image/jpeg',
+  'image/png',
+  'image/gif',
+  'image/webp',
+  'application/pdf',
+]
+
+const MAX_FILE_SIZE_MB = 5
+
 export default function CheckoutClient() {
   const router = useRouter()
   const { items, getSubtotal, clearCart } = useCart()
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const [formData, setFormData] = useState({
     name: '',
@@ -38,12 +50,29 @@ export default function CheckoutClient() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState('')
   const [user, setUser] = useState<any>(null)
-  const [showAuthPrompt, setShowAuthPrompt] = useState(false)
+
+  // Estados para el comprobante
+  const [comprobante, setComprobante] = useState<{
+    file: File | null
+    preview: string | null
+    url: string | null
+    isUploading: boolean
+    uploadProgress: number
+  }>({
+    file: null,
+    preview: null,
+    url: null,
+    isUploading: false,
+    uploadProgress: 0,
+  })
 
   const deliveryZone = DELIVERY_ZONES.find(z => z.id === selectedZone)
   const deliveryCost = deliveryZone?.cost || 0
   const subtotal = getSubtotal()
   const total = subtotal + deliveryCost
+
+  // Verificar si el método de pago requiere comprobante
+  const requiresComprobante = paymentMethod === 'pago_movil' || paymentMethod === 'zelle'
 
   // Check if user is logged in and prefill form
   useEffect(() => {
@@ -109,8 +138,115 @@ export default function CheckoutClient() {
     setErrors(prev => ({ ...prev, [name]: error }))
   }
 
+  // ─── Manejo de comprobante ────────────────────────────────────────────────
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    // Validar tipo de archivo
+    if (!ALLOWED_FILE_TYPES.includes(file.type)) {
+      setErrors(prev => ({ 
+        ...prev, 
+        comprobante: 'Solo se permiten imágenes (JPG, PNG, GIF, WebP) o PDF' 
+      }))
+      return
+    }
+
+    // Validar tamaño
+    if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
+      setErrors(prev => ({ 
+        ...prev, 
+        comprobante: `El archivo es demasiado grande. Máximo ${MAX_FILE_SIZE_MB}MB` 
+      }))
+      return
+    }
+
+    // Crear preview
+    let preview: string | null = null
+    if (file.type.startsWith('image/')) {
+      preview = URL.createObjectURL(file)
+    }
+
+    setComprobante({
+      file,
+      preview,
+      url: null,
+      isUploading: true,
+      uploadProgress: 0,
+    })
+    setErrors(prev => ({ ...prev, comprobante: '' }))
+
+    // Subir archivo inmediatamente
+    await uploadComprobante(file)
+  }
+
+  const uploadComprobante = async (file: File) => {
+    const formData = new FormData()
+    formData.append('file', file)
+
+    try {
+      const res = await fetch('/api/upload-comprobante', {
+        method: 'POST',
+        body: formData,
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Error subiendo el archivo')
+      }
+
+      setComprobante(prev => ({
+        ...prev,
+        url: data.url,
+        isUploading: false,
+        uploadProgress: 100,
+      }))
+    } catch (err: any) {
+      setErrors(prev => ({ ...prev, comprobante: err.message }))
+      setComprobante(prev => ({
+        ...prev,
+        isUploading: false,
+      }))
+    }
+  }
+
+  const removeComprobante = async () => {
+    if (comprobante.url) {
+      // Intentar eliminar del servidor
+      try {
+        const path = comprobante.url.split('/comprobantes/').pop()
+        if (path) {
+          await fetch(`/api/upload-comprobante?path=${encodeURIComponent(path)}`, {
+            method: 'DELETE',
+          })
+        }
+      } catch (err) {
+        console.error('Error removing file:', err)
+      }
+    }
+
+    // Limpiar preview URL
+    if (comprobante.preview) {
+      URL.revokeObjectURL(comprobante.preview)
+    }
+
+    setComprobante({
+      file: null,
+      preview: null,
+      url: null,
+      isUploading: false,
+      uploadProgress: 0,
+    })
+
+    // Limpiar input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''
+    }
+  }
+
   const isFormValid = useMemo(() => {
-    return (
+    const baseValid =
       formData.name.trim() &&
       formData.phone.trim() &&
       formData.phone.length >= 10 &&
@@ -119,8 +255,14 @@ export default function CheckoutClient() {
       selectedZone &&
       paymentMethod &&
       !Object.values(errors).some(e => e)
-    )
-  }, [formData, selectedZone, paymentMethod, errors])
+
+    // Si requiere comprobante, debe estar subido
+    if (requiresComprobante) {
+      return baseValid && comprobante.url && !comprobante.isUploading
+    }
+
+    return baseValid
+  }, [formData, selectedZone, paymentMethod, errors, comprobante, requiresComprobante])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -146,6 +288,7 @@ export default function CheckoutClient() {
           address: formData.address,
           paymentMethod,
           notes: formData.notes || undefined,
+          comprobanteUrl: comprobante.url || undefined,
         }),
       })
 
@@ -171,6 +314,7 @@ export default function CheckoutClient() {
           address: formData.address,
           paymentMethod,
           notes: formData.notes,
+          comprobanteUrl: comprobante.url,
           createdAt: new Date().toISOString(),
         }))
       } catch (storageError) {
@@ -440,6 +584,91 @@ export default function CheckoutClient() {
                 </div>
               )}
 
+              {/* Campo de comprobante */}
+              {requiresComprobante && (
+                <div className="mt-6">
+                  <label className="block text-sm font-bold text-[#111111] mb-3 uppercase">
+                    Comprobante de pago *
+                  </label>
+                  
+                  {!comprobante.url && !comprobante.isUploading && (
+                    <div className="relative">
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/*,.pdf"
+                        onChange={handleFileSelect}
+                        className="hidden"
+                        id="comprobante-upload"
+                      />
+                      <label
+                        htmlFor="comprobante-upload"
+                        className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-[#E0E0E0] rounded-lg cursor-pointer hover:border-[#E10600] hover:bg-red-50 transition-all"
+                      >
+                        <Upload className="w-8 h-8 text-[#E10600] mb-2" />
+                        <p className="text-sm text-[#2A2A2A] font-medium">Haz clic para subir comprobante</p>
+                        <p className="text-xs text-gray-400 mt-1">JPG, PNG, GIF, WebP o PDF (máx. 5MB)</p>
+                      </label>
+                    </div>
+                  )}
+
+                  {comprobante.isUploading && (
+                    <div className="flex flex-col items-center justify-center w-full h-32 border-2 border-[#E0E0E0] rounded-lg bg-gray-50">
+                      <div className="animate-spin w-8 h-8 border-4 border-[#E10600] border-t-transparent rounded-full mb-2"></div>
+                      <p className="text-sm text-[#2A2A2A]">Subiendo comprobante...</p>
+                    </div>
+                  )}
+
+                  {comprobante.url && !comprobante.isUploading && (
+                    <div className="flex items-center gap-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+                      <div className="w-16 h-16 bg-white rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
+                        {comprobante.preview ? (
+                          <img 
+                            src={comprobante.preview} 
+                            alt="Comprobante" 
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <FileText className="w-8 h-8 text-green-600" />
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-green-800 truncate">
+                          {comprobante.file?.name || 'Comprobante subido'}
+                        </p>
+                        <p className="text-xs text-green-600">✅ Listo para enviar</p>
+                      </div>
+                      <div className="flex gap-2">
+                        <a
+                          href={comprobante.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="p-2 bg-white rounded-lg border border-green-200 hover:bg-green-100 transition-colors"
+                          title="Ver comprobante"
+                        >
+                          <Eye className="w-4 h-4 text-green-700" />
+                        </a>
+                        <button
+                          type="button"
+                          onClick={removeComprobante}
+                          className="p-2 bg-white rounded-lg border border-green-200 hover:bg-red-50 hover:border-red-200 transition-colors"
+                          title="Eliminar comprobante"
+                        >
+                          <X className="w-4 h-4 text-red-600" />
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {errors.comprobante && (
+                    <p className="text-red-500 text-xs mt-2 flex items-center gap-1">
+                      <AlertCircle className="w-3 h-3" />
+                      {errors.comprobante}
+                    </p>
+                  )}
+                </div>
+              )}
+
               <div className="mt-4">
                 <label htmlFor="notes" className="block text-sm font-bold text-[#111111] mb-2 uppercase">
                   Notas adicionales (opcional)
@@ -505,6 +734,15 @@ export default function CheckoutClient() {
                   <span className="text-[#E10600]">${total.toFixed(2)}</span>
                 </div>
               </div>
+
+              {requiresComprobante && !comprobante.url && (
+                <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                  <p className="text-xs text-yellow-700 flex items-start gap-2">
+                    <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                    Para {PAYMENT_METHODS.find(m => m.id === paymentMethod)?.name}, debes subir el comprobante de pago
+                  </p>
+                </div>
+              )}
 
               {submitError && (
                 <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg flex items-start gap-2">

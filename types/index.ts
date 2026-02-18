@@ -46,9 +46,11 @@ export interface Order {
   total: number
   deliveryZone: string
   address: string
-  status: 'pendiente' | 'confirmado' | 'en_camino' | 'entregado' | 'cancelado'
+  status: 'draft' | 'pending_payment' | 'confirmed' | 'cancelled' | 'pendiente' | 'confirmado' | 'en_camino' | 'entregado'
   paymentMethod: 'pago_movil' | 'zelle' | 'efectivo'
   notes?: string
+  comprobanteUrl?: string
+  comprobanteSubidoAt?: string
   createdAt?: string
 }
 
