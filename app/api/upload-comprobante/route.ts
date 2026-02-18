@@ -94,7 +94,7 @@ export async function POST(req: NextRequest) {
         .update({
           comprobante_url: publicUrl,
           comprobante_subido_at: new Date().toISOString(),
-          status: 'pending_payment',
+          status: 'pendiente',
         })
         .eq('id', orderId)
 

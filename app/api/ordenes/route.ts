@@ -326,7 +326,7 @@ export async function POST(request: NextRequest) {
         address,
         payment_method: paymentMethod,
         notes,
-        status: comprobante_url ? 'confirmed' : 'pending_payment',
+        status: comprobante_url ? 'confirmado' : 'pendiente',
         comprobante_url,
         comprobante_subido_at: comprobante_url ? new Date().toISOString() : null,
       }])
@@ -416,7 +416,7 @@ export async function PATCH(request: NextRequest) {
       .update({
         comprobante_url: comprobanteUrl,
         comprobante_subido_at: new Date().toISOString(),
-        status: 'confirmed',
+        status: 'confirmado',
       })
       .eq('id', orderId)
       .select()
