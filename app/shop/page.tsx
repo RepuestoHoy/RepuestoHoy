@@ -1,7 +1,7 @@
 'use client'
 
 import { Suspense } from 'react'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { CATEGORIES } from '@/lib/data'
@@ -18,40 +18,40 @@ import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import WhatsAppButton from '@/components/WhatsAppButton'
 
-// Categorías con íconos SVG personalizados
+// Categorías con íconos SVG personalizados - Colores consistentes con la marca
 const CATEGORY_GROUPS = [
   {
     title: 'Mantenimiento Esencial',
     description: 'Lo que tu carro necesita regularmente',
     items: [
-      { id: 'frenos', name: 'Frenos', icon: BrakeIcon, color: 'from-red-500 to-red-600', desc: 'Pastillas, discos' },
-      { id: 'filtros', name: 'Filtros', icon: FilterIcon, color: 'from-blue-500 to-blue-600', desc: 'Aceite, aire, gasolina' },
-      { id: 'bateria', name: 'Batería', icon: BatteryIcon, color: 'from-green-500 to-green-600', desc: 'Baterías y cables' },
-      { id: 'aceites', name: 'Aceites', icon: OilIcon, color: 'from-amber-500 to-amber-600', desc: 'Motor, caja' },
-      { id: 'bujias', name: 'Bujías', icon: SparkPlugIcon, color: 'from-purple-500 to-purple-600', desc: 'Encendido' },
-      { id: 'neumaticos', name: 'Neumáticos', icon: TireIcon, color: 'from-gray-600 to-gray-700', desc: 'Cauchos' },
+      { id: 'frenos', name: 'Frenos', icon: BrakeIcon, color: 'from-[#E10600] to-[#B00500]', desc: 'Pastillas, discos' },
+      { id: 'filtros', name: 'Filtros', icon: FilterIcon, color: 'from-[#E10600] to-[#B00500]', desc: 'Aceite, aire, gasolina' },
+      { id: 'bateria', name: 'Batería', icon: BatteryIcon, color: 'from-[#E10600] to-[#B00500]', desc: 'Baterías y cables' },
+      { id: 'aceites', name: 'Aceites', icon: OilIcon, color: 'from-[#E10600] to-[#B00500]', desc: 'Motor, caja' },
+      { id: 'bujias', name: 'Bujías', icon: SparkPlugIcon, color: 'from-[#E10600] to-[#B00500]', desc: 'Encendido' },
+      { id: 'neumaticos', name: 'Neumáticos', icon: TireIcon, color: 'from-[#E10600] to-[#B00500]', desc: 'Cauchos' },
     ]
   },
   {
     title: 'Reparación',
     description: 'Cuando algo necesita arreglo',
     items: [
-      { id: 'suspension', name: 'Suspensión', icon: SuspensionIcon, color: 'from-slate-500 to-slate-600', desc: 'Amortiguadores' },
-      { id: 'enfriamiento', name: 'Enfriamiento', icon: CoolingIcon, color: 'from-cyan-500 to-cyan-600', desc: 'Radiador' },
-      { id: 'motor', name: 'Motor', icon: EngineIcon, color: 'from-orange-500 to-orange-600', desc: 'Correas, juntas' },
-      { id: 'sensores', name: 'Sensores', icon: SensorIcon, color: 'from-indigo-500 to-indigo-600', desc: 'Check engine' },
+      { id: 'suspension', name: 'Suspensión', icon: SuspensionIcon, color: 'from-[#111111] to-[#2A2A2A]', desc: 'Amortiguadores' },
+      { id: 'enfriamiento', name: 'Enfriamiento', icon: CoolingIcon, color: 'from-[#111111] to-[#2A2A2A]', desc: 'Radiador' },
+      { id: 'motor', name: 'Motor', icon: EngineIcon, color: 'from-[#111111] to-[#2A2A2A]', desc: 'Correas, juntas' },
+      { id: 'sensores', name: 'Sensores', icon: SensorIcon, color: 'from-[#111111] to-[#2A2A2A]', desc: 'Check engine' },
     ]
   },
   {
     title: 'Mejoras & Accesorios',
     description: 'Personaliza tu carro',
     items: [
-      { id: 'audio', name: 'Audio', icon: AudioIcon, color: 'from-pink-500 to-pink-600', desc: 'Parlantes, radio' },
-      { id: 'iluminacion', name: 'Iluminación', icon: LightIcon, color: 'from-yellow-400 to-yellow-500', desc: 'LED, faros' },
-      { id: 'interior', name: 'Interior', icon: InteriorIcon, color: 'from-teal-500 to-teal-600', desc: 'Cubreasientos' },
-      { id: 'exterior', name: 'Exterior', icon: ExteriorIcon, color: 'from-emerald-500 to-emerald-600', desc: 'Estribos, spoilers' },
-      { id: 'seguridad', name: 'Seguridad', icon: SecurityIcon, color: 'from-rose-500 to-rose-600', desc: 'Cámaras, alarmas' },
-      { id: 'herramientas', name: 'Herramientas', icon: ToolIcon, color: 'from-stone-500 to-stone-600', desc: 'Kit de emergencia' },
+      { id: 'audio', name: 'Audio', icon: AudioIcon, color: 'from-[#E10600] to-[#B00500]', desc: 'Parlantes, radio' },
+      { id: 'iluminacion', name: 'Iluminación', icon: LightIcon, color: 'from-[#E10600] to-[#B00500]', desc: 'LED, faros' },
+      { id: 'interior', name: 'Interior', icon: InteriorIcon, color: 'from-[#E10600] to-[#B00500]', desc: 'Cubreasientos' },
+      { id: 'exterior', name: 'Exterior', icon: ExteriorIcon, color: 'from-[#E10600] to-[#B00500]', desc: 'Estribos, spoilers' },
+      { id: 'seguridad', name: 'Seguridad', icon: SecurityIcon, color: 'from-[#111111] to-[#2A2A2A]', desc: 'Cámaras, alarmas' },
+      { id: 'herramientas', name: 'Herramientas', icon: ToolIcon, color: 'from-[#111111] to-[#2A2A2A]', desc: 'Kit de emergencia' },
     ]
   }
 ]
@@ -61,12 +61,27 @@ function ShopContent() {
   const searchParams = useSearchParams()
   const [categoryCounts, setCategoryCounts] = useState<Record<string, number>>({})
   const [loading, setLoading] = useState(true)
+  const [searchQuery, setSearchQuery] = useState('')
   
   const brand = searchParams?.get('brand') || ''
   const model = searchParams?.get('model') || ''
   const year = searchParams?.get('year') || ''
   
   const vehicleName = brand && model ? `${brand} ${model} ${year}` : 'tu vehículo'
+  
+  // Filtrar categorías basado en la búsqueda
+  const filteredGroups = useMemo(() => {
+    if (!searchQuery.trim()) return CATEGORY_GROUPS
+    
+    const query = searchQuery.toLowerCase()
+    return CATEGORY_GROUPS.map(group => ({
+      ...group,
+      items: group.items.filter(item => 
+        item.name.toLowerCase().includes(query) || 
+        item.desc.toLowerCase().includes(query)
+      )
+    })).filter(group => group.items.length > 0)
+  }, [searchQuery])
   
   useEffect(() => {
     if (!brand || !model || !year) {
@@ -191,8 +206,44 @@ function ShopContent() {
           </div>
         </div>
         
+        {/* Search Bar */}
+        <div className="mb-8">
+          <div className="relative max-w-xl mx-auto">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Buscar categoría... (ej: cauchos, frenos, etc.)"
+              className="w-full px-5 py-4 pl-12 bg-white border-2 border-gray-200 rounded-2xl text-[#111111] placeholder-gray-400 focus:outline-none focus:border-[#E10600] transition-colors text-lg"
+            />
+            <svg 
+              className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            )}
+          </div>
+          {searchQuery && (
+            <p className="text-center text-sm text-gray-500 mt-2">
+              {filteredGroups.reduce((acc, group) => acc + group.items.length, 0)} categorías encontradas
+            </p>
+          )}
+        </div>
+
         {/* Grupos de categorías estilo CARiD */}
-        {CATEGORY_GROUPS.map((group) => (
+        {filteredGroups.map((group) => (
           <section 
             key={group.title}
             id={group.title.toLowerCase().replace(/\s+/g, '-')}
