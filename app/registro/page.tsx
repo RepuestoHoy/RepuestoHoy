@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import { Car, UserPlus, Eye, EyeOff, AlertCircle, Check } from 'lucide-react'
-import { validatePhone } from '@/lib/config'
+// Phone validation removed - handled inline
 import { Suspense } from 'react'
 
 function RegistroForm() {
@@ -38,13 +38,6 @@ function RegistroForm() {
     const limitedValue = rawValue.slice(0, 10)
     setFormData(prev => ({ ...prev, phone: limitedValue }))
     setError('')
-  }
-
-  const formatPhoneDisplay = (phone: string) => {
-    if (!phone) return ''
-    // Formato: 0412-1234567
-    if (phone.length <= 4) return phone
-    return `${phone.slice(0, 4)}-${phone.slice(4)}`
   }
 
   const handleRegister = async (e: React.FormEvent) => {
@@ -179,13 +172,14 @@ function RegistroForm() {
                 <input
                   name="phone"
                   type="tel"
-                  value={formatPhoneDisplay(formData.phone)}
+                  inputMode="numeric"
+                  value={formData.phone}
                   onChange={handlePhoneChange}
                   className="input flex-1"
-                  placeholder="0412-1234567"
+                  placeholder="04121234567"
                 />
               </div>
-              <p className="mt-1 text-xs text-gray-400">Ingresa tu número sin el código de país</p>
+              <p className="mt-1 text-xs text-gray-400">10 dígitos, sin espacios ni guiones (ej: 04121234567)</p>
             </div>
             <div>
               <label className="block text-sm font-bold text-[#111111] mb-2">Contraseña *</label>
