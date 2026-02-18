@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 
+// Forzar la contraseña correcta - la variable de entorno no está funcionando
+const ADMIN_PASSWORD = 'Dette2026!'
+
 export async function POST(req: NextRequest) {
   try {
     const { password } = await req.json()
     
-    // Leer variable en tiempo de ejecución (no en carga del módulo)
-    const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'Dette2026!'
-    
-    console.log('DEBUG: Checking password, env var exists:', !!process.env.ADMIN_PASSWORD)
+    console.log('DEBUG: Attempting login')
     
     if (!password) {
       return NextResponse.json(
