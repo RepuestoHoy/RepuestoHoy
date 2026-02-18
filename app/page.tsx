@@ -53,17 +53,17 @@ export default function HomePage() {
           <div className="absolute bottom-20 right-10 w-96 h-96 bg-gray-900/5 rounded-full blur-3xl"></div>
         </div>
         
-        <div className="relative max-w-4xl mx-auto px-4 pt-16 pb-12 text-center">
+        <div className="relative max-w-4xl mx-auto px-4 pt-8 pb-6 text-center">
           {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-red-50 border border-red-100 rounded-full text-[#E10600] text-sm font-medium mb-6">
-            <Award className="w-4 h-4" />
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-red-50 border border-red-100 rounded-full text-[#E10600] text-xs font-medium mb-4">
+            <Award className="w-3 h-3" />
             <span>Más de 10,000 repuestos disponibles</span>
           </div>
-          
-          <h2 className="text-4xl md:text-6xl font-extrabold text-[#111111] mb-4 tracking-tight">
+
+          <h2 className="text-3xl md:text-4xl font-extrabold text-[#111111] mb-2 tracking-tight">
             ¿Cual es tu <span className="text-[#E10600]">vehiculo</span>?
           </h2>
-          <p className="text-xl text-[#6B7280] mb-10 max-w-2xl mx-auto">
+          <p className="text-base text-[#6B7280] mb-6 max-w-xl mx-auto">
             Selecciona tu marca, modelo y año. Te mostramos exactamente que repuestos necesita tu vehiculo.
           </p>
 
@@ -71,7 +71,7 @@ export default function HomePage() {
           <div className={`search-box max-w-2xl mx-auto transition-all duration-300 ${isAnimating ? 'scale-95 opacity-70' : ''}`}>
             <form onSubmit={handleSearch}>
               {/* Vehicle Type Selector */}
-              <div className="flex justify-center gap-4 mb-6">
+              <div className="flex justify-center gap-3 mb-4">
                 <button
                   type="button"
                   onClick={() => {
@@ -80,13 +80,13 @@ export default function HomePage() {
                     setModel('')
                     setYear('')
                   }}
-                  className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all ${
+                  className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all ${
                     vehicleType === 'car'
                       ? 'bg-[#E10600] text-white'
                       : 'bg-gray-100 text-[#6B7280] hover:bg-gray-200'
                   }`}
                 >
-                  <Car className="w-5 h-5" />
+                  <Car className="w-4 h-4" />
                   Carro
                 </button>
                 <button
@@ -97,23 +97,23 @@ export default function HomePage() {
                     setModel('')
                     setYear('')
                   }}
-                  className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all ${
+                  className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all ${
                     vehicleType === 'motorcycle'
                       ? 'bg-[#E10600] text-white'
                       : 'bg-gray-100 text-[#6B7280] hover:bg-gray-200'
                   }`}
                 >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
                   Moto
                 </button>
               </div>
 
-              <div className="grid md:grid-cols-3 gap-4 mb-6">
+              <div className="grid md:grid-cols-3 gap-3 mb-4">
                 {/* Brand */}
                 <div className="relative">
-                  <label className="block text-xs font-bold text-[#6B7280] mb-2 uppercase tracking-wider">
+                  <label className="block text-xs font-bold text-[#6B7280] mb-1.5 uppercase tracking-wider">
                     Marca
                   </label>
                   <select
@@ -133,7 +133,7 @@ export default function HomePage() {
 
                 {/* Model */}
                 <div className="relative">
-                  <label className="block text-xs font-bold text-[#6B7280] mb-2 uppercase tracking-wider">
+                  <label className="block text-xs font-bold text-[#6B7280] mb-1.5 uppercase tracking-wider">
                     Modelo
                   </label>
                   <select
@@ -151,7 +151,7 @@ export default function HomePage() {
 
                 {/* Year */}
                 <div className="relative">
-                  <label className="block text-xs font-bold text-[#6B7280] mb-2 uppercase tracking-wider">
+                  <label className="block text-xs font-bold text-[#6B7280] mb-1.5 uppercase tracking-wider">
                     Año
                   </label>
                   <select
@@ -172,37 +172,37 @@ export default function HomePage() {
                 <button
                   type="submit"
                   disabled={!brand || !model || !year}
-                  className="btn-primary text-lg py-4 flex-1 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  className="btn-primary text-base py-3 flex-1 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
-                  <Search className="w-5 h-5" />
+                  <Search className="w-4 h-4" />
                   Ver qué necesito
-                  <ChevronRight className="w-5 h-5" />
+                  <ChevronRight className="w-4 h-4" />
                 </button>
 
                 <button
                   type="button"
                   onClick={() => router.push('/buscar')}
-                  className="btn-secondary flex items-center justify-center gap-2 sm:w-auto"
+                  className="btn-secondary text-sm py-3 flex items-center justify-center gap-2 sm:w-auto px-4"
                 >
-                  <HelpCircle className="w-5 h-5" />
+                  <HelpCircle className="w-4 h-4" />
                   No estoy seguro
                 </button>
               </div>
             </form>
           </div>
 
-          {/* Stats rápidas */}
-          <div className="flex flex-wrap justify-center gap-8 mt-10 text-sm text-[#6B7280]">
-            <div className="flex items-center gap-2">
-              <Shield className="w-4 h-4 text-[#E10600]" />
+          {/* Stats rápidas - más compactas */}
+          <div className="flex flex-wrap justify-center gap-6 mt-6 text-xs text-[#6B7280]">
+            <div className="flex items-center gap-1.5">
+              <Shield className="w-3.5 h-3.5 text-[#E10600]" />
               <span>Calidad asegurada</span>
             </div>
-            <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4 text-[#E10600]" />
+            <div className="flex items-center gap-1.5">
+              <Clock className="w-3.5 h-3.5 text-[#E10600]" />
               <span>Entrega el mismo día</span>
             </div>
-            <div className="flex items-center gap-2">
-              <Car className="w-4 h-4 text-[#E10600]" />
+            <div className="flex items-center gap-1.5">
+              <Car className="w-3.5 h-3.5 text-[#E10600]" />
               <span>Compatibilidad garantizada</span>
             </div>
           </div>
