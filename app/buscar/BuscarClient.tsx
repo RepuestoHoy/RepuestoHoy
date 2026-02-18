@@ -4,9 +4,9 @@ import { Suspense, useEffect, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useSearchParams } from 'next/navigation'
-import { SAMPLE_PRODUCTS, CATEGORIES } from '@/lib/data'
+import { SAMPLE_PRODUCTS, CATEGORIES, searchByProblem } from '@/lib/data'
 import { categoryIcons } from '@/components/CategoryIcons'
-import { AlertCircle, X, Plus, Check } from 'lucide-react'
+import { AlertCircle, X, Plus, Check, Search, Lightbulb } from 'lucide-react'
 import Header from '@/components/Header'
 import ProductSkeleton from '@/components/ProductSkeleton'
 import { useCart } from '@/components/CartContext'
@@ -20,6 +20,8 @@ function BuscarContent() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [sortOrder, setSortOrder] = useState<'relevance' | 'price-asc' | 'price-desc'>('relevance')
   const [quickAddedId, setQuickAddedId] = useState<string | null>(null)
+  const [problemSearch, setProblemSearch] = useState('')
+  const [problemSuggestion, setProblemSuggestion] = useState<ReturnType<typeof searchByProblem>>(null)
 
   const brand = searchParams.get('brand') || ''
   const model = searchParams.get('model') || ''
@@ -73,11 +75,61 @@ function BuscarContent() {
     setTimeout(() => setQuickAddedId(null), 1500)
   }
 
+  const handleProblemSearch = (value: string) => {
+    setProblemSearch(value)
+    const suggestion = searchByProblem(value)
+    setProblemSuggestion(suggestion)
+  }
+
+  const applyProblemSuggestion = () => {
+    if (problemSuggestion && problemSuggestion.suggestedCategories.length > 0) {
+      setSelectedCategory(problemSuggestion.suggestedCategories[0])
+      setProblemSearch('')
+      setProblemSuggestion(null)
+    }
+  }
+
   return (
     <>
       {/* Header con filtros activos */}
       <div className="bg-white border-b sticky top-0 z-40">
         <div className="max-w-6xl mx-auto px-4 py-4">
+          {/* Búsqueda inteligente por problema */}
+          <div className="mb-4">
+            <div className="relative">
+              <input
+                type="text"
+                value={problemSearch}
+                onChange={(e) => handleProblemSearch(e.target.value)}
+                placeholder="¿Qué le pasa a tu carro? (ej: ruido al frenar, no prende...)"
+                className="w-full px-4 py-3 pl-11 pr-4 bg-gray-50 border border-gray-200 rounded-xl text-[#111111] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#E10600] focus:border-transparent"
+              />
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            </div>
+            
+            {/* Sugerencia inteligente */}
+            {problemSuggestion && (
+              <div className="mt-2 p-3 bg-amber-50 border border-amber-200 rounded-xl flex items-start gap-3">
+                <Lightbulb className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <p className="text-sm text-amber-800 font-medium">{problemSuggestion.suggestion}</p>
+                  <button
+                    onClick={applyProblemSuggestion}
+                    className="mt-2 text-sm text-[#E10600] font-semibold hover:underline"
+                  >
+                    Ver repuestos recomendados →
+                  </button>
+                </div>
+                <button
+                  onClick={() => {setProblemSearch(''); setProblemSuggestion(null)}}
+                  className="text-amber-400 hover:text-amber-600"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            )}
+          </div>
+
           <div className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-hide">
             {brand && (
               <span className="bg-[#111111] text-white px-4 py-2 rounded-full font-bold text-sm whitespace-nowrap flex-shrink-0">

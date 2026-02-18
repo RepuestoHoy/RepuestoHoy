@@ -131,6 +131,115 @@ export const DELIVERY_ZONES = [
 ]
 
 // Sample products
+// Sistema de búsqueda inteligente por problema
+export interface ProblemSearch {
+  keywords: string[]
+  suggestedCategories: string[]
+  suggestion: string
+}
+
+export const PROBLEM_SEARCHES: ProblemSearch[] = [
+  // Frenos
+  { 
+    keywords: ['ruido', 'chirrido', 'chillido', 'frenar', 'freno', 'rueda', 'pastilla'],
+    suggestedCategories: ['frenos'],
+    suggestion: 'Ruido al frenar → Revisa pastillas y discos de freno'
+  },
+  { 
+    keywords: ['freno', 'blando', 'suave', 'largo', 'no frena', 'frenada'],
+    suggestedCategories: ['frenos', 'aceites'],
+    suggestion: 'Freno blando → Puede ser pastillas desgastadas o líquido de frenos'
+  },
+  // Batería / Eléctrico
+  { 
+    keywords: ['no prende', 'no arranca', 'muerto', 'bateria', 'batería', 'electricidad', 'luz', 'apagado'],
+    suggestedCategories: ['bateria'],
+    suggestion: 'No prende → Probablemente batería o sistema de carga'
+  },
+  { 
+    keywords: ['luz', 'check', 'testigo', 'tablero', 'check engine', 'falla'],
+    suggestedCategories: ['sensores', 'bateria'],
+    suggestion: 'Luz en tablero → Revisa sensores y batería'
+  },
+  // Motor / Encendido
+  { 
+    keywords: ['vibra', 'vibracion', 'vibración', 'temblando', 'inestable', 'falla'],
+    suggestedCategories: ['bujias', 'motor', 'filtros'],
+    suggestion: 'Vibración → Puede ser bujías, filtros o soporte de motor'
+  },
+  { 
+    keywords: ['frio', 'frío', 'mañana', 'calentar', 'temperatura'],
+    suggestedCategories: ['bujias', 'sensores', 'enfriamiento'],
+    suggestion: 'Problemas en frío → Revisa bujías, sensor de temperatura o termostato'
+  },
+  { 
+    keywords: ['aceite', 'consumo', 'pierde', 'gotea', 'fuga', 'quema'],
+    suggestedCategories: ['aceites', 'filtros', 'motor'],
+    suggestion: 'Consumo de aceite → Revisa filtro de aceite y sellos del motor'
+  },
+  // Suspensión
+  { 
+    keywords: ['golpe', 'ruido', 'calle', 'tope', 'bache', 'amortiguador', 'suspension'],
+    suggestedCategories: ['suspension'],
+    suggestion: 'Ruido en baches → Probablemente amortiguadores o bujes'
+  },
+  { 
+    keywords: ['direccion', 'dirección', 'dura', 'pesada', 'volante', 'girar'],
+    suggestedCategories: ['direccion'],
+    suggestion: 'Dirección dura → Revisa bomba de dirección o terminales'
+  },
+  // Transmisión
+  { 
+    keywords: ['cambio', 'embrague', 'clutch', 'patina', 'duras', 'velocidad'],
+    suggestedCategories: ['transmision'],
+    suggestion: 'Problemas de cambio → Puede ser embrague o aceite de transmisión'
+  },
+  // Neumáticos
+  { 
+    keywords: ['caucho', 'neumatico', 'neumático', 'llanta', 'desgaste', 'desgastado'],
+    suggestedCategories: ['neumaticos'],
+    suggestion: 'Desgaste de cauchos → Revisa neumáticos y alineación'
+  },
+  // Enfriamiento
+  { 
+    keywords: ['calienta', 'temperatura', 'agua', 'refrigerante', 'vapor'],
+    suggestedCategories: ['enfriamiento'],
+    suggestion: 'Se calienta → Revisa radiador, bomba de agua o termostato'
+  },
+  // Escape
+  { 
+    keywords: ['escape', 'ruido', 'tubo', 'humo', 'olor'],
+    suggestedCategories: ['escape'],
+    suggestion: 'Ruido en escape → Puede ser tubo o catalizador'
+  },
+  // Filtros generales
+  { 
+    keywords: ['aire', 'acondicionado', 'polen', 'polvo', 'olor'],
+    suggestedCategories: ['filtros'],
+    suggestion: 'Problema de aire → Revisa filtro de cabina y de aire'
+  },
+  // Mantenimiento general
+  { 
+    keywords: ['mantenimiento', 'service', 'revision', 'revisión', 'sintonia'],
+    suggestedCategories: ['filtros', 'aceites', 'bujias'],
+    suggestion: 'Mantenimiento general → Filtros, aceite y bujías'
+  }
+]
+
+// Función para buscar problemas
+export function searchByProblem(query: string): ProblemSearch | null {
+  const normalizedQuery = query.toLowerCase().trim()
+  
+  for (const problem of PROBLEM_SEARCHES) {
+    const matches = problem.keywords.some(keyword => 
+      normalizedQuery.includes(keyword)
+    )
+    if (matches) return problem
+  }
+  
+  return null
+}
+
 export const SAMPLE_PRODUCTS: Product[] = [
   {
     id: '1',
