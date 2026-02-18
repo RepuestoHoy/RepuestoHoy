@@ -10,10 +10,11 @@ import { useCart } from '@/components/CartContext'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import WhatsAppButton from '@/components/WhatsAppButton'
-import { Check, AlertCircle } from 'lucide-react'
+import { Check, AlertCircle, User, LogIn } from 'lucide-react'
+import { supabase } from '@/lib/supabase'
 
 const PAYMENT_METHODS = [
-  { id: 'pago_movil', name: 'Pago Móvil', description: 'Transferencia inmediata a Mercantil', icon: '📱', primary: true },
+  { id: 'pago_movil', name: 'Pago Móvil', description: 'Transferencia a Mercantil', icon: '📱', primary: true },
   { id: 'zelle', name: 'Zelle', description: 'Pago desde USA', icon: '🇺🇸' },
   { id: 'efectivo', name: 'Efectivo', description: 'Al recibir el pedido', icon: '💵' },
 ]
@@ -21,7 +22,7 @@ const PAYMENT_METHODS = [
 export default function CheckoutClient() {
   const router = useRouter()
   const { items, getSubtotal, clearCart } = useCart()
-  
+
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -29,32 +30,42 @@ export default function CheckoutClient() {
     address: '',
     notes: ''
   })
-  
+
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [selectedZone, setSelectedZone] = useState('')
   const [paymentMethod, setPaymentMethod] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState('')
+  const [user, setUser] = useState<any>(null)
+  const [showAuthPrompt, setShowAuthPrompt] = useState(false)
 
   const deliveryZone = DELIVERY_ZONES.find(z => z.id === selectedZone)
   const deliveryCost = deliveryZone?.cost || 0
   const subtotal = getSubtotal()
   const total = subtotal + deliveryCost
 
-  // Track page view
+  // Check if user is logged in and prefill form
   useEffect(() => {
-    trackEvent('page_view', { 
-      page_title: 'Finalizar compra',
-      page_location: '/checkout'
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user) {
+        setUser(user)
+        setFormData(prev => ({
+          ...prev,
+          email: user.email || '',
+          name: user.user_metadata?.full_name || '',
+          phone: user.user_metadata?.phone || '',
+        }))
+      }
     })
+    trackEvent('page_view', { page_title: 'Finalizar compra' })
   }, [])
 
-  // Validación en tiempo real
   const validateField = (name: string, value: string): string => {
     switch (name) {
       case 'phone':
-        return validatePhone(value) ? '' : 'Formato: 0412-1234567'
+        return value && !validatePhone(value) ? 'Formato: 0412-1234567' : ''
       case 'email':
-        return validateEmail(value) ? '' : 'Email inválido'
+        return value && !validateEmail(value) ? 'Email inválido' : ''
       default:
         return ''
     }
@@ -63,8 +74,6 @@ export default function CheckoutClient() {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
     setFormData(prev => ({ ...prev, [name]: value }))
-    
-    // Validar en tiempo real
     const error = validateField(name, value)
     setErrors(prev => ({ ...prev, [name]: error }))
   }
@@ -77,74 +86,78 @@ export default function CheckoutClient() {
       validateEmail(formData.email) &&
       formData.address.trim() &&
       selectedZone &&
-      paymentMethod
+      paymentMethod &&
+      !Object.values(errors).some(e => e)
     )
-  }, [formData, selectedZone, paymentMethod])
-
-  const generateOrderNumber = () => {
-    // Usar timestamp + random para evitar duplicados
-    const timestamp = Date.now().toString(36).toUpperCase()
-    const random = Math.random().toString(36).substring(2, 5).toUpperCase()
-    return `RH-${timestamp}-${random}`
-  }
+  }, [formData, selectedZone, paymentMethod, errors])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
-    if (!isFormValid) {
-      return
-    }
+    if (!isFormValid) return
 
     setIsSubmitting(true)
-    
-    const orderNum = generateOrderNumber()
-    
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500))
-    
-    const order = {
-      id: orderNum,
-      customerName: formData.name,
-      customerPhone: formData.phone,
-      customerEmail: formData.email || undefined,
-      items: items,
-      subtotal: subtotal,
-      deliveryCost: deliveryCost,
-      total: total,
-      deliveryZone: deliveryZone?.name || '',
-      address: formData.address,
-      paymentMethod: paymentMethod,
-      notes: formData.notes,
-      createdAt: new Date().toISOString()
-    }
-    
-    // Guardar en localStorage con try/catch
+    setSubmitError('')
+
     try {
-      localStorage.setItem('repuestohoy-last-order', JSON.stringify(order))
-    } catch (error) {
-      console.error('Error saving order:', error)
-      alert('Error al guardar el pedido. Intenta de nuevo.')
+      const res = await fetch('/api/ordenes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          customerName: formData.name,
+          customerPhone: formData.phone,
+          customerEmail: formData.email || undefined,
+          items,
+          subtotal,
+          deliveryCost,
+          total,
+          deliveryZone: deliveryZone?.name || selectedZone,
+          address: formData.address,
+          paymentMethod,
+          notes: formData.notes || undefined,
+        }),
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Error al procesar tu pedido')
+      }
+
+      // Save to localStorage for the thank-you page
+      try {
+        localStorage.setItem('repuestohoy-last-order', JSON.stringify({
+          ...data.order,
+          id: data.order.order_number,
+          customerName: formData.name,
+          customerPhone: formData.phone,
+          customerEmail: formData.email,
+          items,
+          subtotal,
+          deliveryCost,
+          total,
+          deliveryZone: deliveryZone?.name || selectedZone,
+          address: formData.address,
+          paymentMethod,
+          notes: formData.notes,
+          createdAt: new Date().toISOString(),
+        }))
+      } catch (storageError) {
+        console.error('localStorage error:', storageError)
+      }
+
+      trackEvent('purchase', {
+        transaction_id: data.order.order_number,
+        value: total,
+        currency: 'USD',
+        shipping: deliveryCost,
+      })
+
+      clearCart()
+      router.push('/gracias')
+    } catch (err: any) {
+      setSubmitError(err.message || 'Hubo un error. Por favor intenta de nuevo.')
       setIsSubmitting(false)
-      return
     }
-    
-    // Track purchase
-    trackEvent('purchase', {
-      transaction_id: orderNum,
-      value: total,
-      currency: 'USD',
-      shipping: deliveryCost,
-      items: items.map(item => ({
-        item_id: item.product.id,
-        item_name: item.product.name,
-        item_brand: item.product.brand,
-        price: item.product.price,
-        quantity: item.quantity
-      }))
-    })
-    
-    clearCart()
-    router.push('/gracias')
   }
 
   if (items.length === 0) {
@@ -154,10 +167,8 @@ export default function CheckoutClient() {
         <div className="max-w-2xl mx-auto px-4 py-16 text-center">
           <div className="text-6xl mb-4">🛒</div>
           <h1 className="text-2xl font-bold text-[#111111] mb-4">Tu carrito está vacío</h1>
-          <p className="text-[#2A2A2A] mb-6">Agrega algunos productos para continuar con tu compra.</p>
-          <Link href="/buscar" className="btn-primary inline-block px-8">
-            Ver productos
-          </Link>
+          <p className="text-[#2A2A2A] mb-6">Agrega algunos productos para continuar.</p>
+          <Link href="/buscar" className="btn-primary inline-block px-8">Ver productos</Link>
         </div>
         <Footer />
       </div>
@@ -173,8 +184,40 @@ export default function CheckoutClient() {
           Finalizar compra
         </h1>
 
+        {/* Auth prompt - optional account */}
+        {!user && (
+          <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-xl flex items-center justify-between gap-4 flex-wrap">
+            <div className="flex items-center gap-3">
+              <User className="w-5 h-5 text-blue-600 flex-shrink-0" />
+              <div>
+                <p className="font-semibold text-blue-900 text-sm">¿Tienes cuenta? Inicia sesión para agilizar tu compra</p>
+                <p className="text-xs text-blue-700">Tus datos se llenarán automáticamente. <strong>No es obligatorio.</strong></p>
+              </div>
+            </div>
+            <Link
+              href={`/login?redirect=/checkout`}
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors whitespace-nowrap"
+            >
+              <LogIn className="w-4 h-4" />
+              Iniciar sesión
+            </Link>
+          </div>
+        )}
+
+        {user && (
+          <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-xl flex items-center gap-3">
+            <Check className="w-5 h-5 text-green-600 flex-shrink-0" />
+            <p className="text-sm text-green-800">
+              Comprando como <strong>{user.email}</strong>.{' '}
+              <button onClick={() => supabase.auth.signOut().then(() => setUser(null))} className="underline hover:no-underline">
+                Cerrar sesión
+              </button>
+            </p>
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="grid lg:grid-cols-3 gap-8">
-          {/* Left Column - Forms */}
+          {/* Left Column */}
           <div className="lg:col-span-2 space-y-8">
             {/* Contact Info */}
             <section className="card p-6">
@@ -184,10 +227,11 @@ export default function CheckoutClient() {
               </h2>
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-bold text-[#111111] mb-2 uppercase">
+                  <label htmlFor="name" className="block text-sm font-bold text-[#111111] mb-2 uppercase">
                     Nombre completo *
                   </label>
                   <input
+                    id="name"
                     type="text"
                     name="name"
                     value={formData.name}
@@ -198,28 +242,27 @@ export default function CheckoutClient() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-bold text-[#111111] mb-2 uppercase">
+                  <label htmlFor="phone" className="block text-sm font-bold text-[#111111] mb-2 uppercase">
                     Teléfono *
                   </label>
                   <input
+                    id="phone"
                     type="tel"
                     name="phone"
                     value={formData.phone}
                     onChange={handleInputChange}
                     required
-                    pattern="0(412|414|416|424|426)-\d{7}"
                     className={`input ${errors.phone ? 'border-red-500' : ''}`}
                     placeholder="Ej: 0412-1234567"
                   />
-                  {errors.phone && (
-                    <p className="text-red-500 text-xs mt-1">{errors.phone}</p>
-                  )}
+                  {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
                 </div>
                 <div>
-                  <label className="block text-sm font-bold text-[#111111] mb-2 uppercase">
-                    Email
+                  <label htmlFor="email" className="block text-sm font-bold text-[#111111] mb-2 uppercase">
+                    Email <span className="text-gray-400 font-normal normal-case">(para recibir confirmación)</span>
                   </label>
                   <input
+                    id="email"
                     type="email"
                     name="email"
                     value={formData.email}
@@ -227,9 +270,7 @@ export default function CheckoutClient() {
                     className={`input ${errors.email ? 'border-red-500' : ''}`}
                     placeholder="Ej: juan@email.com"
                   />
-                  {errors.email && (
-                    <p className="text-red-500 text-xs mt-1">{errors.email}</p>
-                  )}
+                  {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
                 </div>
               </div>
             </section>
@@ -240,23 +281,22 @@ export default function CheckoutClient() {
                 <span className="w-8 h-8 bg-[#111111] text-white rounded-full flex items-center justify-center text-sm">2</span>
                 Entrega
               </h2>
-              
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-bold text-[#111111] mb-2 uppercase">
+                  <label htmlFor="address" className="block text-sm font-bold text-[#111111] mb-2 uppercase">
                     Dirección de entrega *
                   </label>
                   <textarea
+                    id="address"
                     name="address"
                     value={formData.address}
                     onChange={handleInputChange}
                     required
                     rows={3}
                     className="input resize-none"
-                    placeholder="Ej: Av. Principal de Las Mercedes, Edificio X, Piso 3, Apartamento 301"
+                    placeholder="Ej: Av. Principal de Las Mercedes, Edificio X, Piso 3, Apto 301"
                   />
                 </div>
-
                 <div>
                   <label className="block text-sm font-bold text-[#111111] mb-3 uppercase">
                     Zona de entrega *
@@ -283,14 +323,10 @@ export default function CheckoutClient() {
                           <div className="font-bold text-[#111111]">{zone.name}</div>
                           <div className="text-sm text-[#2A2A2A]">⏱️ {zone.time}</div>
                         </div>
-                        <div className="text-right">
-                          <div className="font-bold text-[#E10600]">
-                            {zone.cost === 0 ? 'GRATIS' : `$${zone.cost.toFixed(2)}`}
-                          </div>
+                        <div className="font-bold text-[#E10600]">
+                          {zone.cost === 0 ? 'GRATIS' : `$${zone.cost.toFixed(2)}`}
                         </div>
-                        {selectedZone === zone.id && (
-                          <Check className="w-5 h-5 text-[#111111]" />
-                        )}
+                        {selectedZone === zone.id && <Check className="w-5 h-5 text-[#111111]" />}
                       </label>
                     ))}
                   </div>
@@ -304,7 +340,6 @@ export default function CheckoutClient() {
                 <span className="w-8 h-8 bg-[#111111] text-white rounded-full flex items-center justify-center text-sm">3</span>
                 Método de pago *
               </h2>
-              
               <div className="grid sm:grid-cols-3 gap-3">
                 {PAYMENT_METHODS.map(method => (
                   <label
@@ -352,16 +387,17 @@ export default function CheckoutClient() {
               )}
 
               <div className="mt-4">
-                <label className="block text-sm font-bold text-[#111111] mb-2 uppercase">
+                <label htmlFor="notes" className="block text-sm font-bold text-[#111111] mb-2 uppercase">
                   Notas adicionales (opcional)
                 </label>
                 <textarea
+                  id="notes"
                   name="notes"
                   value={formData.notes}
                   onChange={handleInputChange}
                   rows={2}
                   className="input resize-none"
-                  placeholder="Instrucciones especiales de entrega, referencias, etc."
+                  placeholder="Instrucciones especiales, referencias, etc."
                 />
               </div>
             </section>
@@ -374,17 +410,17 @@ export default function CheckoutClient() {
                 Resumen del pedido
               </h2>
 
-              {/* Cart Items */}
               <div className="space-y-4 mb-6 max-h-64 overflow-y-auto">
                 {items.map((item) => (
                   <div key={item.product.id} className="flex gap-3 pb-4 border-b border-[#E0E0E0] last:border-0">
                     <div className="w-16 h-16 bg-[#F5F5F5] rounded-lg flex items-center justify-center flex-shrink-0 relative">
-                      {item.product.images[0] ? (
-                        <Image 
-                          src={item.product.images[0]} 
+                      {item.product.images?.[0] ? (
+                        <Image
+                          src={item.product.images[0]}
                           alt={item.product.name}
                           fill
                           className="object-cover rounded-lg"
+                          onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder-product.png' }}
                         />
                       ) : (
                         <span className="text-xl">🔧</span>
@@ -399,7 +435,6 @@ export default function CheckoutClient() {
                 ))}
               </div>
 
-              {/* Totals */}
               <div className="space-y-3 pb-6 border-b border-[#E0E0E0]">
                 <div className="flex justify-between text-[#2A2A2A]">
                   <span>Subtotal</span>
@@ -408,7 +443,7 @@ export default function CheckoutClient() {
                 <div className="flex justify-between text-[#2A2A2A]">
                   <span>Envío</span>
                   <span className={deliveryCost === 0 ? 'text-green-600 font-bold' : ''}>
-                    {deliveryCost === 0 ? 'GRATIS' : `$${deliveryCost.toFixed(2)}`}
+                    {deliveryCost === 0 ? (selectedZone ? 'GRATIS' : '—') : `$${deliveryCost.toFixed(2)}`}
                   </span>
                 </div>
                 <div className="flex justify-between text-xl font-extrabold text-[#111111] pt-3 border-t border-[#E0E0E0]">
@@ -417,11 +452,17 @@ export default function CheckoutClient() {
                 </div>
               </div>
 
-              {/* Submit Button */}
+              {submitError && (
+                <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg flex items-start gap-2">
+                  <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
+                  <p className="text-sm text-red-700">{submitError}</p>
+                </div>
+              )}
+
               <button
                 type="submit"
                 disabled={!isFormValid || isSubmitting}
-                className="w-full mt-6 btn-primary disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full mt-6 btn-primary disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {isSubmitting ? (
                   <>
