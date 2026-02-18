@@ -41,7 +41,7 @@ async function logEmail(
     await supabaseAdmin.from('email_logs').insert([{
       order_id: orderId,
       email_type: emailType,
-      recipient_email: recipientEmail,
+      recipient: recipientEmail,
       subject,
       status,
       error_message: errorMessage || null,
@@ -345,36 +345,45 @@ export async function POST(request: NextRequest) {
     }
 
     // Enviar emails
-    const emailPromises = []
+    const emailResults = []
 
     // Email al cliente
     if (customerEmail) {
-      emailPromises.push(
-        sendEmail({
-          orderId: order.id,
-          emailType: 'cliente',
-          to: customerEmail,
-          subject: `✅ Pedido confirmado #${orderNumber}`,
-          html: emailTemplateCliente(order),
-        })
-      )
+      console.log(`📧 Enviando email al cliente: ${customerEmail}`)
+      const clienteResult = await sendEmail({
+        orderId: order.id,
+        emailType: 'cliente',
+        to: customerEmail,
+        subject: `✅ Pedido confirmado #${orderNumber}`,
+        html: emailTemplateCliente(order),
+      })
+      emailResults.push({ type: 'cliente', result: clienteResult })
+      
+      if (!clienteResult.success) {
+        console.error('❌ Error enviando email al cliente:', clienteResult.error)
+      } else {
+        console.log('✅ Email al cliente enviado correctamente')
+      }
+    } else {
+      console.log('⚠️ No hay email de cliente, no se envía confirmación')
     }
 
     // Email a ventas
-    emailPromises.push(
-      sendEmail({
-        orderId: order.id,
-        emailType: 'admin',
-        to: 'ventas@repuestohoy.com',
-        subject: `🛒 Nueva orden #${orderNumber}`,
-        html: emailTemplateAdmin(order),
-      })
-    )
-
-    // Ejecutar envíos de email (no bloqueantes)
-    Promise.all(emailPromises).catch(err => {
-      console.error('Email sending error:', err)
+    console.log('📧 Enviando email a ventas@repuestohoy.com')
+    const adminResult = await sendEmail({
+      orderId: order.id,
+      emailType: 'admin',
+      to: 'ventas@repuestohoy.com',
+      subject: `🛒 Nueva orden #${orderNumber}`,
+      html: emailTemplateAdmin(order),
     })
+    emailResults.push({ type: 'admin', result: adminResult })
+    
+    if (!adminResult.success) {
+      console.error('❌ Error enviando email a ventas:', adminResult.error)
+    } else {
+      console.log('✅ Email a ventas enviado correctamente')
+    }
 
     return NextResponse.json({
       success: true,
