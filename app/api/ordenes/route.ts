@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import nodemailer from 'nodemailer'
+import { Resend } from 'resend'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
@@ -9,27 +9,22 @@ const supabaseAdmin = supabaseUrl && supabaseServiceKey
   ? createClient(supabaseUrl, supabaseServiceKey)
   : null
 
-// ─── Configuración SMTP con Gmail ──────────────────────────────────────────
-const smtpConfig = {
-  host: 'smtp.gmail.com',
-  port: 465,
-  secure: true,
-  auth: {
-    user: process.env.GMAIL_USER || 'ventas@repuestohoy.com',
-    pass: process.env.GMAIL_APP_PASSWORD || 'mexi hfsi oxok ugwv',
-  },
-}
+// ─── Configuración Resend ──────────────────────────────────────────
+const FROM_EMAIL = 'ventas@repuestohoy.com'
+const FROM_NAME = 'RepuestoHoy'
 
-const transporter = nodemailer.createTransport(smtpConfig)
-
-// Verificar conexión SMTP
-transporter.verify((error, success) => {
-  if (error) {
-    console.error('SMTP Connection Error:', error)
-  } else {
-    console.log('SMTP Server ready')
+let resendInstance: Resend | null = null
+function getResend() {
+  if (!resendInstance) {
+    const apiKey = process.env.RESEND_API_KEY
+    if (!apiKey) {
+      console.error('RESEND_API_KEY no está configurada')
+      return null
+    }
+    resendInstance = new Resend(apiKey)
   }
-})
+  return resendInstance
+}
 
 // ─── Función para loguear emails ───────────────────────────────────────────
 async function logEmail(
@@ -71,274 +66,209 @@ async function sendEmail({
   subject: string
   html: string
 }) {
-  const GMAIL_USER = process.env.GMAIL_USER || 'ventas@repuestohoy.com'
-
   try {
+    const resend = getResend()
+    if (!resend) {
+      const errorMsg = 'Resend no está configurado (falta RESEND_API_KEY)'
+      console.error(errorMsg)
+      await logEmail(orderId, emailType, to, subject, 'failed', errorMsg)
+      return { success: false, error: errorMsg }
+    }
+
     // Log inicial como pending
     await logEmail(orderId, emailType, to, subject, 'pending')
 
-    const info = await transporter.sendMail({
-      from: `"Repuesto Hoy" <${GMAIL_USER}>`,
-      to,
+    const { data, error } = await resend.emails.send({
+      from: `${FROM_NAME} <${FROM_EMAIL}>`,
+      to: [to],
       subject,
       html,
     })
 
-    console.log(`Email sent successfully to ${to}:`, info.messageId)
+    if (error) {
+      console.error('Resend error:', error)
+      await logEmail(orderId, emailType, to, subject, 'failed', error.message)
+      return { success: false, error: error.message }
+    }
+
+    // Log éxito
     await logEmail(orderId, emailType, to, subject, 'sent')
-    return { success: true, messageId: info.messageId }
+    console.log(`✅ Email ${emailType} enviado a ${to}:`, data?.id)
+    
+    return { success: true, messageId: data?.id }
   } catch (error: any) {
-    console.error(`Error sending email to ${to}:`, error)
+    console.error('Error sending email:', error)
     await logEmail(orderId, emailType, to, subject, 'failed', error.message)
     return { success: false, error: error.message }
   }
 }
 
-// ─── Email templates ───────────────────────────────────────────────────────
-function emailVendedor(order: any) {
-  const itemsHtml = order.items
-    .map(
-      (item: any) => `
-      <tr>
-        <td style="padding:8px 12px;border-bottom:1px solid #eee;">${item.product.name}</td>
-        <td style="padding:8px 12px;border-bottom:1px solid #eee;text-align:center;">${item.quantity}</td>
-        <td style="padding:8px 12px;border-bottom:1px solid #eee;text-align:right;color:#E10600;font-weight:bold;">$${(item.product.price * item.quantity).toFixed(2)}</td>
-      </tr>`
-    )
-    .join('')
-
-  const paymentMap: Record<string, string> = {
-    pago_movil: '📱 Pago Móvil',
-    zelle: '🇺🇸 Zelle',
-    efectivo: '💵 Efectivo',
-  }
-
-  const comprobanteHtml = order.comprobante_url
-    ? `<div style="background:#d4edda;border-left:4px solid #28a745;padding:12px 16px;border-radius:4px;margin-bottom:20px;">
-        <strong style="color:#155724;">✅ COMPROBANTE ADJUNTO</strong><br>
-        <a href="${order.comprobante_url}" style="color:#155724;text-decoration:underline;" target="_blank">Ver comprobante de pago</a>
-       </div>`
-    : `<div style="background:#fff3cd;border-left:4px solid #ffc107;padding:12px 16px;border-radius:4px;margin-bottom:20px;">
-        <strong style="color:#856404;">⏳ ESPERANDO COMPROBANTE</strong><br>
-        <span style="color:#856404;">El cliente aún no ha subido el comprobante de pago.</span>
-       </div>`
+// ─── Plantilla email cliente ───────────────────────────────────────────────
+function emailTemplateCliente(order: any) {
+  const items = order.items?.map((item: any) => `
+    <tr>
+      <td style="padding: 10px; border-bottom: 1px solid #eee;">${item.name}</td>
+      <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: center;">${item.quantity}</td>
+      <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: right;">$${item.price}</td>
+    </tr>
+  `).join('') || ''
 
   return `
 <!DOCTYPE html>
 <html>
-<head><meta charset="UTF-8"></head>
-<body style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#f5f5f5;padding:20px;">
-  <div style="background:#111111;padding:20px;border-radius:12px 12px 0 0;text-align:center;">
-    <h1 style="color:white;margin:0;font-size:24px;">🔧 REPUESTO HOY</h1>
-    <p style="color:#aaa;margin:5px 0 0;">Nueva orden recibida</p>
+<head>
+  <meta charset="utf-8">
+  <title>Pedido Confirmado</title>
+</head>
+<body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #333;">
+  <div style="text-align: center; margin-bottom: 30px;">
+    <h1 style="color: #E10600; margin-bottom: 10px;">✅ ¡Pedido Confirmado!</h1>
+    <p style="font-size: 18px; color: #666;">Gracias por tu compra</p>
   </div>
-  <div style="background:white;padding:24px;border-radius:0 0 12px 12px;">
-    <div style="background:#fff3cd;border-left:4px solid #E10600;padding:12px 16px;border-radius:4px;margin-bottom:20px;">
-      <strong style="color:#E10600;font-size:18px;">🆕 NUEVA ORDEN: ${order.order_number}</strong>
-    </div>
+  
+  <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+    <h2 style="margin-top: 0; color: #111;">Pedido #${order.order_number}</h2>
+    <p><strong>Estado:</strong> <span style="color: #E10600; font-weight: bold;">Pendiente de pago</span></p>
+    <p><strong>Fecha:</strong> ${new Date().toLocaleDateString('es-VE')}</p>
+  </div>
 
-    ${comprobanteHtml}
+  <h3 style="color: #111;">Detalle de productos:</h3>
+  <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+    <thead>
+      <tr style="background: #111; color: white;">
+        <th style="padding: 10px; text-align: left;">Producto</th>
+        <th style="padding: 10px; text-align: center;">Cantidad</th>
+        <th style="padding: 10px; text-align: right;">Precio</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${items}
+    </tbody>
+  </table>
 
-    <table style="width:100%;border-collapse:collapse;margin-bottom:20px;">
-      <tr><td style="padding:6px 0;color:#666;width:140px;">👤 Cliente</td><td style="padding:6px 0;font-weight:bold;">${order.customer_name}</td></tr>
-      <tr><td style="padding:6px 0;color:#666;">📱 Teléfono</td><td style="padding:6px 0;"><a href="https://wa.me/58${order.customer_phone.replace(/^0/, '').replace(/-/g, '')}" style="color:#25D366;font-weight:bold;">${order.customer_phone}</a></td></tr>
-      ${order.customer_email ? `<tr><td style="padding:6px 0;color:#666;">📧 Email</td><td style="padding:6px 0;">${order.customer_email}</td></tr>` : ''}
-      <tr><td style="padding:6px 0;color:#666;">🗺️ Zona</td><td style="padding:6px 0;">${order.delivery_zone}</td></tr>
-      <tr><td style="padding:6px 0;color:#666;">📍 Dirección</td><td style="padding:6px 0;">${order.address}</td></tr>
-      <tr><td style="padding:6px 0;color:#666;">💳 Pago</td><td style="padding:6px 0;">${paymentMap[order.payment_method] || order.payment_method}</td></tr>
-      ${order.notes ? `<tr><td style="padding:6px 0;color:#666;">📝 Notas</td><td style="padding:6px 0;">${order.notes}</td></tr>` : ''}
-    </table>
+  <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+    <p style="margin: 5px 0;"><strong>Subtotal:</strong> $${order.subtotal?.toFixed(2)}</p>
+    <p style="margin: 5px 0;"><strong>Envío:</strong> $${order.delivery_cost?.toFixed(2) || '0.00'}</p>
+    <p style="margin: 5px 0; font-size: 18px; color: #E10600;"><strong>Total:</strong> $${order.total?.toFixed(2)}</p>
+  </div>
 
-    <h3 style="color:#111;border-bottom:2px solid #eee;padding-bottom:8px;">Productos pedidos</h3>
-    <table style="width:100%;border-collapse:collapse;">
-      <thead>
-        <tr style="background:#f5f5f5;">
-          <th style="padding:8px 12px;text-align:left;font-size:13px;color:#666;">Producto</th>
-          <th style="padding:8px 12px;text-align:center;font-size:13px;color:#666;">Cant.</th>
-          <th style="padding:8px 12px;text-align:right;font-size:13px;color:#666;">Total</th>
-        </tr>
-      </thead>
-      <tbody>${itemsHtml}</tbody>
-    </table>
+  <div style="border-left: 4px solid #E10600; padding-left: 15px; margin-bottom: 20px;">
+    <h3 style="margin-top: 0;">📍 Datos de entrega:</h3>
+    <p><strong>Nombre:</strong> ${order.customer_name}</p>
+    <p><strong>Teléfono:</strong> ${order.customer_phone}</p>
+    <p><strong>Dirección:</strong> ${order.address}</p>
+    <p><strong>Zona:</strong> ${order.delivery_zone}</p>
+  </div>
 
-    <div style="background:#f9f9f9;padding:16px;border-radius:8px;margin-top:20px;">
-      <div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span style="color:#666;">Subtotal</span><span>$${order.subtotal.toFixed(2)}</span></div>
-      <div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span style="color:#666;">Envío</span><span>${order.delivery_cost === 0 ? 'GRATIS' : '$' + order.delivery_cost.toFixed(2)}</span></div>
-      <div style="display:flex;justify-content:space-between;font-size:20px;font-weight:bold;color:#E10600;border-top:2px solid #eee;padding-top:10px;margin-top:10px;">
-        <span>TOTAL</span><span>$${order.total.toFixed(2)}</span>
-      </div>
-    </div>
+  <div style="background: #e8f5e9; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+    <h3 style="margin-top: 0; color: #2e7d32;">💳 Método de pago:</h3>
+    <p style="margin: 0;">${order.payment_method === 'pago_movil' ? 'Pago Móvil' : order.payment_method === 'zelle' ? 'Zelle' : 'Efectivo'}</p>
+    ${order.comprobante_url ? '<p style="color: #2e7d32; margin: 10px 0 0;">✓ Comprobante recibido</p>' : ''}
+  </div>
 
-    <div style="text-align:center;margin-top:24px;">
-      <a href="https://wa.me/58${order.customer_phone.replace(/^0/, '').replace(/-/g, '')}?text=${encodeURIComponent(`Hola ${order.customer_name}! Recibimos tu orden ${order.order_number}. Estamos procesando tu pedido.`)}"
-         style="display:inline-block;background:#25D366;color:white;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:bold;">
-        📲 Contactar cliente por WhatsApp
-      </a>
-    </div>
+  <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 2px solid #eee;">
+    <p style="color: #666;">Nos pondremos en contacto contigo para coordinar la entrega.</p>
+    <p style="color: #666;">¿Tienes dudas? Escríbenos por WhatsApp: +58 412-2223775</p>
+    <a href="https://repuestohoy.com" style="display: inline-block; margin-top: 15px; padding: 12px 30px; background: #E10600; color: white; text-decoration: none; border-radius: 5px; font-weight: bold;">Visitar tienda</a>
   </div>
 </body>
-</html>`
+</html>
+  `
 }
 
-function emailComprador(order: any) {
-  const itemsHtml = order.items
-    .map(
-      (item: any) => `
-      <tr>
-        <td style="padding:10px 12px;border-bottom:1px solid #eee;">${item.product.name}</td>
-        <td style="padding:10px 12px;border-bottom:1px solid #eee;text-align:center;">${item.quantity}</td>
-        <td style="padding:10px 12px;border-bottom:1px solid #eee;text-align:right;color:#E10600;font-weight:bold;">$${(item.product.price * item.quantity).toFixed(2)}</td>
-      </tr>`
-    )
-    .join('')
+// ─── Plantilla email admin ─────────────────────────────────────────────────
+function emailTemplateAdmin(order: any) {
+  const items = order.items?.map((item: any) => `
+    <tr>
+      <td style="padding: 10px; border-bottom: 1px solid #eee;">${item.name}</td>
+      <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: center;">${item.quantity}</td>
+      <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: right;">$${item.price}</td>
+    </tr>
+  `).join('') || ''
 
-  const paymentMap: Record<string, string> = {
-    pago_movil: 'Pago Móvil',
-    zelle: 'Zelle',
-    efectivo: 'Efectivo al recibir',
-  }
-
-  const comprobanteStatus = order.comprobante_url
-    ? `<div style="background:#d4edda;border-left:4px solid #28a745;padding:16px;border-radius:4px;margin-bottom:24px;">
-        <p style="margin:0;color:#155724;font-weight:bold;">✅ Comprobante recibido</p>
-        <p style="margin:8px 0 0;color:#155724;font-size:14px;">Tu comprobante de pago ha sido recibido y está siendo verificado.</p>
-       </div>`
-    : `<div style="background:#fff3cd;border-left:4px solid #ffc107;padding:16px;border-radius:4px;margin-bottom:24px;">
-        <p style="margin:0;color:#856404;font-weight:bold;">⏳ Pendiente de comprobante</p>
-        <p style="margin:8px 0 0;color:#856404;font-size:14px;">No olvides subir tu comprobante de pago para confirmar tu orden.</p>
-       </div>`
+  const comprobanteSection = order.comprobante_url ? `
+    <div style="background: #e8f5e9; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+      <h3 style="margin-top: 0; color: #2e7d32;">📎 Comprobante de pago:</h3>
+      <a href="${order.comprobante_url}" style="color: #2e7d32; text-decoration: underline; font-weight: bold;">Ver comprobante</a>
+    </div>
+  ` : `
+    <div style="background: #fff3e0; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+      <h3 style="margin-top: 0; color: #e65100;">⚠️ Sin comprobante</h3>
+      <p>El cliente no ha subido comprobante de pago todavía.</p>
+    </div>
+  `
 
   return `
 <!DOCTYPE html>
 <html>
-<head><meta charset="UTF-8"></head>
-<body style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#f5f5f5;padding:20px;">
-  <div style="background:#111111;padding:24px;border-radius:12px 12px 0 0;text-align:center;">
-    <h1 style="color:white;margin:0;font-size:28px;">REPUESTO HOY</h1>
-    <p style="color:#aaa;margin:5px 0 0;">Caracas • Entrega el mismo día</p>
+<head>
+  <meta charset="utf-8">
+  <title>Nueva Orden</title>
+</head>
+<body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #333;">
+  <div style="text-align: center; margin-bottom: 30px;">
+    <h1 style="color: #E10600; margin-bottom: 10px;">🛒 ¡NUEVA ORDEN!</h1>
+    <p style="font-size: 18px; color: #666;">Se ha recibido un nuevo pedido</p>
   </div>
-  <div style="background:white;padding:32px;border-radius:0 0 12px 12px;">
-    <div style="text-align:center;margin-bottom:28px;">
-      <div style="width:60px;height:60px;background:#d4edda;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:28px;margin-bottom:12px;">✅</div>
-      <h2 style="color:#111;margin:0;font-size:22px;">¡Pedido confirmado!</h2>
-      <p style="color:#666;margin:8px 0 0;">Hola <strong>${order.customer_name}</strong>, recibimos tu orden.</p>
-    </div>
+  
+  <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+    <h2 style="margin-top: 0; color: #111;">Pedido #${order.order_number}</h2>
+    <p><strong>Estado:</strong> <span style="color: #E10600; font-weight: bold;">${order.status}</span></p>
+    <p><strong>Fecha:</strong> ${new Date().toLocaleString('es-VE')}</p>
+  </div>
 
-    ${comprobanteStatus}
+  <div style="border-left: 4px solid #E10600; padding-left: 15px; margin-bottom: 20px;">
+    <h3 style="margin-top: 0;">👤 Cliente:</h3>
+    <p><strong>Nombre:</strong> ${order.customer_name}</p>
+    <p><strong>Teléfono:</strong> <a href="https://wa.me/${order.customer_phone?.replace(/\D/g, '')}" style="color: #25D366; text-decoration: none;">${order.customer_phone}</a></p>
+    <p><strong>Email:</strong> ${order.customer_email || 'No proporcionado'}</p>
+  </div>
 
-    <div style="background:#f9f9f9;border-radius:8px;padding:16px;text-align:center;margin-bottom:24px;">
-      <p style="color:#666;margin:0 0 4px;font-size:13px;text-transform:uppercase;letter-spacing:1px;">Número de orden</p>
-      <p style="color:#111;font-size:24px;font-weight:bold;margin:0;letter-spacing:2px;">${order.order_number}</p>
-      <p style="color:#666;font-size:12px;margin:8px 0 0;">Guarda este número para cualquier consulta</p>
-    </div>
+  <div style="border-left: 4px solid #111; padding-left: 15px; margin-bottom: 20px;">
+    <h3 style="margin-top: 0;">📍 Entrega:</h3>
+    <p><strong>Dirección:</strong> ${order.address}</p>
+    <p><strong>Zona:</strong> ${order.delivery_zone}</p>
+  </div>
 
-    <h3 style="color:#111;border-bottom:2px solid #eee;padding-bottom:8px;">Tu pedido</h3>
-    <table style="width:100%;border-collapse:collapse;">
-      <thead>
-        <tr style="background:#f5f5f5;">
-          <th style="padding:8px 12px;text-align:left;font-size:13px;color:#666;">Producto</th>
-          <th style="padding:8px 12px;text-align:center;font-size:13px;color:#666;">Cant.</th>
-          <th style="padding:8px 12px;text-align:right;font-size:13px;color:#666;">Total</th>
-        </tr>
-      </thead>
-      <tbody>${itemsHtml}</tbody>
-    </table>
+  <h3 style="color: #111;">🛍️ Productos:</h3>
+  <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+    <thead>
+      <tr style="background: #111; color: white;">
+        <th style="padding: 10px; text-align: left;">Producto</th>
+        <th style="padding: 10px; text-align: center;">Cantidad</th>
+        <th style="padding: 10px; text-align: right;">Precio</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${items}
+    </tbody>
+  </table>
 
-    <div style="background:#f9f9f9;padding:16px;border-radius:8px;margin-top:16px;margin-bottom:24px;">
-      <div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span style="color:#666;">Subtotal</span><span>$${order.subtotal.toFixed(2)}</span></div>
-      <div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span style="color:#666;">Envío</span><span style="color:${order.delivery_cost === 0 ? 'green' : 'inherit'}">${order.delivery_cost === 0 ? 'GRATIS' : '$' + order.delivery_cost.toFixed(2)}</span></div>
-      <div style="display:flex;justify-content:space-between;font-size:20px;font-weight:bold;color:#E10600;border-top:2px solid #eee;padding-top:10px;margin-top:8px;">
-        <span>TOTAL</span><span>$${order.total.toFixed(2)}</span>
-      </div>
-    </div>
+  <div style="background: #111; color: white; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+    <p style="margin: 5px 0;"><strong>Subtotal:</strong> $${order.subtotal?.toFixed(2)}</p>
+    <p style="margin: 5px 0;"><strong>Envío:</strong> $${order.delivery_cost?.toFixed(2) || '0.00'}</p>
+    <p style="margin: 5px 0; font-size: 20px;"><strong>TOTAL: $${order.total?.toFixed(2)}</strong></p>
+  </div>
 
-    <div style="background:#fff;border:1px solid #eee;border-radius:8px;padding:16px;margin-bottom:24px;">
-      <table style="width:100%;">
-        <tr><td style="color:#666;padding:4px 0;width:140px;">📍 Dirección</td><td style="padding:4px 0;">${order.address}</td></tr>
-        <tr><td style="color:#666;padding:4px 0;">🗺️ Zona</td><td style="padding:4px 0;">${order.delivery_zone}</td></tr>
-        <tr><td style="color:#666;padding:4px 0;">💳 Forma de pago</td><td style="padding:4px 0;">${paymentMap[order.payment_method] || order.payment_method}</td></tr>
-      </table>
-    </div>
+  <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+    <h3 style="margin-top: 0;">💳 Pago:</h3>
+    <p style="margin: 0;"><strong>Método:</strong> ${order.payment_method === 'pago_movil' ? 'Pago Móvil' : order.payment_method === 'zelle' ? 'Zelle' : 'Efectivo'}</p>
+  </div>
 
-    <div style="background:#e8f5e9;border-left:4px solid #25D366;padding:16px;border-radius:4px;margin-bottom:24px;">
-      <p style="margin:0;color:#111;font-weight:bold;">¿Qué sigue?</p>
-      <p style="margin:8px 0 0;color:#444;font-size:14px;">Nuestro equipo revisará tu pedido y te contactará pronto al número <strong>${order.customer_phone}</strong> para coordinar la entrega y confirmar el pago.</p>
-    </div>
+  ${comprobanteSection}
 
-    <div style="text-align:center;">
-      <a href="https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP || '584122223775'}?text=${encodeURIComponent(`Hola! Tengo una pregunta sobre mi orden ${order.order_number}`)}"
-         style="display:inline-block;background:#25D366;color:white;padding:14px 28px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:15px;">
-        📲 Escribirnos por WhatsApp
-      </a>
-    </div>
-
-    <p style="text-align:center;color:#aaa;font-size:12px;margin-top:28px;">
-      Repuesto Hoy • Caracas, Venezuela<br>
-      <a href="https://repuestohoy.com" style="color:#E10600;">repuestohoy.com</a>
-    </p>
+  <div style="text-align: center; margin-top: 30px;">
+    <a href="https://repuestohoy.com/admin" style="display: inline-block; padding: 12px 30px; background: #E10600; color: white; text-decoration: none; border-radius: 5px; font-weight: bold;">Ver en Admin</a>
   </div>
 </body>
-</html>`
+</html>
+  `
 }
 
-function emailComprobanteRecibido(order: any) {
-  return `
-<!DOCTYPE html>
-<html>
-<head><meta charset="UTF-8"></head>
-<body style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#f5f5f5;padding:20px;">
-  <div style="background:#111111;padding:24px;border-radius:12px 12px 0 0;text-align:center;">
-    <h1 style="color:white;margin:0;font-size:28px;">REPUESTO HOY</h1>
-    <p style="color:#aaa;margin:5px 0 0;">Caracas • Entrega el mismo día</p>
-  </div>
-  <div style="background:white;padding:32px;border-radius:0 0 12px 12px;">
-    <div style="text-align:center;margin-bottom:28px;">
-      <div style="width:60px;height:60px;background:#d4edda;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:28px;margin-bottom:12px;">📎</div>
-      <h2 style="color:#111;margin:0;font-size:22px;">¡Comprobante recibido!</h2>
-    </div>
-
-    <div style="background:#d4edda;border-left:4px solid #28a745;padding:16px;border-radius:4px;margin-bottom:24px;">
-      <p style="margin:0;color:#155724;">Hola <strong>${order.customer_name}</strong>, hemos recibido tu comprobante de pago para la orden <strong>${order.order_number}</strong>.</p>
-      <p style="margin:8px 0 0;color:#155724;font-size:14px;">Nuestro equipo lo verificará y te contactará pronto.</p>
-    </div>
-
-    <div style="background:#f9f9f9;border-radius:8px;padding:16px;text-align:center;margin-bottom:24px;">
-      <p style="color:#666;margin:0 0 4px;font-size:13px;text-transform:uppercase;letter-spacing:1px;">Número de orden</p>
-      <p style="color:#111;font-size:24px;font-weight:bold;margin:0;letter-spacing:2px;">${order.order_number}</p>
-    </div>
-
-    <div style="text-align:center;">
-      <a href="${order.comprobante_url}" target="_blank"
-         style="display:inline-block;background:#E10600;color:white;padding:14px 28px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:15px;">
-        📎 Ver comprobante
-      </a>
-    </div>
-
-    <div style="text-align:center;margin-top:24px;">
-      <a href="https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP || '584122223775'}?text=${encodeURIComponent(`Hola! Confirmé mi pago para la orden ${order.order_number}`)}"
-         style="display:inline-block;background:#25D366;color:white;padding:14px 28px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:15px;">
-        📲 Contactar por WhatsApp
-      </a>
-    </div>
-
-    <p style="text-align:center;color:#aaa;font-size:12px;margin-top:28px;">
-      Repuesto Hoy • Caracas, Venezuela<br>
-      <a href="https://repuestohoy.com" style="color:#E10600;">repuestohoy.com</a>
-    </p>
-  </div>
-</body>
-</html>`
-}
-
-// ─── POST /api/ordenes ─────────────────────────────────────────────────────
-export async function POST(req: NextRequest) {
-  if (!supabaseAdmin) {
-    return NextResponse.json({ error: 'Servicio no configurado' }, { status: 503 })
-  }
-
+// ─── POST - Crear orden ────────────────────────────────────────────────────
+export async function POST(request: NextRequest) {
   try {
-    const body = await req.json()
-
+    const body = await request.json()
     const {
       customerName,
       customerPhone,
@@ -351,188 +281,173 @@ export async function POST(req: NextRequest) {
       address,
       paymentMethod,
       notes,
-      comprobanteUrl, // Nuevo campo opcional
+      comprobante_url,
     } = body
 
-    // Validate required fields
-    if (!customerName || !customerPhone || !items?.length || !deliveryZone || !address || !paymentMethod) {
-      return NextResponse.json({ error: 'Faltan campos requeridos' }, { status: 400 })
+    // Validaciones
+    if (!customerName || !customerPhone || !address || !deliveryZone || !paymentMethod) {
+      return NextResponse.json(
+        { error: 'Faltan campos requeridos' },
+        { status: 400 }
+      )
     }
 
-    // Para pago móvil o zelle, el comprobante es obligatorio
-    const requiresComprobante = paymentMethod === 'pago_movil' || paymentMethod === 'zelle'
-    if (requiresComprobante && !comprobanteUrl) {
-      return NextResponse.json({ 
-        error: 'Se requiere comprobante de pago para Pago Móvil y Zelle',
-        code: 'COMPROBANTE_REQUIRED'
-      }, { status: 400 })
+    // Validar comprobante para Pago Móvil/Zelle
+    if ((paymentMethod === 'pago_movil' || paymentMethod === 'zelle') && !comprobante_url) {
+      return NextResponse.json(
+        { error: 'El comprobante de pago es obligatorio para Pago Móvil y Zelle' },
+        { status: 400 }
+      )
     }
 
-    // Generate order number
-    const timestamp = Date.now().toString(36).toUpperCase()
-    const random = Math.random().toString(36).substring(2, 5).toUpperCase()
-    const orderNumber = `RH-${timestamp}-${random}`
+    if (!supabaseAdmin) {
+      return NextResponse.json(
+        { error: 'Error de configuración del servidor' },
+        { status: 500 }
+      )
+    }
 
-    // Determinar status inicial
-    const status = requiresComprobante && comprobanteUrl ? 'pending_payment' : 
-                   requiresComprobante ? 'draft' : 'confirmed'
+    // Generar número de orden
+    const orderNumber = `RH-${Date.now().toString(36).toUpperCase()}`
 
-    // Save order to Supabase
+    // Crear orden en la base de datos
     const { data: order, error: dbError } = await supabaseAdmin
       .from('orders')
       .insert([{
         order_number: orderNumber,
         customer_name: customerName,
         customer_phone: customerPhone,
-        customer_email: customerEmail || null,
-        delivery_zone: deliveryZone,
-        address,
+        customer_email: customerEmail,
         items,
         subtotal,
         delivery_cost: deliveryCost,
         total,
+        delivery_zone: deliveryZone,
+        address,
         payment_method: paymentMethod,
-        status,
-        notes: notes || null,
-        comprobante_url: comprobanteUrl || null,
-        comprobante_subido_at: comprobanteUrl ? new Date().toISOString() : null,
+        notes,
+        status: comprobante_url ? 'confirmed' : 'pending_payment',
+        comprobante_url,
+        comprobante_subido_at: comprobante_url ? new Date().toISOString() : null,
       }])
       .select()
       .single()
 
-    if (dbError) {
-      console.error('Supabase error:', dbError)
-      return NextResponse.json({ error: 'Error guardando la orden: ' + dbError.message }, { status: 500 })
+    if (dbError || !order) {
+      console.error('Database error:', dbError)
+      return NextResponse.json(
+        { error: 'Error al crear la orden' },
+        { status: 500 }
+      )
     }
 
-    // Send emails in parallel (fire and forget - don't fail order if email fails)
-    const SELLER_EMAIL = process.env.SELLER_EMAIL || process.env.GMAIL_USER || 'ventas@repuestohoy.com'
-    
-    const emailPromises = [
-      // Email al vendedor siempre
+    // Enviar emails
+    const emailPromises = []
+
+    // Email al cliente
+    if (customerEmail) {
+      emailPromises.push(
+        sendEmail({
+          orderId: order.id,
+          emailType: 'cliente',
+          to: customerEmail,
+          subject: `✅ Pedido confirmado #${orderNumber}`,
+          html: emailTemplateCliente(order),
+        })
+      )
+    }
+
+    // Email a ventas
+    emailPromises.push(
       sendEmail({
         orderId: order.id,
-        emailType: 'vendedor',
-        to: SELLER_EMAIL,
-        subject: `🆕 Nueva orden ${orderNumber} - $${total.toFixed(2)} - ${customerName}`,
-        html: emailVendedor(order),
-      }),
-      // Email al comprador solo si tiene email
-      ...(customerEmail ? [sendEmail({
-        orderId: order.id,
-        emailType: 'cliente',
-        to: customerEmail,
-        subject: `✅ Confirmación de tu pedido ${orderNumber} - Repuesto Hoy`,
-        html: emailComprador(order),
-      })] : []),
-    ]
-
-    // Don't await — send emails async so response is fast
-    Promise.allSettled(emailPromises).then(results => {
-      results.forEach((r, i) => {
-        if (r.status === 'rejected') {
-          console.error(`Email ${i} failed:`, r.reason)
-        }
+        emailType: 'admin',
+        to: 'ventas@repuestohoy.com',
+        subject: `🛒 Nueva orden #${orderNumber}`,
+        html: emailTemplateAdmin(order),
       })
+    )
+
+    // Ejecutar envíos de email (no bloqueantes)
+    Promise.all(emailPromises).catch(err => {
+      console.error('Email sending error:', err)
     })
 
     return NextResponse.json({
       success: true,
       order: {
         id: order.id,
-        order_number: order.order_number,
+        order_number: orderNumber,
         status: order.status,
-        ...order,
       },
     })
-  } catch (err: any) {
-    console.error('API error:', err)
-    return NextResponse.json({ error: 'Error interno: ' + err.message }, { status: 500 })
+  } catch (error: any) {
+    console.error('Order creation error:', error)
+    return NextResponse.json(
+      { error: error.message || 'Error interno del servidor' },
+      { status: 500 }
+    )
   }
 }
 
-// ─── PATCH /api/ordenes (para actualizar comprobante) ──────────────────────
-export async function PATCH(req: NextRequest) {
-  if (!supabaseAdmin) {
-    return NextResponse.json({ error: 'Servicio no configurado' }, { status: 503 })
-  }
-
+// ─── PATCH - Actualizar comprobante ────────────────────────────────────────
+export async function PATCH(request: NextRequest) {
   try {
-    const body = await req.json()
+    const body = await request.json()
     const { orderId, comprobanteUrl } = body
 
     if (!orderId || !comprobanteUrl) {
-      return NextResponse.json({ error: 'Faltan orderId o comprobanteUrl' }, { status: 400 })
+      return NextResponse.json(
+        { error: 'Faltan orderId o comprobanteUrl' },
+        { status: 400 }
+      )
     }
 
-    // Actualizar orden con el comprobante
+    if (!supabaseAdmin) {
+      return NextResponse.json(
+        { error: 'Error de configuración del servidor' },
+        { status: 500 }
+      )
+    }
+
+    // Actualizar orden
     const { data: order, error: dbError } = await supabaseAdmin
       .from('orders')
       .update({
         comprobante_url: comprobanteUrl,
         comprobante_subido_at: new Date().toISOString(),
-        status: 'pending_payment',
+        status: 'confirmed',
       })
       .eq('id', orderId)
       .select()
       .single()
 
-    if (dbError) {
-      console.error('Supabase error:', dbError)
-      return NextResponse.json({ error: 'Error actualizando la orden: ' + dbError.message }, { status: 500 })
+    if (dbError || !order) {
+      console.error('Database error:', dbError)
+      return NextResponse.json(
+        { error: 'Error al actualizar la orden' },
+        { status: 500 }
+      )
     }
 
-    // Enviar emails de confirmación de comprobante
-    const SELLER_EMAIL = process.env.SELLER_EMAIL || process.env.GMAIL_USER || 'ventas@repuestohoy.com'
-    
-    const emailPromises = [
-      // Email al vendedor notificando nuevo comprobante
-      sendEmail({
-        orderId: order.id,
-        emailType: 'comprobante_vendedor',
-        to: SELLER_EMAIL,
-        subject: `📎 Comprobante recibido - Orden ${order.order_number}`,
-        html: emailVendedor(order),
-      }),
-      // Email al comprador confirmando recepción
-      ...(order.customer_email ? [sendEmail({
-        orderId: order.id,
-        emailType: 'comprobante_cliente',
-        to: order.customer_email,
-        subject: `📎 Comprobante recibido - Orden ${order.order_number} - Repuesto Hoy`,
-        html: emailComprobanteRecibido(order),
-      })] : []),
-    ]
-
-    Promise.allSettled(emailPromises)
+    // Reenviar email admin con comprobante
+    await sendEmail({
+      orderId: order.id,
+      emailType: 'admin_update',
+      to: 'ventas@repuestohoy.com',
+      subject: `📎 Comprobante recibido #${order.order_number}`,
+      html: emailTemplateAdmin(order),
+    })
 
     return NextResponse.json({
       success: true,
       order,
     })
-  } catch (err: any) {
-    console.error('API error:', err)
-    return NextResponse.json({ error: 'Error interno: ' + err.message }, { status: 500 })
+  } catch (error: any) {
+    console.error('Order update error:', error)
+    return NextResponse.json(
+      { error: error.message || 'Error interno del servidor' },
+      { status: 500 }
+    )
   }
-}
-
-// ─── GET /api/ordenes (para admin) ────────────────────────────────────────
-export async function GET(req: NextRequest) {
-  if (!supabaseAdmin) {
-    return NextResponse.json({ error: 'Servicio no configurado' }, { status: 503 })
-  }
-
-  const adminKey = req.headers.get('x-admin-key')
-  if (adminKey !== process.env.ADMIN_SECRET_KEY) {
-    return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
-  }
-
-  const { data, error } = await supabaseAdmin
-    .from('orders')
-    .select('*')
-    .order('created_at', { ascending: false })
-    .limit(100)
-
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-  return NextResponse.json({ orders: data })
 }
