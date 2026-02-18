@@ -56,8 +56,8 @@ function RegistroForm() {
       setError('La contraseña debe tener al menos 6 caracteres')
       return
     }
-    if (formData.phone && formData.phone.length < 10) {
-      setError('El teléfono debe tener 10 dígitos (ej: 4121234567)')
+    if (!formData.phone || formData.phone.length < 10) {
+      setError('El teléfono es obligatorio. Debe tener 10 dígitos (ej: 4121234567)')
       return
     }
 
@@ -69,7 +69,7 @@ function RegistroForm() {
       options: {
         data: {
           full_name: formData.name,
-          phone: formData.phone,
+          phone: `${countryCode}${formData.phone}`,
         },
       },
     })
@@ -156,7 +156,7 @@ function RegistroForm() {
               <input name="email" type="email" value={formData.email} onChange={handleChange} required className="input" placeholder="tu@email.com" />
             </div>
             <div>
-              <label className="block text-sm font-bold text-[#111111] mb-2">Teléfono <span className="text-gray-400 font-normal">(opcional)</span></label>
+              <label className="block text-sm font-bold text-[#111111] mb-2">Teléfono *</label>
               <div className="flex gap-2">
                 <select
                   value={countryCode}
@@ -179,6 +179,7 @@ function RegistroForm() {
                   inputMode="numeric"
                   value={formData.phone}
                   onChange={handlePhoneChange}
+                  required
                   className="input flex-1"
                   placeholder="4121234567"
                 />
