@@ -281,8 +281,11 @@ export async function POST(request: NextRequest) {
       address,
       paymentMethod,
       notes,
-      comprobante_url,
+      comprobanteUrl,
     } = body
+    
+    // Mapear camelCase a snake_case para la base de datos
+    const comprobante_url = comprobanteUrl
 
     // Validaciones
     if (!customerName || !customerPhone || !address || !deliveryZone || !paymentMethod) {
