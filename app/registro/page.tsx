@@ -33,8 +33,12 @@ function RegistroForm() {
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     // Solo permitir números
-    const rawValue = e.target.value.replace(/\D/g, '')
-    // Limitar a 10 dígitos (sin código de país)
+    let rawValue = e.target.value.replace(/\D/g, '')
+    // Si empieza con 0, lo quitamos (el +58 ya está en el dropdown)
+    if (rawValue.startsWith('0')) {
+      rawValue = rawValue.slice(1)
+    }
+    // Limitar a 10 dígitos
     const limitedValue = rawValue.slice(0, 10)
     setFormData(prev => ({ ...prev, phone: limitedValue }))
     setError('')
@@ -53,7 +57,7 @@ function RegistroForm() {
       return
     }
     if (formData.phone && formData.phone.length < 10) {
-      setError('El teléfono debe tener 10 dígitos (ej: 04121234567)')
+      setError('El teléfono debe tener 10 dígitos (ej: 4121234567)')
       return
     }
 
@@ -176,10 +180,10 @@ function RegistroForm() {
                   value={formData.phone}
                   onChange={handlePhoneChange}
                   className="input flex-1"
-                  placeholder="04121234567"
+                  placeholder="4121234567"
                 />
               </div>
-              <p className="mt-1 text-xs text-gray-400">10 dígitos, sin espacios ni guiones (ej: 04121234567)</p>
+              <p className="mt-1 text-xs text-gray-400">Escribe: 4121234567 (10 dígitos sin el 0 inicial)</p>
             </div>
             <div>
               <label className="block text-sm font-bold text-[#111111] mb-2">Contraseña *</label>
