@@ -165,7 +165,7 @@ export default function GraciasClient() {
           </p>
         </div>
 
-        {/* Email Warning */}
+        {/* Email Warning - Just above order number */}
         {order.customerEmail && (
           <div className="card p-4 mb-6 bg-amber-50 border-amber-200">
             <div className="flex items-start gap-3">
@@ -179,12 +179,11 @@ export default function GraciasClient() {
                   📧 Revisa tu correo electrónico
                 </p>
                 <p className="text-sm text-amber-700">
-                  Te enviamos un email de confirmación a <strong>{order.customerEmail}</strong>
+                  Te enviamos un email a <strong>{order.customerEmail}</strong>
                 </p>
                 <p className="text-sm text-amber-700 mt-2">
                   <span className="font-semibold">Importante:</span> Si no lo ves en tu bandeja de entrada, 
-                  revisa la carpeta de <strong>Spam</strong> o <strong>Promociones</strong>. 
-                  A veces los emails llegan allí.
+                  revisa la carpeta de <strong>Spam</strong> o <strong>Promociones</strong>.
                 </p>
               </div>
             </div>
