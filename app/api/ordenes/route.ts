@@ -26,6 +26,40 @@ function getResend() {
   return resendInstance
 }
 
+// ─── Función para enviar WhatsApp ─────────────────────────────────────────
+async function sendWhatsApp(
+  phoneNumber: string,
+  customerName: string,
+  orderNumber: string,
+  paymentMethod: string
+) {
+  try {
+    // Limpiar número de teléfono (quitar + y espacios)
+    const cleanPhone = phoneNumber.replace(/\D/g, '')
+    
+    // Mensaje personalizado
+    const message = `Hola ${customerName.split(' ')[0]} 👋\n\n¡Gracias por tu compra en Repuesto Hoy! 🚗\n\nHemos recibido tu pedido #${orderNumber} correctamente ✅\n\nQueremos agradecerte por confiar en nosotros 🙌\n\nPara continuar con el proceso de envío, por favor envíanos:\n\n📄 El comprobante de pago${paymentMethod === 'efectivo' ? ' (si aplica)' : ''}\n📍 Tu ubicación exacta por Google Maps\n\nUna vez recibamos esta información, procederemos con tu despacho lo antes posible 🚚\n\n¿Tienes dudas? Escríbenos aquí mismo.\n\n¡Gracias nuevamente por tu confianza! 💙\n\n_Repuesto Hoy - Caracas_`
+
+    // Usar CallMeBot API (gratuita)
+    const apiKey = process.env.CALLMEBOT_API_KEY || '123456' // API key de ejemplo
+    const url = `https://api.callmebot.com/whatsapp.php?phone=${cleanPhone}&text=${encodeURIComponent(message)}&apikey=${apiKey}`
+    
+    // Hacer la petición
+    const response = await fetch(url, { method: 'GET' })
+    
+    if (response.ok) {
+      console.log(`✅ WhatsApp enviado a ${phoneNumber}`)
+      return { success: true }
+    } else {
+      console.error(`❌ Error enviando WhatsApp: ${response.status}`)
+      return { success: false, error: `HTTP ${response.status}` }
+    }
+  } catch (error: any) {
+    console.error('Error sending WhatsApp:', error)
+    return { success: false, error: error.message }
+  }
+}
+
 // ─── Función para loguear emails ───────────────────────────────────────────
 async function logEmail(
   orderId: string,
@@ -394,6 +428,23 @@ export async function POST(request: NextRequest) {
       console.error('❌ Error enviando email a ventas:', adminResult.error)
     } else {
       console.log('✅ Email a ventas enviado correctamente')
+    }
+
+    // Enviar WhatsApp al cliente
+    if (customerPhone) {
+      console.log(`📱 Enviando WhatsApp a: ${customerPhone}`)
+      const whatsappResult = await sendWhatsApp(
+        customerPhone,
+        customerName,
+        orderNumber,
+        paymentMethod
+      )
+      
+      if (!whatsappResult.success) {
+        console.error('❌ Error enviando WhatsApp:', whatsappResult.error)
+      } else {
+        console.log('✅ WhatsApp enviado correctamente')
+      }
     }
 
     return NextResponse.json({
