@@ -8,14 +8,14 @@ export const BUSINESS_CONFIG = {
   // Pago Móvil
   payment: {
     pagoMovil: {
-      bank: 'Mercantil',
-      phone: '0412-2223775',
-      id: 'V-12345678', // Reemplazar con cédula real
-      name: 'Repuesto Hoy CA'
+      bank: process.env.NEXT_PUBLIC_PAGO_MOVIL_BANK || 'Mercantil',
+      phone: process.env.NEXT_PUBLIC_PAGO_MOVIL_PHONE || '0412-2223775',
+      id: process.env.NEXT_PUBLIC_PAGO_MOVIL_ID || '', // Configurar en Vercel: NEXT_PUBLIC_PAGO_MOVIL_ID=V-XXXXXXXX
+      name: process.env.NEXT_PUBLIC_PAGO_MOVIL_NAME || 'Repuesto Hoy CA'
     },
     zelle: {
-      email: 'ventas@repuestohoy.com',
-      name: 'Repuesto Hoy CA'
+      email: process.env.NEXT_PUBLIC_ZELLE_EMAIL || 'ventas@repuestohoy.com',
+      name: process.env.NEXT_PUBLIC_ZELLE_NAME || 'Repuesto Hoy CA'
     }
   },
   

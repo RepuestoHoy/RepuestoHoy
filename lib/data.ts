@@ -30,6 +30,36 @@ export const CARS: Car[] = [
     brand: 'Hyundai',
     models: ['Accent', 'Elantra', 'Tucson', 'Santa Fe', 'Getz'],
     years: Array.from({ length: 21 }, (_, i) => 2005 + i)
+  },
+  {
+    brand: 'Nissan',
+    models: ['Sentra', 'Versa', 'Frontier', 'Patrol', 'X-Trail', 'Tiida', 'March'],
+    years: Array.from({ length: 21 }, (_, i) => 2005 + i)
+  },
+  {
+    brand: 'JAC',
+    models: ['Arena', 'La Venezolana', 'Tepuy', 'Nevado', 'S3', 'S4', 'S7', 'X200'],
+    years: Array.from({ length: 10 }, (_, i) => 2015 + i)
+  },
+  {
+    brand: 'Kia',
+    models: ['Rio', 'Sportage', 'Sorento', 'Picanto', 'Cerato'],
+    years: Array.from({ length: 16 }, (_, i) => 2010 + i)
+  },
+  {
+    brand: 'Daihatsu',
+    models: ['Terios', 'Bego', 'Gran Max'],
+    years: Array.from({ length: 16 }, (_, i) => 2005 + i)
+  },
+  {
+    brand: 'Mazda',
+    models: ['Mazda 3', 'Mazda 6', 'CX-5', 'BT-50'],
+    years: Array.from({ length: 16 }, (_, i) => 2008 + i)
+  },
+  {
+    brand: 'DFSK',
+    models: ['Glory 500', 'Glory 580', 'AX7', 'C35'],
+    years: Array.from({ length: 8 }, (_, i) => 2018 + i)
   }
 ]
 

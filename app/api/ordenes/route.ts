@@ -3,7 +3,9 @@ import { createClient } from '@supabase/supabase-js'
 import { Resend } from 'resend'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+// IMPORTANTE: Nunca usar la anon key como fallback de la service key.
+// Si SUPABASE_SERVICE_ROLE_KEY no está configurada, las operaciones de servidor fallarán.
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || ''
 
 const supabaseAdmin = supabaseUrl && supabaseServiceKey
   ? createClient(supabaseUrl, supabaseServiceKey)
@@ -26,39 +28,11 @@ function getResend() {
   return resendInstance
 }
 
-// ─── Función para enviar WhatsApp ─────────────────────────────────────────
-async function sendWhatsApp(
-  phoneNumber: string,
-  customerName: string,
-  orderNumber: string,
-  paymentMethod: string
-) {
-  try {
-    // Limpiar número de teléfono (quitar + y espacios)
-    const cleanPhone = phoneNumber.replace(/\D/g, '')
-    
-    // Mensaje personalizado
-    const message = `Hola ${customerName.split(' ')[0]} 👋\n\n¡Gracias por tu compra en Repuesto Hoy! 🚗\n\nHemos recibido tu pedido #${orderNumber} correctamente ✅\n\nQueremos agradecerte por confiar en nosotros 🙌\n\nPara continuar con el proceso de envío, por favor envíanos:\n\n📄 El comprobante de pago${paymentMethod === 'efectivo' ? ' (si aplica)' : ''}\n📍 Tu ubicación exacta por Google Maps\n\nUna vez recibamos esta información, procederemos con tu despacho lo antes posible 🚚\n\n¿Tienes dudas? Escríbenos aquí mismo.\n\n¡Gracias nuevamente por tu confianza! 💙\n\n_Repuesto Hoy - Caracas_`
-
-    // Usar CallMeBot API (gratuita)
-    const apiKey = process.env.CALLMEBOT_API_KEY || '123456' // API key de ejemplo
-    const url = `https://api.callmebot.com/whatsapp.php?phone=${cleanPhone}&text=${encodeURIComponent(message)}&apikey=${apiKey}`
-    
-    // Hacer la petición
-    const response = await fetch(url, { method: 'GET' })
-    
-    if (response.ok) {
-      console.log(`✅ WhatsApp enviado a ${phoneNumber}`)
-      return { success: true }
-    } else {
-      console.error(`❌ Error enviando WhatsApp: ${response.status}`)
-      return { success: false, error: `HTTP ${response.status}` }
-    }
-  } catch (error: any) {
-    console.error('Error sending WhatsApp:', error)
-    return { success: false, error: error.message }
-  }
-}
+// ─── WhatsApp automático (TODO: activar cuando esté Meta Business listo) ──
+// Cuando tengas configurado Meta Cloud API, descomentar y agregar:
+//   META_ACCESS_TOKEN=... en Vercel env vars
+//   META_PHONE_NUMBER_ID=... en Vercel env vars
+// Ver documentación: https://developers.facebook.com/docs/whatsapp/cloud-api
 
 // ─── Función para loguear emails ───────────────────────────────────────────
 async function logEmail(
@@ -212,9 +186,16 @@ function emailTemplateCliente(order: any) {
   </div>
 
   <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 2px solid #eee;">
-    <p style="color: #666;">Nos pondremos en contacto contigo para coordinar la entrega.</p>
-    <p style="color: #666;">¿Tienes dudas? Escríbenos por WhatsApp: +58 412-2223775</p>
-    <a href="https://repuestohoy.com" style="display: inline-block; margin-top: 15px; padding: 12px 30px; background: #E10600; color: white; text-decoration: none; border-radius: 5px; font-weight: bold;">Visitar tienda</a>
+    <p style="color: #666; margin-bottom: 8px;">📞 Te escribiremos por WhatsApp en los próximos minutos para coordinar el pago y la entrega.</p>
+    <p style="color: #999; font-size: 14px; margin-bottom: 20px;">¿Prefieres escribirnos tú primero? No hay problema:</p>
+    
+    <a href="https://wa.me/584122223775?text=Hola!%20Acabo%20de%20hacer%20el%20pedido%20%23${order.order_number}%20en%20RepuestoHoy%20y%20quiero%20coordinar%20el%20pago."
+      style="display: inline-block; padding: 14px 32px; background: #25D366; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; margin-bottom: 15px;">
+      📲 Escríbenos por WhatsApp
+    </a>
+    
+    <br>
+    <a href="https://repuestohoy.com" style="display: inline-block; margin-top: 15px; padding: 10px 24px; background: #E10600; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; font-size: 14px;">Ver tienda</a>
   </div>
 </body>
 </html>
@@ -430,22 +411,10 @@ export async function POST(request: NextRequest) {
       console.log('✅ Email a ventas enviado correctamente')
     }
 
-    // Enviar WhatsApp al cliente
-    if (customerPhone) {
-      console.log(`📱 Enviando WhatsApp a: ${customerPhone}`)
-      const whatsappResult = await sendWhatsApp(
-        customerPhone,
-        customerName,
-        orderNumber,
-        paymentMethod
-      )
-      
-      if (!whatsappResult.success) {
-        console.error('❌ Error enviando WhatsApp:', whatsappResult.error)
-      } else {
-        console.log('✅ WhatsApp enviado correctamente')
-      }
-    }
+    // WhatsApp automático — pendiente de configurar (Meta Cloud API)
+    // Por ahora la confirmación se maneja por email + atención manual por WhatsApp
+    // TODO: Activar cuando esté listo Meta Business API
+    // Ver: META_ACCESS_TOKEN, META_PHONE_NUMBER_ID en variables de entorno
 
     return NextResponse.json({
       success: true,
