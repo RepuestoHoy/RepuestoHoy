@@ -170,7 +170,7 @@ function emailTemplateCliente(order: any) {
 
   <div style="background: #e8f5e9; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
     <h3 style="margin-top: 0; color: #2e7d32;">💳 Método de pago:</h3>
-    <p style="margin: 0;">${order.payment_method === 'pago_movil' ? 'Pago Móvil' : order.payment_method === 'zelle' ? 'Zelle' : 'Efectivo'}</p>
+    <p style="margin: 0;">${order.payment_method === 'pago_movil' ? 'Pago Móvil' : 'Zelle'}</p>
     ${order.comprobante_url ? '<p style="color: #2e7d32; margin: 10px 0 0;">✓ Comprobante recibido</p>' : ''}
   </div>
 
