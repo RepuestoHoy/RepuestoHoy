@@ -1,0 +1,22 @@
+# Allow all search engines to crawl everything except admin pages
+User-agent: *
+
+# Allow main sections
+Allow: /
+Allow: /buscar
+Allow: /producto/
+Allow: /marca/
+Allow: /blog
+Allow: /shop
+Allow: /carrito
+
+# Block admin and private areas
+Disallow: /admin/
+Disallow: /api/
+Disallow: /checkout
+Disallow: /gracias
+Disallow: /login
+Disallow: /registro
+
+# Sitemap location
+Sitemap: https://repuestohoy.com/sitemap.xml
