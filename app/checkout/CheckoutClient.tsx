@@ -566,22 +566,10 @@ export default function CheckoutClient() {
               </div>
 
               {paymentMethod === 'pago_movil' && (
-                <div className="mt-4 p-4 bg-[#F5F5F5] rounded-lg">
-                  {!BUSINESS_CONFIG.payment.pagoMovil.id ? (
-                    <p className="text-sm text-red-600 font-semibold">
-                      ⚠️ Datos de Pago Móvil no configurados. Contacta al administrador.
-                    </p>
-                  ) : (
-                    <div className="text-sm text-[#2A2A2A] space-y-1">
-                      <p><strong>Datos para Pago Móvil:</strong></p>
-                      <p>Banco: {BUSINESS_CONFIG.payment.pagoMovil.bank}</p>
-                      <p>Teléfono: {BUSINESS_CONFIG.payment.pagoMovil.phone}</p>
-                      <p>CI: {BUSINESS_CONFIG.payment.pagoMovil.id}</p>
-                      <p className="mt-2 text-green-700 font-medium">
-                        📲 Una vez confirmes el pedido, te contactaremos por WhatsApp para coordinar el pago.
-                      </p>
-                    </div>
-                  )}
+                <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+                  <p className="text-sm text-green-800 font-medium">
+                    📲 Al confirmar tu pedido te escribiremos por WhatsApp en los próximos minutos para coordinar el pago.
+                  </p>
                 </div>
               )}
 
