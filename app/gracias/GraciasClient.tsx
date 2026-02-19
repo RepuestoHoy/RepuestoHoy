@@ -36,8 +36,7 @@ interface Order {
 
 const PAYMENT_METHOD_TEXT: Record<string, string> = {
   pago_movil: 'Pago Móvil',
-  zelle: 'Zelle',
-  efectivo: 'Efectivo al recibir'
+  zelle: 'Zelle'
 }
 
 export default function GraciasClient() {

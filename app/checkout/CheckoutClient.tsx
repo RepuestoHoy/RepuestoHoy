@@ -16,7 +16,6 @@ import { supabase } from '@/lib/supabase'
 const PAYMENT_METHODS = [
   { id: 'pago_movil', name: 'Pago Móvil', description: 'Transferencia a Mercantil', icon: '📱', primary: true },
   { id: 'zelle', name: 'Zelle', description: 'Pago desde USA', icon: '🇺🇸' },
-  { id: 'efectivo', name: 'Efectivo', description: 'Al recibir el pedido', icon: '💵' },
 ]
 
 // Tipos de archivo permitidos
@@ -71,10 +70,19 @@ export default function CheckoutClient() {
   const subtotal = getSubtotal()
   const total = subtotal + deliveryCost
 
-  // Verificar si el método de pago requiere comprobante
-  const requiresComprobante = paymentMethod === 'pago_movil' || paymentMethod === 'zelle'
+  // Pago Móvil: se contacta por WhatsApp, sin comprobante
+  // Zelle: comprobante opcional
+  const requiresComprobante = false
+  const showComprobanteUpload = paymentMethod === 'zelle'
 
   // Check if user is logged in and prefill form
+  // Redirigir si el carrito está vacío
+  useEffect(() => {
+    if (items.length === 0) {
+      router.push('/buscar')
+    }
+  }, [items, router])
+
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (user) {
@@ -246,7 +254,7 @@ export default function CheckoutClient() {
   }
 
   const isFormValid = useMemo(() => {
-    const baseValid =
+    return !!(
       formData.name.trim() &&
       formData.phone.trim() &&
       formData.phone.length >= 10 &&
@@ -255,14 +263,8 @@ export default function CheckoutClient() {
       selectedZone &&
       paymentMethod &&
       !Object.values(errors).some(e => e)
-
-    // Si requiere comprobante, debe estar subido
-    if (requiresComprobante) {
-      return baseValid && comprobante.url && !comprobante.isUploading
-    }
-
-    return baseValid
-  }, [formData, selectedZone, paymentMethod, errors, comprobante, requiresComprobante])
+    )
+  }, [formData, selectedZone, paymentMethod, errors])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -565,12 +567,21 @@ export default function CheckoutClient() {
 
               {paymentMethod === 'pago_movil' && (
                 <div className="mt-4 p-4 bg-[#F5F5F5] rounded-lg">
-                  <p className="text-sm text-[#2A2A2A]">
-                    <strong>Datos para Pago Móvil:</strong><br />
-                    Banco: {BUSINESS_CONFIG.payment.pagoMovil.bank}<br />
-                    Teléfono: {BUSINESS_CONFIG.payment.pagoMovil.phone}<br />
-                    CI: {BUSINESS_CONFIG.payment.pagoMovil.id}
-                  </p>
+                  {!BUSINESS_CONFIG.payment.pagoMovil.id ? (
+                    <p className="text-sm text-red-600 font-semibold">
+                      ⚠️ Datos de Pago Móvil no configurados. Contacta al administrador.
+                    </p>
+                  ) : (
+                    <div className="text-sm text-[#2A2A2A] space-y-1">
+                      <p><strong>Datos para Pago Móvil:</strong></p>
+                      <p>Banco: {BUSINESS_CONFIG.payment.pagoMovil.bank}</p>
+                      <p>Teléfono: {BUSINESS_CONFIG.payment.pagoMovil.phone}</p>
+                      <p>CI: {BUSINESS_CONFIG.payment.pagoMovil.id}</p>
+                      <p className="mt-2 text-green-700 font-medium">
+                        📲 Una vez confirmes el pedido, te contactaremos por WhatsApp para coordinar el pago.
+                      </p>
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -584,11 +595,11 @@ export default function CheckoutClient() {
                 </div>
               )}
 
-              {/* Campo de comprobante */}
-              {requiresComprobante && (
+              {/* Campo de comprobante — opcional para Zelle */}
+              {showComprobanteUpload && (
                 <div className="mt-6">
                   <label className="block text-sm font-bold text-[#111111] mb-3 uppercase">
-                    Comprobante de pago *
+                    Comprobante de pago <span className="text-gray-400 font-normal normal-case">(opcional)</span>
                   </label>
                   
                   {!comprobante.url && !comprobante.isUploading && (
@@ -735,11 +746,11 @@ export default function CheckoutClient() {
                 </div>
               </div>
 
-              {requiresComprobante && !comprobante.url && (
-                <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                  <p className="text-xs text-yellow-700 flex items-start gap-2">
+              {showComprobanteUpload && !comprobante.url && (
+                <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                  <p className="text-xs text-blue-700 flex items-start gap-2">
                     <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                    Para {PAYMENT_METHODS.find(m => m.id === paymentMethod)?.name}, debes subir el comprobante de pago
+                    Puedes adjuntar el comprobante de Zelle para agilizar la confirmación (opcional).
                   </p>
                 </div>
               )}
