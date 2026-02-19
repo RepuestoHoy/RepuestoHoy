@@ -117,7 +117,7 @@ function emailTemplateCliente(order: any) {
     <tr>
       <td style="padding: 10px; border-bottom: 1px solid #eee;">${item.name}</td>
       <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: center;">${item.quantity}</td>
-      <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: right;">$${item.price}</td>
+      <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: right;">$${Number(item.price).toFixed(2)}</td>
     </tr>
   `).join('') || ''
 
@@ -208,7 +208,7 @@ function emailTemplateAdmin(order: any) {
     <tr>
       <td style="padding: 10px; border-bottom: 1px solid #eee;">${item.name}</td>
       <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: center;">${item.quantity}</td>
-      <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: right;">$${item.price}</td>
+      <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: right;">$${Number(item.price).toFixed(2)}</td>
     </tr>
   `).join('') || ''
 
@@ -278,7 +278,7 @@ function emailTemplateAdmin(order: any) {
 
   <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
     <h3 style="margin-top: 0;">💳 Pago:</h3>
-    <p style="margin: 0;"><strong>Método:</strong> ${order.payment_method === 'pago_movil' ? 'Pago Móvil' : order.payment_method === 'zelle' ? 'Zelle' : 'Efectivo'}</p>
+    <p style="margin: 0;"><strong>Método:</strong> ${order.payment_method === 'pago_movil' ? 'Pago Móvil' : 'Zelle'}</p>
   </div>
 
   ${comprobanteSection}
@@ -321,13 +321,16 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Validar comprobante para Pago Móvil/Zelle
-    if ((paymentMethod === 'pago_movil' || paymentMethod === 'zelle') && !comprobante_url) {
+    // Validar que el método de pago sea válido (solo pago_movil o zelle)
+    if (!['pago_movil', 'zelle'].includes(paymentMethod)) {
       return NextResponse.json(
-        { error: 'El comprobante de pago es obligatorio para Pago Móvil y Zelle' },
+        { error: 'Método de pago no válido' },
         { status: 400 }
       )
     }
+
+    // Comprobante opcional para Zelle, no requerido para Pago Móvil
+    // El pago se coordina por WhatsApp
 
     if (!supabaseAdmin) {
       return NextResponse.json(
