@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 130" width="520" height="130" role="img" aria-label="repuestohoy">
+  <rect x="0" y="0" width="520" height="130" rx="3" fill="#E8181A"/>
+  <text
+    x="260"
+    y="100"
+    text-anchor="middle"
+    font-family="'Futura', 'Trebuchet MS', 'Arial Rounded MT Bold', Arial, sans-serif"
+    font-weight="bold"
+    font-style="italic"
+    font-size="96"
+    letter-spacing="-2"
+    fill="#FFFFFF"
+  >repuestohoy</text>
+</svg>
