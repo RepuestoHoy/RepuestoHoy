@@ -1,0 +1,19 @@
+Abrir este archivo en tu navegador para ver la web completa:
+
+file:///Users/gabrielatlas/clawd/repuesto-hoy/preview-interactivo.html
+
+El archivo incluye:
+- Home funcional con selector de carro
+- Página de búsqueda con productos
+- Página de producto individual
+- Carrito/checkout
+- Todo con la paleta oficial (negro, rojo #E10600, blanco)
+- Botón de WhatsApp funcional (+58 412-2223775)
+
+Para verlo:
+1. Abrí Finder
+2. Navegá a: /Users/gabrielatlas/clawd/repuesto-hoy/
+3. Hacé doble clic en: preview-interactivo.html
+
+O desde terminal:
+open /Users/gabrielatlas/clawd/repuesto-hoy/preview-interactivo.html
