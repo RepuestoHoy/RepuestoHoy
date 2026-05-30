@@ -3,6 +3,7 @@
 import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { CARS, MOTORCYCLES, CATEGORIES } from '@/lib/data'
+import { getToyotaModelOptions, type ModelOption } from '@/lib/toyota-generations'
 import { categoryIcons } from '@/components/CategoryIcons'
 import { Search, HelpCircle, Car, Shield, Clock, Award, ChevronRight } from 'lucide-react'
 import Header from '@/components/Header'
@@ -31,12 +32,25 @@ export default function HomePage() {
   const vehicleList = vehicleType === 'car' ? CARS : MOTORCYCLES
   const selectedVehicle = vehicleList.find(v => v.brand === brand)
 
+  // Opciones de modelo: para Toyota se desdoblan en Gasolina/Diésel cuando aplica.
+  const modelOptions: ModelOption[] = useMemo(() => {
+    if (!selectedVehicle) return []
+    if (vehicleType === 'car' && brand === 'Toyota') {
+      return getToyotaModelOptions(selectedVehicle.models)
+    }
+    return selectedVehicle.models.map(m => ({ label: m, model: m }))
+  }, [selectedVehicle, vehicleType, brand])
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
     if (brand && model && year) {
+      // 'model' guarda el label (ej. "Hilux (Diésel)"); separamos base y combustible.
+      const opt = modelOptions.find(o => o.label === model)
+      const baseModel = opt ? opt.model : model
+      const fuelParam = opt?.fuel ? `&fuel=${encodeURIComponent(opt.fuel)}` : ''
       setIsAnimating(true)
       setTimeout(() => {
-        router.push(`/shop?type=${vehicleType}&brand=${brand}&model=${model}&year=${year}`)
+        router.push(`/shop?type=${vehicleType}&brand=${brand}&model=${encodeURIComponent(baseModel)}&year=${year}${fuelParam}`)
       }, 300)
     }
   }
@@ -143,8 +157,8 @@ export default function HomePage() {
                     className="select disabled:bg-gray-100 disabled:cursor-not-allowed"
                   >
                     <option value="">Selecciona</option>
-                    {selectedVehicle?.models.map(m => (
-                      <option key={m} value={m}>{m}</option>
+                    {modelOptions.map(opt => (
+                      <option key={opt.label} value={opt.label}>{opt.label}</option>
                     ))}
                   </select>
                 </div>

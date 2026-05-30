@@ -3,8 +3,13 @@ import { Car, Motorcycle, Product } from '@/types'
 export const CARS: Car[] = [
   {
     brand: 'Toyota',
-    models: ['Corolla', 'Yaris', 'Hilux', 'Fortuner', 'RAV4', 'Prado'],
-    years: Array.from({ length: 21 }, (_, i) => 2005 + i)
+    models: [
+      '4Runner', 'Agya', 'Avalon', 'Camry', 'Celica', 'Corolla', 'Corolla Cross',
+      'Dyna', 'FJ Cruiser', 'Fortuner', 'Hiace', 'Hilux', 'Land Cruiser',
+      'Land Cruiser Prado', 'Land Cruiser Serie 70', 'Meru', 'Previa', 'RAV4',
+      'Sequoia', 'Starlet', 'Tercel', 'Terios', 'Tundra', 'Yaris', 'Yaris Cross'
+    ],
+    years: Array.from({ length: 32 }, (_, i) => 1995 + i) // 1995–2026
   },
   {
     brand: 'Chevrolet',

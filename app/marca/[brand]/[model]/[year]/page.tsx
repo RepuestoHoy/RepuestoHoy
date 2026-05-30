@@ -1,6 +1,7 @@
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { CARS } from '@/lib/data'
+import { getToyotaModelDetail, getGenerationForYear } from '@/lib/toyota-generations'
 import { supabase } from '@/lib/supabase'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
@@ -104,14 +105,19 @@ export default async function CarYearPage({ params }: PageProps) {
   
   // Decode and format params
   const brandDecoded = decodeURIComponent(brand).replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
-  const modelDecoded = decodeURIComponent(model).replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+  const modelSlug = decodeURIComponent(model)
   const yearNum = parseInt(year)
   
   // Validate car exists in our data
   const carData = CARS.find(c => c.brand === brandDecoded)
-  if (!carData || !carData.models.includes(modelDecoded) || !carData.years.includes(yearNum)) {
+  // Buscar el modelo real comparando slugs (robusto para "4Runner", "RAV4", "FJ Cruiser", etc.)
+  const realModel = carData?.models.find(
+    m => m.toLowerCase().replace(/\s+/g, '-') === modelSlug
+  )
+  if (!carData || !realModel || !carData.years.includes(yearNum)) {
     notFound()
   }
+  const modelDecoded = realModel
   
   // Fetch products compatible with this car
   let products: any[] = []
@@ -150,6 +156,10 @@ export default async function CarYearPage({ params }: PageProps) {
 
   const schemaData = generateSchema(brandDecoded, modelDecoded, year, products.length)
 
+  // Generación y motores específicos para este año (solo Toyota enriquecido)
+  const detail = brandDecoded === 'Toyota' ? getToyotaModelDetail(modelSlug) : null
+  const generation = detail ? getGenerationForYear(detail, yearNum) : null
+
   return (
     <>
       <script
@@ -163,11 +173,11 @@ export default async function CarYearPage({ params }: PageProps) {
           {/* Breadcrumb */}
           <nav className="text-sm text-gray-500 mb-6">
             <ol className="flex flex-wrap items-center gap-2">
-              <li><Link href="/" className="hover:text-red-600">Inicio</Link></li>
+              <li><Link href="/" className="hover:text-rh-red">Inicio</Link></li>
               <li>/</li>
-              <li><Link href={`/marca/${brand}`} className="hover:text-red-600">{brandDecoded}</Link></li>
+              <li><Link href={`/marca/${brand}`} className="hover:text-rh-red">{brandDecoded}</Link></li>
               <li>/</li>
-              <li><Link href={`/marca/${brand}/${model}`} className="hover:text-red-600">{modelDecoded}</Link></li>
+              <li><Link href={`/marca/${brand}/${model}`} className="hover:text-rh-red">{modelDecoded}</Link></li>
               <li>/</li>
               <li className="text-gray-900 font-medium">{year}</li>
             </ol>
@@ -178,6 +188,21 @@ export default async function CarYearPage({ params }: PageProps) {
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
               Repuestos para {brandDecoded} {modelDecoded} {year}
             </h1>
+            {generation && (
+              <div className="flex flex-wrap items-center gap-2 mb-3">
+                <span className="inline-flex items-center px-3 py-1 rounded-full bg-rh-red/10 text-rh-red text-sm font-medium">
+                  {generation.name}
+                </span>
+                {generation.engines.map((eng) => (
+                  <span
+                    key={eng}
+                    className="inline-flex items-center px-3 py-1 rounded-full bg-gray-100 text-gray-700 text-sm"
+                  >
+                    {eng}
+                  </span>
+                ))}
+              </div>
+            )}
             <p className="text-gray-600">
               Encontrá {products.length} repuestos compatibles con tu vehículo. 
               Entrega el mismo día en Caracas.
@@ -220,7 +245,7 @@ export default async function CarYearPage({ params }: PageProps) {
                       {product.brand}
                     </p>
                     <div className="flex items-center justify-between">
-                      <span className="text-xl font-bold text-red-600">
+                      <span className="text-xl font-bold text-rh-red">
                         ${product.sale_price?.toFixed(2)}
                       </span>
                       <span className="text-sm text-gray-500">
@@ -266,7 +291,7 @@ export default async function CarYearPage({ params }: PageProps) {
                   <Link
                     key={y}
                     href={`/marca/${brand}/${model}/${y}`}
-                    className="px-4 py-2 bg-white border border-gray-200 rounded-lg hover:border-red-500 hover:text-red-600 transition-colors"
+                    className="px-4 py-2 bg-white border border-gray-200 rounded-lg hover:border-rh-red hover:text-rh-red transition-colors"
                   >
                     {y}
                   </Link>

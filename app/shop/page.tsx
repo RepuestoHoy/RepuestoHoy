@@ -67,8 +67,9 @@ function ShopContent() {
   const brand = searchParams?.get('brand') || ''
   const model = searchParams?.get('model') || ''
   const year = searchParams?.get('year') || ''
+  const fuel = searchParams?.get('fuel') || ''
   
-  const vehicleName = brand && model ? `${brand} ${model} ${year}` : 'tu vehículo'
+  const vehicleName = brand && model ? `${brand} ${model}${fuel ? ` ${fuel}` : ''} ${year}` : 'tu vehículo'
   
   // Filtrar categorías basado en la búsqueda
   const filteredGroups = useMemo(() => {
