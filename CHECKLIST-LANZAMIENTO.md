@@ -134,7 +134,7 @@ Asegurar que esté verificado en Resend.
 
 ### Test 8: Admin
 - [ ] Ir a `/admin`
-- [ ] Ingresar contraseña (Dette2026!)
+- [ ] Ingresar contraseña ([CONTRASEÑA ELIMINADA — usar Supabase Auth])
 - [ ] Ver lista de productos
 - [ ] Agregar producto nuevo
 

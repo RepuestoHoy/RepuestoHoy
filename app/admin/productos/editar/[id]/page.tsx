@@ -1,19 +1,22 @@
 'use client'
 
-import { useState, useRef } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useRef, useEffect } from 'react'
+import { useRouter, useParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { CATEGORIES } from '@/lib/data'
 import { categoryIcons } from '@/components/CategoryIcons'
-import { Upload, Plus, Check, AlertCircle, ArrowLeft, X, ImageIcon } from 'lucide-react'
+import { Upload, Save, Check, AlertCircle, ArrowLeft, X, ImageIcon, Loader2 } from 'lucide-react'
+import { validateImage, compressImage } from '@/lib/image-upload'
 import Link from 'next/link'
 import Image from 'next/image'
-import { validateImage, compressImage } from '@/lib/image-upload'
 
-export default function NuevoProductoPage() {
+export default function EditarProductoPage() {
   const supabase = createClient()
   const router = useRouter()
+  const params = useParams()
+  const productId = params?.id as string
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const [loadingData, setLoadingData] = useState(true)
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState('')
@@ -32,6 +35,43 @@ export default function NuevoProductoPage() {
     stock: ''
   })
 
+  // Cargar datos del producto a editar
+  useEffect(() => {
+    const supabaseAuth = createClient()
+    supabaseAuth.auth.getUser().then(({ data: { user } }) => {
+      if (!user) { router.push('/admin'); return }
+      loadProduct()
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [productId])
+
+  const loadProduct = async () => {
+    setLoadingData(true)
+    const { data, error } = await supabase
+      .from('products')
+      .select('*')
+      .eq('id', productId)
+      .single()
+    if (error || !data) {
+      setError('No se pudo cargar el producto.')
+      setLoadingData(false)
+      return
+    }
+    setFormData({
+      sku: data.sku || '',
+      name: data.name || '',
+      description: data.description || '',
+      category_id: data.category_id || '',
+      brand: data.brand || '',
+      type: data.type || 'generico',
+      cost_price: data.cost_price?.toString() || '',
+      sale_price: data.sale_price?.toString() || '',
+      stock: data.stock?.toString() || ''
+    })
+    setUploadedImages(data.images || [])
+    setLoadingData(false)
+  }
+
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
     if (!files?.length) return
@@ -40,26 +80,26 @@ export default function NuevoProductoPage() {
     setError('')
 
     for (const file of Array.from(files)) {
-      const check = validateImage(file)
-      if (!check.ok) {
-        setError(`${file.name}: ${check.error}`)
+      if (file.size > 3 * 1024 * 1024) {
+        setError(`${file.name} es muy grande. Máximo 3MB.`)
         continue
       }
-      try {
-        const blob = await compressImage(file)
-        const fileName = `producto-${Date.now()}-${Math.random().toString(36).slice(2, 7)}.webp`
-        const { error: uploadError } = await supabase.storage
-          .from('productos')
-          .upload(fileName, blob, { cacheControl: '3600', upsert: false, contentType: 'image/webp' })
+      if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+        setError(`${file.name}: Solo se permiten JPG, PNG o WebP.`)
+        continue
+      }
 
-        if (uploadError) {
-          setError(`Error subiendo ${file.name}: ${uploadError.message}`)
-        } else {
-          const { data: urlData } = supabase.storage.from('productos').getPublicUrl(fileName)
-          setUploadedImages(prev => [...prev, urlData.publicUrl])
-        }
-      } catch (err: any) {
-        setError(err.message || `Error procesando ${file.name}`)
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${file.name.split('.').pop()}`
+
+      const { data, error: uploadError } = await supabase.storage
+        .from('productos')
+        .upload(fileName, file, { cacheControl: '3600', upsert: false })
+
+      if (uploadError) {
+        setError(`Error subiendo ${file.name}: ${uploadError.message}`)
+      } else {
+        const { data: urlData } = supabase.storage.from('productos').getPublicUrl(fileName)
+        setUploadedImages(prev => [...prev, urlData.publicUrl])
       }
     }
     setUploadingImage(false)
@@ -76,7 +116,7 @@ export default function NuevoProductoPage() {
     setError('')
 
     try {
-      const { error } = await supabase.from('products').insert([{
+      const { error } = await supabase.from('products').update({
         sku: formData.sku,
         name: formData.name,
         description: formData.description,
@@ -86,15 +126,13 @@ export default function NuevoProductoPage() {
         cost_price: parseFloat(formData.cost_price),
         sale_price: parseFloat(formData.sale_price),
         stock: parseInt(formData.stock),
-        is_available: true,
-        images: uploadedImages,
-        features: {}
-      }])
+        images: uploadedImages
+      }).eq('id', productId)
 
       if (error) throw error
 
       setSuccess(true)
-      setTimeout(() => router.push('/admin/dashboard'), 2000)
+      setTimeout(() => router.push('/admin/productos'), 1500)
     } catch (err: any) {
       setError(err.message || 'Error al guardar el producto')
     } finally {
@@ -113,13 +151,24 @@ export default function NuevoProductoPage() {
     ? (margin / parseFloat(formData.cost_price) * 100).toFixed(0)
     : null
 
+  if (loadingData) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-10 h-10 text-[#E10600] animate-spin mx-auto" />
+          <p className="mt-4 text-gray-500">Cargando producto…</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-[#111111] text-white py-4">
         <div className="max-w-4xl mx-auto px-4 flex items-center justify-between">
-          <Link href="/admin/dashboard" className="flex items-center gap-2 text-gray-300 hover:text-white transition-colors">
+          <Link href="/admin/productos" className="flex items-center gap-2 text-gray-300 hover:text-white transition-colors">
             <ArrowLeft className="w-5 h-5" />
-            Volver al dashboard
+            Volver a productos
           </Link>
           <h1 className="font-bold">Panel de Administración</h1>
         </div>
@@ -129,18 +178,18 @@ export default function NuevoProductoPage() {
         <div className="bg-white rounded-2xl shadow-lg p-8">
           <div className="flex items-center gap-3 mb-6">
             <div className="w-10 h-10 bg-[#E10600] rounded-lg flex items-center justify-center">
-              <Plus className="w-5 h-5 text-white" />
+              <Save className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-[#111111]">Agregar Nuevo Producto</h2>
-              <p className="text-gray-500">Completa los datos del repuesto</p>
+              <h2 className="text-2xl font-bold text-[#111111]">Editar Producto</h2>
+              <p className="text-gray-500">Modifica los datos del repuesto</p>
             </div>
           </div>
 
           {success && (
             <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-xl flex items-center gap-3 text-green-700">
               <Check className="w-5 h-5" />
-              <div><p className="font-semibold">¡Producto guardado!</p><p className="text-sm">Redirigiendo...</p></div>
+              <div><p className="font-semibold">¡Cambios guardados!</p><p className="text-sm">Redirigiendo...</p></div>
             </div>
           )}
 
@@ -287,7 +336,7 @@ export default function NuevoProductoPage() {
                     <>
                       <ImageIcon className="w-10 h-10 text-gray-400 mx-auto mb-3" />
                       <p className="text-gray-600 font-medium">Click para subir fotos</p>
-                      <p className="text-xs text-gray-500 mt-1">JPG, PNG o WebP • Máximo 8MB · se optimiza solo</p>
+                      <p className="text-xs text-gray-500 mt-1">JPG, PNG o WebP • Máximo 3MB por foto</p>
                     </>
                   )}
                 </div>
@@ -315,7 +364,7 @@ export default function NuevoProductoPage() {
                 {loading ? (
                   <><div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />Guardando...</>
                 ) : (
-                  <><Check className="w-5 h-5" />Guardar Producto</>
+                  <><Check className="w-5 h-5" />Guardar Cambios</>
                 )}
               </button>
               <Link href="/admin/dashboard" className="btn-secondary flex items-center justify-center">

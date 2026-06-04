@@ -1,10 +1,11 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { CARS, MOTORCYCLES, CATEGORIES } from '@/lib/data'
 import { getToyotaModelOptions, type ModelOption } from '@/lib/toyota-generations'
 import { categoryIcons } from '@/components/CategoryIcons'
+import { createClient } from '@/lib/supabase/client'
 import { Search, HelpCircle, Car, Shield, Clock, Award, ChevronRight } from 'lucide-react'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
@@ -18,6 +19,24 @@ export default function HomePage() {
   const [year, setYear] = useState('')
   const [isAnimating, setIsAnimating] = useState(false)
   const [categorySearch, setCategorySearch] = useState('')
+  // Imágenes de categorías subidas desde el panel (slug -> url)
+  const [categoryImages, setCategoryImages] = useState<Record<string, string>>({})
+
+  useEffect(() => {
+    const supabase = createClient()
+    supabase
+      .from('categories')
+      .select('slug, image_url')
+      .then(({ data }) => {
+        if (data) {
+          const map: Record<string, string> = {}
+          data.forEach((c: { slug: string; image_url: string | null }) => {
+            if (c.image_url) map[c.slug] = c.image_url
+          })
+          setCategoryImages(map)
+        }
+      })
+  }, [])
 
   // Filtrar categorías basado en la búsqueda
   const filteredCategories = useMemo(() => {
@@ -320,14 +339,19 @@ export default function HomePage() {
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             {filteredCategories.map(cat => {
               const IconComponent = categoryIcons[cat.icon]
+              const imageUrl = categoryImages[cat.id]
               return (
                 <a
                   key={cat.id}
                   href={`/buscar?category=${cat.id}`}
                   className="card p-5 text-center hover:border-[#E10600] hover:shadow-xl transition-all group bg-white"
                 >
-                  <div className="w-12 h-12 mx-auto mb-3 flex items-center justify-center text-[#E10600] group-hover:scale-110 transition-transform">
-                    {IconComponent && <IconComponent className="w-10 h-10" />}
+                  <div className="w-12 h-12 mx-auto mb-3 flex items-center justify-center text-[#E10600] group-hover:scale-110 transition-transform overflow-hidden">
+                    {imageUrl ? (
+                      <img src={imageUrl} alt={cat.name} className="w-12 h-12 object-cover rounded-lg" />
+                    ) : (
+                      IconComponent && <IconComponent className="w-10 h-10" />
+                    )}
                   </div>
                   <h4 className="font-bold text-[#111111] text-sm uppercase mb-1">{cat.name}</h4>
                   <p className="text-xs text-[#6B7280]">{cat.description}</p>

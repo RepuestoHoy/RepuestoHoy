@@ -4,46 +4,37 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Lock, LogIn } from 'lucide-react'
 import Link from 'next/link'
+import { createClient } from '@/lib/supabase/client'
 
 export default function AdminLoginPage() {
   const router = useRouter()
+  const supabase = createClient()
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
+  // Si ya hay sesión válida, pasa directo al dashboard.
   useEffect(() => {
-    const isAdmin = sessionStorage.getItem('rh-admin-auth')
-    if (isAdmin === 'true') {
-      router.push('/admin/dashboard')
-    }
-  }, [router])
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user) router.push('/admin/dashboard')
+    })
+  }, [router, supabase])
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setError('')
 
-    try {
-      const res = await fetch('/api/admin-auth', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password })
-      })
+    const { error } = await supabase.auth.signInWithPassword({ email, password })
 
-      const data = await res.json()
-
-      if (res.ok && data.success) {
-        sessionStorage.setItem('rh-admin-auth', 'true')
-        sessionStorage.setItem('rh-admin-token', data.token)
-        router.push('/admin/dashboard')
-      } else {
-        setError(data.error || 'Contraseña incorrecta')
-        setLoading(false)
-      }
-    } catch (err) {
-      setError('Error de conexión. Intenta de nuevo.')
+    if (error) {
+      setError('Correo o contraseña incorrectos')
       setLoading(false)
+      return
     }
+    router.push('/admin/dashboard')
+    router.refresh()
   }
 
   return (
@@ -60,7 +51,7 @@ export default function AdminLoginPage() {
             <Lock className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-2xl font-bold text-white">Panel Admin</h1>
-          <p className="text-gray-400 mt-2">Ingresa la contraseña para continuar</p>
+          <p className="text-gray-400 mt-2">Ingresa con tu correo y contraseña</p>
         </div>
 
         <div className="bg-white/10 backdrop-blur rounded-2xl p-8">
@@ -71,19 +62,26 @@ export default function AdminLoginPage() {
           )}
 
           <form onSubmit={handleLogin} className="space-y-4">
-            <div>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-[#E10600] transition-colors"
-                placeholder="Contraseña del panel"
-                autoFocus
-              />
-            </div>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-[#E10600] transition-colors"
+              placeholder="Correo"
+              autoFocus
+              required
+            />
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-[#E10600] transition-colors"
+              placeholder="Contraseña"
+              required
+            />
             <button
               type="submit"
-              disabled={loading || !password}
+              disabled={loading || !password || !email}
               className="w-full bg-[#E10600] hover:bg-[#B00500] text-white font-bold py-3 rounded-xl transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {loading ? (

@@ -175,7 +175,7 @@ RESEND_API_KEY=re_key_aquí
 **Estado:** ⚠️ Inseguro
 
 **Problemas:**
-1. Contraseña hardcodeada: `Dette2026!`
+1. Contraseña hardcodeada: `[CONTRASEÑA ELIMINADA — usar Supabase Auth]`
 2. No usa variable de entorno `ADMIN_PASSWORD` como debería
 3. Token generado es muy simple (Base64 de timestamp)
 4. **Riesgo de seguridad:** La contraseña está en el código fuente
