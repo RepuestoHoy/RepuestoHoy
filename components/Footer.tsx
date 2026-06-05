@@ -11,7 +11,7 @@ export default function Footer() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center">
-                <Truck className="w-5 h-5 text-[#E10600]" />
+                <Truck className="w-5 h-5 text-[#FF6A00]" />
               </div>
               <div>
                 <p className="font-semibold text-sm">Envío Rápido</p>
@@ -20,7 +20,7 @@ export default function Footer() {
             </div>
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center">
-                <Shield className="w-5 h-5 text-[#E10600]" />
+                <Shield className="w-5 h-5 text-[#FF6A00]" />
               </div>
               <div>
                 <p className="font-semibold text-sm">Piezas verificadas</p>
@@ -29,7 +29,7 @@ export default function Footer() {
             </div>
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center">
-                <RefreshCw className="w-5 h-5 text-[#E10600]" />
+                <RefreshCw className="w-5 h-5 text-[#FF6A00]" />
               </div>
               <div>
                 <p className="font-semibold text-sm">Asesoria tecnica</p>
@@ -38,7 +38,7 @@ export default function Footer() {
             </div>
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center">
-                <Clock className="w-5 h-5 text-[#E10600]" />
+                <Clock className="w-5 h-5 text-[#FF6A00]" />
               </div>
               <div>
                 <p className="font-semibold text-sm">Atención Personal</p>
@@ -56,7 +56,7 @@ export default function Footer() {
           <div className="md:col-span-1">
             <div className="flex items-center gap-3 mb-4">
               <span style={{
-                background: '#E8181A',
+                background: '#FF6A00',
                 color: '#FFFFFF',
                 fontFamily: "'Futura', 'Trebuchet MS', 'Arial Black', Arial, sans-serif",
                 fontWeight: 900,
@@ -134,15 +134,15 @@ export default function Footer() {
             <h5 className="font-bold text-sm uppercase tracking-wider mb-4">Contacto</h5>
             <ul className="space-y-3 text-sm">
               <li className="flex items-start gap-2">
-                <Phone className="w-4 h-4 text-[#E10600] mt-0.5 flex-shrink-0" />
+                <Phone className="w-4 h-4 text-[#FF6A00] mt-0.5 flex-shrink-0" />
                 <span className="text-gray-400">{BUSINESS_CONFIG.phone}</span>
               </li>
               <li className="flex items-start gap-2">
-                <Mail className="w-4 h-4 text-[#E10600] mt-0.5 flex-shrink-0" />
+                <Mail className="w-4 h-4 text-[#FF6A00] mt-0.5 flex-shrink-0" />
                 <span className="text-gray-400">{BUSINESS_CONFIG.email}</span>
               </li>
               <li className="flex items-start gap-2">
-                <MapPin className="w-4 h-4 text-[#E10600] mt-0.5 flex-shrink-0" />
+                <MapPin className="w-4 h-4 text-[#FF6A00] mt-0.5 flex-shrink-0" />
                 <span className="text-gray-400">Caracas, Venezuela</span>
               </li>
             </ul>

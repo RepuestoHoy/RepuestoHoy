@@ -128,7 +128,7 @@ export default function NuevoProductoPage() {
       <main className="max-w-4xl mx-auto px-4 py-8">
         <div className="bg-white rounded-2xl shadow-lg p-8">
           <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 bg-[#E10600] rounded-lg flex items-center justify-center">
+            <div className="w-10 h-10 bg-[#FF6A00] rounded-lg flex items-center justify-center">
               <Plus className="w-5 h-5 text-white" />
             </div>
             <div>
@@ -152,16 +152,26 @@ export default function NuevoProductoPage() {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 flex gap-3">
+              <span className="text-2xl">💡</span>
+              <div className="text-sm text-blue-900">
+                <p className="font-semibold mb-1">¿Cómo agregar un producto?</p>
+                <p>Llena los campos marcados con <strong>*</strong> (son obligatorios). Cada campo tiene una explicación debajo. Al final, sube una o varias fotos y dale "Guardar".</p>
+              </div>
+            </div>
+
             {/* SKU y Nombre */}
             <div className="grid md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-bold text-[#111111] mb-2">SKU (Código único) *</label>
+                <label className="block text-sm font-bold text-[#111111] mb-2">SKU (Código del producto) *</label>
                 <input type="text" name="sku" value={formData.sku} onChange={handleChange} required placeholder="Ej: FIL-TOY-COR-001" className="input" />
+                <p className="text-xs text-gray-500 mt-1">Un código único que identifica este repuesto. Tú lo inventas. Ejemplo: FIL-TOY-001</p>
                 <p className="text-xs text-gray-500 mt-1">Debe ser único para cada producto</p>
               </div>
               <div>
                 <label className="block text-sm font-bold text-[#111111] mb-2">Nombre del Producto *</label>
                 <input type="text" name="name" value={formData.name} onChange={handleChange} required placeholder="Ej: Filtro de Aceite Toyota Corolla" className="input" />
+                <p className="text-xs text-gray-500 mt-1">El nombre que verá el cliente en la tienda.</p>
               </div>
             </div>
 
@@ -169,6 +179,7 @@ export default function NuevoProductoPage() {
             <div>
               <label className="block text-sm font-bold text-[#111111] mb-2">Descripción *</label>
               <textarea name="description" value={formData.description} onChange={handleChange} required rows={3} placeholder="Compatibilidad, duración, qué incluye..." className="input" />
+              <p className="text-xs text-gray-500 mt-1">Detalles del repuesto: para qué vehículos sirve, qué incluye, etc.</p>
             </div>
 
             {/* Categoría y Marca */}
@@ -185,6 +196,7 @@ export default function NuevoProductoPage() {
               <div>
                 <label className="block text-sm font-bold text-[#111111] mb-2">Marca del Repuesto *</label>
                 <input type="text" name="brand" value={formData.brand} onChange={handleChange} required placeholder="Ej: FRAM, Toyota, Genérico" className="input" />
+                <p className="text-xs text-gray-500 mt-1">Quién fabrica el repuesto (la marca de la pieza, no del carro).</p>
               </div>
             </div>
 
@@ -196,7 +208,7 @@ export default function NuevoProductoPage() {
                   { id: 'original', label: '⭐ Original', desc: 'Marca oficial del vehículo' },
                   { id: 'generico', label: '🔧 Genérico', desc: 'Marca alternativa' }
                 ].map(tipo => (
-                  <label key={tipo.id} className={`cursor-pointer p-4 rounded-xl border-2 transition-all text-center ${formData.type === tipo.id ? 'border-[#E10600] bg-red-50' : 'border-gray-200 hover:border-gray-300'}`}>
+                  <label key={tipo.id} className={`cursor-pointer p-4 rounded-xl border-2 transition-all text-center ${formData.type === tipo.id ? 'border-[#FF6A00] bg-red-50' : 'border-gray-200 hover:border-gray-300'}`}>
                     <input type="radio" name="type" value={tipo.id} checked={formData.type === tipo.id} onChange={handleChange} className="hidden" />
                     <div className="font-bold text-[#111111]">{tipo.label}</div>
                     <div className="text-xs text-gray-500 mt-1">{tipo.desc}</div>
@@ -213,7 +225,7 @@ export default function NuevoProductoPage() {
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">$</span>
                   <input type="number" name="cost_price" value={formData.cost_price} onChange={handleChange} required min="0" step="0.01" placeholder="12.50" className="input pl-8" />
                 </div>
-                <p className="text-xs text-gray-500 mt-1">Lo que pagas tú</p>
+                <p className="text-xs text-gray-500 mt-1">Lo que te cuesta a ti (no se muestra al cliente).</p>
               </div>
               <div>
                 <label className="block text-sm font-bold text-[#111111] mb-2">Precio Venta (USD) *</label>
@@ -221,11 +233,12 @@ export default function NuevoProductoPage() {
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">$</span>
                   <input type="number" name="sale_price" value={formData.sale_price} onChange={handleChange} required min="0" step="0.01" placeholder="18.50" className="input pl-8" />
                 </div>
-                <p className="text-xs text-gray-500 mt-1">Lo que cobras</p>
+                <p className="text-xs text-gray-500 mt-1">El precio que paga el cliente.</p>
               </div>
               <div>
                 <label className="block text-sm font-bold text-[#111111] mb-2">Stock (Unidades) *</label>
                 <input type="number" name="stock" value={formData.stock} onChange={handleChange} required min="0" placeholder="15" className="input" />
+                <p className="text-xs text-gray-500 mt-1">Cuántas unidades tienes disponibles.</p>
               </div>
             </div>
 
@@ -276,17 +289,17 @@ export default function NuevoProductoPage() {
               {uploadedImages.length < 5 && (
                 <div
                   onClick={() => fileInputRef.current?.click()}
-                  className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-[#E10600] transition-colors cursor-pointer"
+                  className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-[#FF6A00] transition-colors cursor-pointer"
                 >
                   {uploadingImage ? (
                     <div className="flex flex-col items-center gap-3">
-                      <div className="w-8 h-8 border-4 border-[#E10600] border-t-transparent rounded-full animate-spin" />
+                      <div className="w-8 h-8 border-4 border-[#FF6A00] border-t-transparent rounded-full animate-spin" />
                       <p className="text-gray-600">Subiendo...</p>
                     </div>
                   ) : (
                     <>
                       <ImageIcon className="w-10 h-10 text-gray-400 mx-auto mb-3" />
-                      <p className="text-gray-600 font-medium">Click para subir fotos</p>
+                      <p className="text-gray-600 font-medium">Haz clic para subir fotos</p>
                       <p className="text-xs text-gray-500 mt-1">JPG, PNG o WebP • Máximo 8MB · se optimiza solo</p>
                     </>
                   )}

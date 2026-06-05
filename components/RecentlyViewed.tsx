@@ -37,7 +37,7 @@ export default function RecentlyViewed() {
             <div className="p-4">
               <div className="text-xs font-bold text-[#2A2A2A] uppercase">{product.brand}</div>
               <h3 className="font-bold text-[#111111] text-sm mt-1 line-clamp-2">{product.name}</h3>
-              <div className="text-lg font-extrabold text-[#E10600] mt-2">
+              <div className="text-lg font-extrabold text-[#FF6A00] mt-2">
                 ${product.price.toFixed(2)}
               </div>
             </div>

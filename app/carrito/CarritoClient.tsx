@@ -82,7 +82,7 @@ export default function CarritoClient() {
                 {/* Info */}
                 <div className="flex-1 min-w-0">
                   <Link href={`/producto/${item.product.id}`}>
-                    <h3 className="font-bold text-[#111111] hover:text-[#E10600] transition-colors line-clamp-2">
+                    <h3 className="font-bold text-[#111111] hover:text-[#FF6A00] transition-colors line-clamp-2">
                       {item.product.name}
                     </h3>
                   </Link>
@@ -91,7 +91,7 @@ export default function CarritoClient() {
                   </p>
                   <div className="flex items-center gap-2 mt-2">
                     <span className={`text-xs px-2 py-1 rounded uppercase font-bold ${
-                      item.product.type === 'original' ? 'bg-[#E10600] text-white' : 'bg-gray-200 text-gray-700'
+                      item.product.type === 'original' ? 'bg-[#FF6A00] text-white' : 'bg-gray-200 text-gray-700'
                     }`}>
                       {item.product.type === 'original' ? 'Original' : 'Genérico'}
                     </span>
@@ -107,7 +107,7 @@ export default function CarritoClient() {
                 <div className="flex flex-col items-end justify-between">
                   <button
                     onClick={() => handleRemoveItem(item.product.id, item.product.name)}
-                    className="text-[#2A2A2A] hover:text-[#E10600] transition-colors p-1 cursor-pointer"
+                    className="text-[#2A2A2A] hover:text-[#FF6A00] transition-colors p-1 cursor-pointer"
                     aria-label={`Eliminar ${item.product.name}`}
                     type="button"
                   >
@@ -141,7 +141,7 @@ export default function CarritoClient() {
                   </div>
 
                   <div className="text-right">
-                    <div className="text-lg font-extrabold text-[#E10600]">
+                    <div className="text-lg font-extrabold text-[#FF6A00]">
                       ${(item.product.price * item.quantity).toFixed(2)}
                     </div>
                     <div className="text-xs text-[#2A2A2A]">
@@ -155,7 +155,7 @@ export default function CarritoClient() {
             {/* Continue Shopping */}
             <Link 
               href="/buscar" 
-              className="inline-flex items-center gap-2 text-[#2A2A2A] hover:text-[#E10600] transition-colors font-medium"
+              className="inline-flex items-center gap-2 text-[#2A2A2A] hover:text-[#FF6A00] transition-colors font-medium"
             >
               <ShoppingBag className="w-5 h-5" />
               Seguir comprando
@@ -181,7 +181,7 @@ export default function CarritoClient() {
                 </div>
                 <div className="flex justify-between text-xl font-extrabold text-[#111111] pt-3 border-t border-[#E0E0E0]">
                   <span>Subtotal</span>
-                  <span className="text-[#E10600]">${subtotal.toFixed(2)}</span>
+                  <span className="text-[#FF6A00]">${subtotal.toFixed(2)}</span>
                 </div>
               </div>
 
@@ -209,19 +209,19 @@ export default function CarritoClient() {
 
               <div className="mt-6 space-y-3 text-sm">
                 <div className="flex items-center gap-2 text-[#2A2A2A]">
-                  <svg className="w-5 h-5 text-[#E10600]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 text-[#FF6A00]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                   </svg>
                   <span>Pago seguro garantizado</span>
                 </div>
                 <div className="flex items-center gap-2 text-[#2A2A2A]">
-                  <svg className="w-5 h-5 text-[#E10600]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 text-[#FF6A00]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                   </svg>
                   <span>Cambios gratis si no le queda</span>
                 </div>
                 <div className="flex items-center gap-2 text-[#2A2A2A]">
-                  <svg className="w-5 h-5 text-[#E10600]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 text-[#FF6A00]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
                   <span>Entrega el mismo día en Caracas</span>

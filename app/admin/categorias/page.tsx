@@ -142,7 +142,7 @@ export default function AdminCategoriasPage() {
                     }}
                     onClick={() => !isBusy && fileInputs.current[cat.id]?.click()}
                     className={`aspect-square flex items-center justify-center relative cursor-pointer transition-colors ${
-                      isDrag ? 'bg-red-50 ring-2 ring-[#E10600] ring-inset' : 'bg-gray-100 hover:bg-gray-200'
+                      isDrag ? 'bg-red-50 ring-2 ring-[#FF6A00] ring-inset' : 'bg-gray-100 hover:bg-gray-200'
                     }`}
                   >
                     {cat.image_url ? (
@@ -183,7 +183,7 @@ export default function AdminCategoriasPage() {
                     <button
                       onClick={(e) => { e.stopPropagation(); fileInputs.current[cat.id]?.click() }}
                       disabled={isBusy}
-                      className="w-full bg-[#E10600] hover:bg-[#B00500] text-white text-sm font-medium py-2 rounded-lg flex items-center justify-center gap-1.5 disabled:opacity-60"
+                      className="w-full bg-[#FF6A00] hover:bg-[#E55A00] text-white text-sm font-medium py-2 rounded-lg flex items-center justify-center gap-1.5 disabled:opacity-60"
                     >
                       {isBusy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
                       {cat.image_url ? 'Cambiar' : 'Subir'}

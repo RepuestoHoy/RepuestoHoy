@@ -43,7 +43,7 @@ export default function AdminLoginPage() {
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center mb-6">
             <svg viewBox="0 0 420 100" height="36" xmlns="http://www.w3.org/2000/svg" aria-label="repuestohoy">
-              <rect x="0" y="0" width="420" height="100" rx="3" fill="#E8181A"/>
+              <rect x="0" y="0" width="420" height="100" rx="3" fill="#FF6A00"/>
               <text x="210" y="76" textAnchor="middle" fontFamily="'Futura', 'Trebuchet MS', Arial, sans-serif" fontWeight="bold" fontStyle="italic" fontSize="74" letterSpacing="-1" fill="#FFFFFF">repuestohoy</text>
             </svg>
           </Link>
@@ -66,7 +66,7 @@ export default function AdminLoginPage() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-[#E10600] transition-colors"
+              className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-[#FF6A00] transition-colors"
               placeholder="Correo"
               autoFocus
               required
@@ -75,14 +75,14 @@ export default function AdminLoginPage() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-[#E10600] transition-colors"
+              className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-[#FF6A00] transition-colors"
               placeholder="Contraseña"
               required
             />
             <button
               type="submit"
               disabled={loading || !password || !email}
-              className="w-full bg-[#E10600] hover:bg-[#B00500] text-white font-bold py-3 rounded-xl transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+              className="w-full bg-[#FF6A00] hover:bg-[#E55A00] text-white font-bold py-3 rounded-xl transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {loading ? (
                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />

@@ -47,7 +47,7 @@ function LoginForm() {
           <Link href="/" className="inline-flex items-center gap-3">
             <span
               style={{
-                background: '#E8181A',
+                background: '#FF6A00',
                 color: '#FFFFFF',
                 fontFamily: "'Futura', 'Trebuchet MS', 'Arial Black', Arial, sans-serif",
                 fontWeight: 900,
@@ -64,7 +64,7 @@ function LoginForm() {
           </Link>
           <h1 className="mt-6 text-2xl font-bold text-[#111111]">Iniciar sesión</h1>
           <p className="mt-2 text-gray-600">¿No tienes cuenta?{' '}
-            <Link href={`/registro?redirect=${redirect}`} className="text-[#E10600] font-semibold hover:underline">
+            <Link href={`/registro?redirect=${redirect}`} className="text-[#FF6A00] font-semibold hover:underline">
               Créala gratis
             </Link>
           </p>

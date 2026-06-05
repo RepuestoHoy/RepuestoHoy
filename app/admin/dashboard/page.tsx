@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import {
   Package, ShoppingBag, DollarSign, Clock, CheckCircle, Truck, XCircle,
-  LogOut, Plus, Eye, BarChart2, RefreshCw, Bell, Car
+  LogOut, Plus, Eye, BarChart2, RefreshCw, Bell, Car, Trash2, AlertTriangle, Loader2, X
 } from 'lucide-react'
 
 interface Order {
@@ -53,6 +53,8 @@ export default function AdminDashboard() {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
   const [updatingStatus, setUpdatingStatus] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState<'orders' | 'products'>('orders')
+  const [orderToDelete, setOrderToDelete] = useState<Order | null>(null)
+  const [deletingOrder, setDeletingOrder] = useState(false)
 
   useEffect(() => {
     // Verificación real contra Supabase (el middleware ya protege, esto es refuerzo).
@@ -102,6 +104,20 @@ export default function AdminDashboard() {
     setUpdatingStatus(null)
   }
 
+  const handleDeleteOrder = async () => {
+    if (!orderToDelete) return
+    setDeletingOrder(true)
+    // Borrar primero las líneas de la orden (si existen), luego la orden
+    await supabase.from('order_items').delete().eq('order_id', orderToDelete.id)
+    const { error } = await supabase.from('orders').delete().eq('id', orderToDelete.id)
+    if (!error) {
+      setOrders(prev => prev.filter(o => o.id !== orderToDelete.id))
+      if (selectedOrder?.id === orderToDelete.id) setSelectedOrder(null)
+    }
+    setDeletingOrder(false)
+    setOrderToDelete(null)
+  }
+
   const handleLogout = async () => {
     await supabase.auth.signOut()
     router.push('/admin')
@@ -121,7 +137,7 @@ export default function AdminDashboard() {
       <header className="bg-[#111111] text-white py-4 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-[#E10600] rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-[#FF6A00] rounded-lg flex items-center justify-center">
               <Car className="w-5 h-5" />
             </div>
             <h1 className="font-bold text-lg">Panel Admin</h1>
@@ -194,7 +210,7 @@ export default function AdminDashboard() {
             <div className="flex-1 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
               {loading ? (
                 <div className="p-12 text-center">
-                  <div className="w-10 h-10 border-4 border-[#E10600] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+                  <div className="w-10 h-10 border-4 border-[#FF6A00] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
                   <p className="text-gray-500">Cargando órdenes...</p>
                 </div>
               ) : orders.length === 0 ? (
@@ -227,7 +243,7 @@ export default function AdminDashboard() {
                             onClick={() => setSelectedOrder(order)}
                           >
                             <td className="py-4 px-5">
-                              <span className="font-mono text-xs font-bold text-[#E10600]">{order.order_number}</span>
+                              <span className="font-mono text-xs font-bold text-[#FF6A00]">{order.order_number}</span>
                             </td>
                             <td className="py-4 px-4">
                               <div>
@@ -236,7 +252,7 @@ export default function AdminDashboard() {
                               </div>
                             </td>
                             <td className="py-4 px-4">
-                              <span className="font-bold text-[#E10600]">${Number(order.total).toFixed(2)}</span>
+                              <span className="font-bold text-[#FF6A00]">${Number(order.total).toFixed(2)}</span>
                             </td>
                             <td className="py-4 px-4">
                               <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold ${statusCfg.color}`}>
@@ -248,7 +264,16 @@ export default function AdminDashboard() {
                               {formatDate(order.created_at)}
                             </td>
                             <td className="py-4 px-5">
-                              <Eye className="w-4 h-4 text-gray-400" />
+                              <div className="flex items-center gap-1">
+                                <Eye className="w-4 h-4 text-gray-400" />
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); setOrderToDelete(order) }}
+                                  className="p-1.5 text-gray-400 hover:text-red-600 transition-colors"
+                                  title="Eliminar orden"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              </div>
                             </td>
                           </tr>
                         )
@@ -268,16 +293,16 @@ export default function AdminDashboard() {
                     <button onClick={() => setSelectedOrder(null)} className="text-gray-400 hover:text-gray-600">✕</button>
                   </div>
 
-                  <div className="font-mono text-lg font-bold text-[#E10600] mb-4">{selectedOrder.order_number}</div>
+                  <div className="font-mono text-lg font-bold text-[#FF6A00] mb-4">{selectedOrder.order_number}</div>
 
                   <div className="space-y-2 text-sm mb-4">
                     <div className="flex justify-between"><span className="text-gray-500">Cliente</span><span className="font-semibold">{selectedOrder.customer_name}</span></div>
                     <div className="flex justify-between"><span className="text-gray-500">Teléfono</span>
                       <a href={`https://wa.me/58${selectedOrder.customer_phone.replace(/^0/, '').replace(/-/g, '')}`} target="_blank" className="text-green-600 font-semibold">{selectedOrder.customer_phone}</a>
                     </div>
-                    {selectedOrder.customer_email && <div className="flex justify-between"><span className="text-gray-500">Email</span><span className="text-xs">{selectedOrder.customer_email}</span></div>}
+                    {selectedOrder.customer_email && <div className="flex justify-between"><span className="text-gray-500">Correo</span><span className="text-xs">{selectedOrder.customer_email}</span></div>}
                     <div className="flex justify-between"><span className="text-gray-500">Pago</span><span>{PAYMENT_LABELS[selectedOrder.payment_method] || selectedOrder.payment_method}</span></div>
-                    <div className="flex justify-between"><span className="text-gray-500">Total</span><span className="font-bold text-[#E10600] text-base">${Number(selectedOrder.total).toFixed(2)}</span></div>
+                    <div className="flex justify-between"><span className="text-gray-500">Total</span><span className="font-bold text-[#FF6A00] text-base">${Number(selectedOrder.total).toFixed(2)}</span></div>
                   </div>
 
                   <div className="mb-4">
@@ -325,6 +350,45 @@ export default function AdminDashboard() {
           </div>
         )}
 
+        {/* Modal confirmación borrar orden */}
+        {orderToDelete && (
+          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-2xl max-w-md w-full p-6">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <AlertTriangle className="w-6 h-6 text-red-600" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-lg font-bold text-gray-900">Eliminar orden</h3>
+                  <p className="text-gray-600 text-sm mt-1">
+                    ¿Seguro que quieres eliminar la orden <strong>{orderToDelete.order_number}</strong> de {orderToDelete.customer_name}? Esta acción no se puede deshacer.
+                  </p>
+                </div>
+                <button onClick={() => setOrderToDelete(null)} className="text-gray-400 hover:text-gray-600">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              <div className="flex gap-3 mt-6">
+                <button
+                  onClick={() => setOrderToDelete(null)}
+                  disabled={deletingOrder}
+                  className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-60"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleDeleteOrder}
+                  disabled={deletingOrder}
+                  className="flex-1 px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium flex items-center justify-center gap-2 disabled:opacity-60"
+                >
+                  {deletingOrder ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                  Eliminar
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {activeTab === 'products' && (
           <div className="flex justify-end mb-4">
             <Link href="/admin/productos/nuevo" className="btn-primary flex items-center gap-2">
@@ -344,7 +408,6 @@ export default function AdminDashboard() {
 }
 
 function ProductsTab() {
-  const supabase = createClient()
   const [products, setProducts] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
@@ -374,7 +437,7 @@ function ProductsTab() {
 
   if (loading) return (
     <div className="text-center py-8">
-      <div className="w-8 h-8 border-4 border-[#E10600] border-t-transparent rounded-full animate-spin mx-auto" />
+      <div className="w-8 h-8 border-4 border-[#FF6A00] border-t-transparent rounded-full animate-spin mx-auto" />
     </div>
   )
 
@@ -394,7 +457,7 @@ function ProductsTab() {
         <div className="text-center py-8 text-gray-500">
           <Package className="w-10 h-10 mx-auto mb-3 text-gray-300" />
           <p>No hay productos aún.</p>
-          <Link href="/admin/productos/nuevo" className="text-[#E10600] hover:underline text-sm mt-2 inline-block">
+          <Link href="/admin/productos/nuevo" className="text-[#FF6A00] hover:underline text-sm mt-2 inline-block">
             Agregar el primero →
           </Link>
         </div>
@@ -419,7 +482,7 @@ function ProductsTab() {
                   </div>
                 </td>
                 <td className="py-3 font-mono text-xs text-gray-600">{p.sku}</td>
-                <td className="py-3 font-bold text-[#E10600]">${Number(p.sale_price).toFixed(2)}</td>
+                <td className="py-3 font-bold text-[#FF6A00]">${Number(p.sale_price).toFixed(2)}</td>
                 <td className="py-3">
                   <span className={`font-semibold text-sm ${p.stock < 5 ? 'text-orange-600' : 'text-green-600'}`}>
                     {p.stock} {p.stock < 5 && '⚠️'}

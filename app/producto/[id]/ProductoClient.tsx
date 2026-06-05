@@ -115,11 +115,11 @@ export default function ProductoClient({ productId }: ProductoClientProps) {
       <div className="bg-[#F5F5F5] border-b border-[#E0E0E0]">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <div className="flex items-center gap-2 text-sm text-[#2A2A2A]">
-            <Link href="/" className="hover:text-[#E10600]">Inicio</Link>
+            <Link href="/" className="hover:text-[#FF6A00]">Inicio</Link>
             <span>/</span>
-            <Link href="/buscar" className="hover:text-[#E10600]">Repuestos</Link>
+            <Link href="/buscar" className="hover:text-[#FF6A00]">Repuestos</Link>
             <span>/</span>
-            <Link href={`/buscar?category=${product.category}`} className="hover:text-[#E10600]">
+            <Link href={`/buscar?category=${product.category}`} className="hover:text-[#FF6A00]">
               {category?.name}
             </Link>
             <span>/</span>
@@ -153,7 +153,7 @@ export default function ProductoClient({ productId }: ProductoClientProps) {
               )}
               {/* Type Badge */}
               <div className={`absolute top-4 left-4 px-4 py-2 rounded-lg text-sm font-bold uppercase tracking-wider ${
-                product.type === 'original' ? 'bg-[#E10600] text-white' :
+                product.type === 'original' ? 'bg-[#FF6A00] text-white' :
                 'bg-gray-200 text-gray-700'
               }`}>
                 {product.type === 'original' ? '⭐ Original' : '🔧 Genérico'}
@@ -225,7 +225,7 @@ export default function ProductoClient({ productId }: ProductoClientProps) {
                     ${product.originalPrice.toFixed(2)}
                   </span>
                 )}
-                <span className="text-4xl font-extrabold text-[#E10600]">
+                <span className="text-4xl font-extrabold text-[#FF6A00]">
                   ${product.price.toFixed(2)}
                 </span>
               </div>
@@ -239,7 +239,7 @@ export default function ProductoClient({ productId }: ProductoClientProps) {
                   </>
                 ) : (
                   <>
-                    <span className="w-2 h-2 bg-[#E10600] rounded-full"></span>
+                    <span className="w-2 h-2 bg-[#FF6A00] rounded-full"></span>
                     <span className="text-[#2A2A2A]">En stock ({product.stock} disponibles)</span>
                   </>
                 )}
@@ -295,7 +295,7 @@ export default function ProductoClient({ productId }: ProductoClientProps) {
 
               <button
                 onClick={handleBuyNow}
-                className="w-full py-4 bg-[#E10600] text-white font-bold uppercase tracking-wide rounded-lg hover:bg-[#B00500] transition-all cursor-pointer"
+                className="w-full py-4 bg-[#FF6A00] text-white font-bold uppercase tracking-wide rounded-lg hover:bg-[#E55A00] transition-all cursor-pointer"
                 type="button"
               >
                 Comprar ahora
@@ -305,15 +305,15 @@ export default function ProductoClient({ productId }: ProductoClientProps) {
             {/* Trust Badges */}
             <div className="grid grid-cols-3 gap-4 pt-6 border-t border-[#E0E0E0]">
               <div className="text-center">
-                <Shield className="w-6 h-6 mx-auto mb-2 text-[#E10600]" />
+                <Shield className="w-6 h-6 mx-auto mb-2 text-[#FF6A00]" />
                 <p className="text-xs font-medium text-[#2A2A2A]">Pieza verificada</p>
               </div>
               <div className="text-center">
-                <Truck className="w-6 h-6 mx-auto mb-2 text-[#E10600]" />
+                <Truck className="w-6 h-6 mx-auto mb-2 text-[#FF6A00]" />
                 <p className="text-xs font-medium text-[#2A2A2A]">Entrega hoy</p>
               </div>
               <div className="text-center">
-                <RotateCcw className="w-6 h-6 mx-auto mb-2 text-[#E10600]" />
+                <RotateCcw className="w-6 h-6 mx-auto mb-2 text-[#FF6A00]" />
                 <p className="text-xs font-medium text-[#2A2A2A]">Compatibilidad</p>
               </div>
             </div>
@@ -350,7 +350,7 @@ export default function ProductoClient({ productId }: ProductoClientProps) {
             <ul className="space-y-3">
               {product.features.map((feature, idx) => (
                 <li key={idx} className="flex items-start gap-3">
-                  <Check className="w-5 h-5 text-[#E10600] flex-shrink-0 mt-0.5" />
+                  <Check className="w-5 h-5 text-[#FF6A00] flex-shrink-0 mt-0.5" />
                   <span className="text-[#2A2A2A]">{feature}</span>
                 </li>
               ))}
@@ -394,7 +394,7 @@ export default function ProductoClient({ productId }: ProductoClientProps) {
 
                       {/* Type Badge */}
                       <div className={`absolute top-2 left-2 px-2 py-1 rounded-lg text-xs font-bold ${
-                        relatedProduct.type === 'original' ? 'bg-[#E10600] text-white' :
+                        relatedProduct.type === 'original' ? 'bg-[#FF6A00] text-white' :
                         'bg-gray-200 text-gray-700'
                       }`}>
                         {relatedProduct.type === 'original' ? 'Original' : 'Genérico'}
@@ -410,7 +410,7 @@ export default function ProductoClient({ productId }: ProductoClientProps) {
                     <div className="p-3">
                       <div className="text-xs text-gray-500 mb-1">{relatedProduct.brand}</div>
                       <h3 className="font-bold text-[#111111] text-sm line-clamp-2 mb-2">{relatedProduct.name}</h3>
-                      <div className="text-lg font-extrabold text-[#E10600]">
+                      <div className="text-lg font-extrabold text-[#FF6A00]">
                         ${relatedProduct.price.toFixed(2)}
                       </div>
                     </div>

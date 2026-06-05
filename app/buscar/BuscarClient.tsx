@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { useSearchParams } from 'next/navigation'
 import { SAMPLE_PRODUCTS, CATEGORIES, searchByProblem } from '@/lib/data'
 import { categoryIcons } from '@/components/CategoryIcons'
+import { createClient } from '@/lib/supabase/client'
 import { AlertCircle, X, Plus, Check, Search, Lightbulb } from 'lucide-react'
 import Header from '@/components/Header'
 import ProductSkeleton from '@/components/ProductSkeleton'
@@ -22,6 +23,20 @@ function BuscarContent() {
   const [quickAddedId, setQuickAddedId] = useState<string | null>(null)
   const [problemSearch, setProblemSearch] = useState('')
   const [problemSuggestion, setProblemSuggestion] = useState<ReturnType<typeof searchByProblem>>(null)
+  const [categoryImages, setCategoryImages] = useState<Record<string, string>>({})
+
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.from('categories').select('slug, image_url').then(({ data }) => {
+      if (data) {
+        const map: Record<string, string> = {}
+        data.forEach((c: { slug: string; image_url: string | null }) => {
+          if (c.image_url) map[c.slug] = c.image_url
+        })
+        setCategoryImages(map)
+      }
+    })
+  }, [])
 
   const brand = searchParams.get('brand') || ''
   const model = searchParams.get('model') || ''
@@ -102,7 +117,7 @@ function BuscarContent() {
                 value={problemSearch}
                 onChange={(e) => handleProblemSearch(e.target.value)}
                 placeholder="¿Qué le pasa a tu carro? (ej: ruido al frenar, no prende...)"
-                className="w-full px-4 py-3 pl-11 pr-4 bg-gray-50 border border-gray-200 rounded-xl text-[#111111] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#E10600] focus:border-transparent"
+                className="w-full px-4 py-3 pl-11 pr-4 bg-gray-50 border border-gray-200 rounded-xl text-[#111111] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#FF6A00] focus:border-transparent"
               />
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
             </div>
@@ -115,7 +130,7 @@ function BuscarContent() {
                   <p className="text-sm text-amber-800 font-medium">{problemSuggestion.suggestion}</p>
                   <button
                     onClick={applyProblemSuggestion}
-                    className="mt-2 text-sm text-[#E10600] font-semibold hover:underline"
+                    className="mt-2 text-sm text-[#FF6A00] font-semibold hover:underline"
                   >
                     Ver repuestos recomendados →
                   </button>
@@ -143,7 +158,7 @@ function BuscarContent() {
                 {selectedCategory && categoryObj && (
                   <button
                     onClick={() => setSelectedCategory(null)}
-                    className="bg-[#E10600] text-white px-4 py-2 rounded-full font-medium text-sm whitespace-nowrap flex-shrink-0 flex items-center gap-2 active:scale-95 transition-transform"
+                    className="bg-[#FF6A00] text-white px-4 py-2 rounded-full font-medium text-sm whitespace-nowrap flex-shrink-0 flex items-center gap-2 active:scale-95 transition-transform"
                   >
                     {(() => {
               const IconComponent = categoryIcons[categoryObj?.icon || 'filtros']
@@ -154,7 +169,7 @@ function BuscarContent() {
                 {selectedType && (
                   <button
                     onClick={() => setSelectedType(null)}
-                    className="bg-[#E10600] text-white px-4 py-2 rounded-full font-medium text-sm whitespace-nowrap flex-shrink-0 flex items-center gap-2 active:scale-95 transition-transform"
+                    className="bg-[#FF6A00] text-white px-4 py-2 rounded-full font-medium text-sm whitespace-nowrap flex-shrink-0 flex items-center gap-2 active:scale-95 transition-transform"
                   >
                     {selectedType === 'original' && '⭐ Original ✕'}
                     {selectedType === 'generico' && '🔧 Genérico ✕'}
@@ -162,7 +177,7 @@ function BuscarContent() {
                 )}
                 <button
                   onClick={() => {setSelectedCategory(null); setSelectedType(null)}}
-                  className="text-gray-500 hover:text-[#E10600] px-2 py-2 text-sm whitespace-nowrap flex-shrink-0"
+                  className="text-gray-500 hover:text-[#FF6A00] px-2 py-2 text-sm whitespace-nowrap flex-shrink-0"
                 >
                   Limpiar todo
                 </button>
@@ -173,7 +188,7 @@ function BuscarContent() {
             
             <Link 
               href="/"
-              className="text-[#E10600] hover:text-[#B00500] text-sm font-medium underline ml-auto whitespace-nowrap flex-shrink-0"
+              className="text-[#FF6A00] hover:text-[#E55A00] text-sm font-medium underline ml-auto whitespace-nowrap flex-shrink-0"
             >
               Cambiar carro
             </Link>
@@ -189,21 +204,28 @@ function BuscarContent() {
               {/* Categories */}
               <div className="mb-6">
                 <h4 className="font-bold text-[#111111] mb-3 text-sm uppercase">Categorías</h4>
-                <div className="flex flex-wrap gap-2 lg:flex-col lg:gap-2">
+                <div className="grid grid-cols-2 lg:grid-cols-1 gap-3">
                   {CATEGORIES.map(cat => {
-                    const IconComponent = categoryIcons[cat.icon]
+                    const imageUrl = categoryImages[cat.id]
+                    const isActive = selectedCategory === cat.id
                     return (
                       <button
                         key={cat.id}
-                        onClick={() => setSelectedCategory(selectedCategory === cat.id ? null : cat.id)}
-                        className={`px-4 py-3 rounded-xl text-sm font-medium transition-all flex items-center gap-2 flex-1 lg:w-full justify-center lg:justify-start ${
-                          selectedCategory === cat.id
-                            ? 'bg-[#111111] text-white shadow-lg'
-                            : 'bg-gray-100 text-[#2A2A2A] hover:bg-gray-200'
+                        onClick={() => setSelectedCategory(isActive ? null : cat.id)}
+                        className={`rounded-xl overflow-hidden border-2 transition-all text-left ${
+                          isActive ? 'border-[#FF6A00] shadow-lg' : 'border-gray-200 hover:border-gray-300'
                         }`}
                       >
-                        <span className="text-xl">{IconComponent && <IconComponent className="w-5 h-5" />}</span>
-                        <span>{cat.name}</span>
+                        <div className="aspect-square bg-gray-100 flex items-center justify-center overflow-hidden">
+                          {imageUrl ? (
+                            <img src={imageUrl} alt={cat.name} className="w-full h-full object-cover" />
+                          ) : (
+                            <span className="text-gray-300 text-xs px-2 text-center">{cat.name}</span>
+                          )}
+                        </div>
+                        <div className={`px-3 py-2 ${isActive ? 'bg-[#FF6A00] text-white' : 'bg-white text-[#111111]'}`}>
+                          <span className="font-semibold text-sm">{cat.name}</span>
+                        </div>
                       </button>
                     )
                   })}
@@ -223,7 +245,7 @@ function BuscarContent() {
                       onClick={() => setSelectedType(selectedType === type.id ? null : type.id)}
                       className={`px-4 py-3 rounded-xl border-2 text-left transition-all ${
                         selectedType === type.id
-                          ? 'border-[#E10600] bg-red-50 shadow-lg'
+                          ? 'border-[#FF6A00] bg-orange-50 shadow-lg'
                           : 'border-gray-200 hover:border-gray-300'
                       }`}
                     >
@@ -255,7 +277,7 @@ function BuscarContent() {
                 <select
                   value={sortOrder}
                   onChange={(e) => setSortOrder(e.target.value as typeof sortOrder)}
-                  className="px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#E10600] focus:border-transparent cursor-pointer"
+                  className="px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#FF6A00] focus:border-transparent cursor-pointer"
                 >
                   <option value="relevance">Relevancia</option>
                   <option value="price-asc">Menor precio</option>
@@ -320,7 +342,7 @@ function BuscarContent() {
 
                         {/* Type Badge */}
                         <div className={`absolute top-2 left-2 px-2 py-1 rounded-lg text-xs font-bold ${
-                          product.type === 'original' ? 'bg-[#E10600] text-white' :
+                          product.type === 'original' ? 'bg-[#FF6A00] text-white' :
                           'bg-gray-200 text-gray-700'
                         }`}>
                           {product.type === 'original' ? 'Original' : 'Genérico'}
@@ -349,7 +371,7 @@ function BuscarContent() {
                             className={`absolute bottom-2 right-2 w-10 h-10 rounded-full flex items-center justify-center shadow-lg transition-all transform hover:scale-110 active:scale-95 ${
                               isQuickAdded
                                 ? 'bg-green-500 text-white'
-                                : 'bg-[#E10600] text-white hover:bg-[#B00500]'
+                                : 'bg-[#FF6A00] text-white hover:bg-[#E55A00]'
                             }`}
                             aria-label={isQuickAdded ? 'Agregado' : 'Agregar al carrito'}
                           >
@@ -370,7 +392,7 @@ function BuscarContent() {
                         <h3 className="font-bold text-[#111111] text-sm line-clamp-2 mb-2">
                           {product.name}
                         </h3>
-                        <div className="text-lg font-extrabold text-[#E10600]">
+                        <div className="text-lg font-extrabold text-[#FF6A00]">
                           ${product.price.toFixed(2)}
                         </div>
                       </div>

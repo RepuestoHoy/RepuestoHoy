@@ -115,7 +115,7 @@ function RegistroForm() {
           <Link href="/" className="inline-flex items-center gap-3">
             <span
               style={{
-                background: '#E8181A',
+                background: '#FF6A00',
                 color: '#FFFFFF',
                 fontFamily: "'Futura', 'Trebuchet MS', 'Arial Black', Arial, sans-serif",
                 fontWeight: 900,
@@ -132,7 +132,7 @@ function RegistroForm() {
           </Link>
           <h1 className="mt-6 text-2xl font-bold text-[#111111]">Crear cuenta</h1>
           <p className="mt-2 text-gray-600">¿Ya tienes cuenta?{' '}
-            <Link href={`/login?redirect=${redirect}`} className="text-[#E10600] font-semibold hover:underline">
+            <Link href={`/login?redirect=${redirect}`} className="text-[#FF6A00] font-semibold hover:underline">
               Inicia sesión
             </Link>
           </p>

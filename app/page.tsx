@@ -6,7 +6,7 @@ import { CARS, MOTORCYCLES, CATEGORIES } from '@/lib/data'
 import { getToyotaModelOptions, type ModelOption } from '@/lib/toyota-generations'
 import { categoryIcons } from '@/components/CategoryIcons'
 import { createClient } from '@/lib/supabase/client'
-import { Search, HelpCircle, Car, Shield, Clock, Award, ChevronRight } from 'lucide-react'
+import { Search, HelpCircle, Car, Shield, Clock, ChevronRight } from 'lucide-react'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import WhatsAppButton from '@/components/WhatsAppButton'
@@ -82,19 +82,13 @@ export default function HomePage() {
       <section className="relative overflow-hidden bg-gradient-to-br from-white via-gray-50 to-white">
         {/* Patrón de fondo decorativo */}
         <div className="absolute inset-0 opacity-30">
-          <div className="absolute top-20 left-10 w-72 h-72 bg-red-500/5 rounded-full blur-3xl"></div>
+          <div className="absolute top-20 left-10 w-72 h-72 bg-orange-500/5 rounded-full blur-3xl"></div>
           <div className="absolute bottom-20 right-10 w-96 h-96 bg-gray-900/5 rounded-full blur-3xl"></div>
         </div>
         
         <div className="relative max-w-4xl mx-auto px-4 pt-8 pb-6 text-center">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-red-50 border border-red-100 rounded-full text-[#E10600] text-xs font-medium mb-4">
-            <Award className="w-3 h-3" />
-            <span>Más de 10,000 repuestos disponibles</span>
-          </div>
-
           <h2 className="text-3xl md:text-4xl font-extrabold text-[#111111] mb-2 tracking-tight">
-            ¿Cual es tu <span className="text-[#E10600]">vehiculo</span>?
+            ¿Cual es tu <span className="text-[#FF6A00]">vehiculo</span>?
           </h2>
           <p className="text-base text-[#6B7280] mb-6 max-w-xl mx-auto">
             Selecciona tu marca, modelo y año. Te mostramos exactamente que repuestos necesita tu vehiculo.
@@ -115,7 +109,7 @@ export default function HomePage() {
                   }}
                   className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all ${
                     vehicleType === 'car'
-                      ? 'bg-[#E10600] text-white'
+                      ? 'bg-[#FF6A00] text-white'
                       : 'bg-gray-100 text-[#6B7280] hover:bg-gray-200'
                   }`}
                 >
@@ -132,7 +126,7 @@ export default function HomePage() {
                   }}
                   className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all ${
                     vehicleType === 'motorcycle'
-                      ? 'bg-[#E10600] text-white'
+                      ? 'bg-[#FF6A00] text-white'
                       : 'bg-gray-100 text-[#6B7280] hover:bg-gray-200'
                   }`}
                 >
@@ -227,15 +221,15 @@ export default function HomePage() {
           {/* Stats rápidas - más compactas */}
           <div className="flex flex-wrap justify-center gap-6 mt-6 text-xs text-[#6B7280]">
             <div className="flex items-center gap-1.5">
-              <Shield className="w-3.5 h-3.5 text-[#E10600]" />
+              <Shield className="w-3.5 h-3.5 text-[#FF6A00]" />
               <span>Calidad asegurada</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <Clock className="w-3.5 h-3.5 text-[#E10600]" />
+              <Clock className="w-3.5 h-3.5 text-[#FF6A00]" />
               <span>Entrega el mismo día</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <Car className="w-3.5 h-3.5 text-[#E10600]" />
+              <Car className="w-3.5 h-3.5 text-[#FF6A00]" />
               <span>Compatibilidad garantizada</span>
             </div>
           </div>
@@ -314,7 +308,7 @@ export default function HomePage() {
                   value={categorySearch}
                   onChange={(e) => setCategorySearch(e.target.value)}
                   placeholder="Buscar categoría... (ej: cauchos, frenos)"
-                  className="w-full px-5 py-3 pl-12 bg-white border-2 border-gray-200 rounded-xl text-[#111111] placeholder-gray-400 focus:outline-none focus:border-[#E10600] transition-colors"
+                  className="w-full px-5 py-3 pl-12 bg-white border-2 border-gray-200 rounded-xl text-[#111111] placeholder-gray-400 focus:outline-none focus:border-[#FF6A00] transition-colors"
                 />
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 {categorySearch && (
@@ -336,7 +330,7 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-x-5 gap-y-8">
             {filteredCategories.map(cat => {
               const IconComponent = categoryIcons[cat.icon]
               const imageUrl = categoryImages[cat.id]
@@ -344,17 +338,23 @@ export default function HomePage() {
                 <a
                   key={cat.id}
                   href={`/buscar?category=${cat.id}`}
-                  className="card p-5 text-center hover:border-[#E10600] hover:shadow-xl transition-all group bg-white"
+                  className="group"
                 >
-                  <div className="w-12 h-12 mx-auto mb-3 flex items-center justify-center text-[#E10600] group-hover:scale-110 transition-transform overflow-hidden">
-                    {imageUrl ? (
-                      <img src={imageUrl} alt={cat.name} className="w-12 h-12 object-cover rounded-lg" />
-                    ) : (
-                      IconComponent && <IconComponent className="w-10 h-10" />
-                    )}
-                  </div>
-                  <h4 className="font-bold text-[#111111] text-sm uppercase mb-1">{cat.name}</h4>
-                  <p className="text-xs text-[#6B7280]">{cat.description}</p>
+                  {imageUrl ? (
+                    <div className="w-full aspect-square bg-[#F2F2F2] rounded-2xl overflow-hidden flex items-center justify-center p-6">
+                      <img
+                        src={imageUrl}
+                        alt={cat.name}
+                        className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
+                      />
+                    </div>
+                  ) : (
+                    <div className="w-full aspect-square bg-[#F2F2F2] rounded-2xl flex items-center justify-center text-[#FF6A00] group-hover:scale-105 transition-transform duration-300">
+                      {IconComponent && <IconComponent className="w-20 h-20" />}
+                    </div>
+                  )}
+                  <h4 className="font-bold text-[#111111] text-lg mt-3">{cat.name}</h4>
+                  <p className="text-sm text-[#6B7280] mt-0.5">{cat.description}</p>
                 </a>
               )
             })}
@@ -365,7 +365,7 @@ export default function HomePage() {
               <p className="text-gray-500">No se encontraron categorías con "{categorySearch}"</p>
               <button
                 onClick={() => setCategorySearch('')}
-                className="mt-2 text-[#E10600] hover:underline"
+                className="mt-2 text-[#FF6A00] hover:underline"
               >
                 Limpiar búsqueda
               </button>
@@ -387,15 +387,15 @@ export default function HomePage() {
           </div>
           
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="card p-6 text-center group hover:border-[#E10600] transition-colors">
-              <div className="w-12 h-12 bg-red-50 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:bg-red-100 transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-7 h-7 text-[#E10600]"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            <div className="card p-6 text-center group hover:border-[#FF6A00] transition-colors">
+              <div className="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:bg-orange-100 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-7 h-7 text-[#FF6A00]"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
               </div>
               <h4 className="font-bold text-[#111111] mb-2">Entrega Hoy</h4>
               <p className="text-sm text-[#6B7280]">En Chacao, Baruta y alrededores</p>
             </div>
 
-            <div className="card p-6 text-center group hover:border-[#E10600] transition-colors">
+            <div className="card p-6 text-center group hover:border-[#FF6A00] transition-colors">
               <div className="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:bg-green-100 transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-7 h-7 text-green-600"><circle cx="12" cy="12" r="10"/><path d="M16 8h-6a2 2 0 00-2 2v4a2 2 0 002 2h6a2 2 0 002-2v-4a2 2 0 00-2-2z"/><path d="M12 12v.01"/></svg>
               </div>
@@ -403,7 +403,7 @@ export default function HomePage() {
               <p className="text-sm text-[#6B7280]">Transparente y competitivo</p>
             </div>
 
-            <div className="card p-6 text-center group hover:border-[#E10600] transition-colors">
+            <div className="card p-6 text-center group hover:border-[#FF6A00] transition-colors">
               <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:bg-blue-100 transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-7 h-7 text-blue-600"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
               </div>
@@ -411,7 +411,7 @@ export default function HomePage() {
               <p className="text-sm text-[#6B7280]">Confirmamos la pieza exacta antes de enviar</p>
             </div>
 
-            <div className="card p-6 text-center group hover:border-[#E10600] transition-colors">
+            <div className="card p-6 text-center group hover:border-[#FF6A00] transition-colors">
               <div className="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:bg-purple-100 transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-7 h-7 text-purple-600"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
               </div>

@@ -523,7 +523,7 @@ export default function CheckoutClient() {
                           <div className="font-bold text-[#111111]">{zone.name}</div>
                           <div className="text-sm text-[#2A2A2A]">⏱️ {zone.time}</div>
                         </div>
-                        <div className="font-bold text-[#E10600]">
+                        <div className="font-bold text-[#FF6A00]">
                           {zone.cost === 0 ? 'GRATIS' : `$${zone.cost.toFixed(2)}`}
                         </div>
                         {selectedZone === zone.id && <Check className="w-5 h-5 text-[#111111]" />}
@@ -602,9 +602,9 @@ export default function CheckoutClient() {
                       />
                       <label
                         htmlFor="comprobante-upload"
-                        className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-[#E0E0E0] rounded-lg cursor-pointer hover:border-[#E10600] hover:bg-red-50 transition-all"
+                        className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-[#E0E0E0] rounded-lg cursor-pointer hover:border-[#FF6A00] hover:bg-red-50 transition-all"
                       >
-                        <Upload className="w-8 h-8 text-[#E10600] mb-2" />
+                        <Upload className="w-8 h-8 text-[#FF6A00] mb-2" />
                         <p className="text-sm text-[#2A2A2A] font-medium">Haz clic para subir comprobante</p>
                         <p className="text-xs text-gray-400 mt-1">JPG, PNG, GIF, WebP o PDF (máx. 5MB)</p>
                       </label>
@@ -613,7 +613,7 @@ export default function CheckoutClient() {
 
                   {comprobante.isUploading && (
                     <div className="flex flex-col items-center justify-center w-full h-32 border-2 border-[#E0E0E0] rounded-lg bg-gray-50">
-                      <div className="animate-spin w-8 h-8 border-4 border-[#E10600] border-t-transparent rounded-full mb-2"></div>
+                      <div className="animate-spin w-8 h-8 border-4 border-[#FF6A00] border-t-transparent rounded-full mb-2"></div>
                       <p className="text-sm text-[#2A2A2A]">Subiendo comprobante...</p>
                     </div>
                   )}
@@ -711,7 +711,7 @@ export default function CheckoutClient() {
                     <div className="flex-1 min-w-0">
                       <p className="font-bold text-[#111111] text-sm truncate">{item.product.name}</p>
                       <p className="text-xs text-[#2A2A2A]">Cantidad: {item.quantity}</p>
-                      <p className="text-[#E10600] font-bold">${(item.product.price * item.quantity).toFixed(2)}</p>
+                      <p className="text-[#FF6A00] font-bold">${(item.product.price * item.quantity).toFixed(2)}</p>
                     </div>
                   </div>
                 ))}
@@ -730,7 +730,7 @@ export default function CheckoutClient() {
                 </div>
                 <div className="flex justify-between text-xl font-extrabold text-[#111111] pt-3 border-t border-[#E0E0E0]">
                   <span>TOTAL</span>
-                  <span className="text-[#E10600]">${total.toFixed(2)}</span>
+                  <span className="text-[#FF6A00]">${total.toFixed(2)}</span>
                 </div>
               </div>
 

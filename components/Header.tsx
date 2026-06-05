@@ -96,7 +96,7 @@ export default function Header({
                 <span
                   className="transition-transform group-hover:-translate-y-0.5 inline-block"
                   style={{
-                    background: '#E8181A',
+                    background: '#FF6A00',
                     color: '#FFFFFF',
                     fontFamily: "'Futura', 'Trebuchet MS', 'Arial Black', Arial, sans-serif",
                     fontWeight: 900,
@@ -141,7 +141,7 @@ export default function Header({
               >
                 <ShoppingCart className="w-6 h-6 group-hover:scale-110 transition-transform" />
                 {cartCount > 0 && (
-                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-gradient-to-br from-[#E10600] to-[#B00500] text-white text-xs font-bold rounded-full flex items-center justify-center shadow-lg">
+                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-gradient-to-br from-[#FF6A00] to-[#E55A00] text-white text-xs font-bold rounded-full flex items-center justify-center shadow-lg">
                     {cartCount > 99 ? '99+' : cartCount}
                   </span>
                 )}
@@ -154,7 +154,7 @@ export default function Header({
                     onClick={() => setUserMenuOpen(!userMenuOpen)}
                     className="flex items-center gap-2 p-2 hover:bg-white/10 rounded-xl transition-colors"
                   >
-                    <div className="w-7 h-7 bg-[#E10600] rounded-full flex items-center justify-center text-white text-xs font-bold">
+                    <div className="w-7 h-7 bg-[#FF6A00] rounded-full flex items-center justify-center text-white text-xs font-bold">
                       {displayName[0].toUpperCase()}
                     </div>
                     <span className="text-sm text-gray-300 max-w-24 truncate hidden lg:block">{displayName}</span>
@@ -167,7 +167,7 @@ export default function Header({
                       </div>
                       <button
                         onClick={handleSignOut}
-                        className="w-full px-4 py-3 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2 transition-colors"
+                        className="w-full px-4 py-3 text-left text-sm text-rh-red hover:bg-orange-50 flex items-center gap-2 transition-colors"
                       >
                         <LogOut className="w-4 h-4" />
                         Cerrar sesión
@@ -221,7 +221,7 @@ export default function Header({
                       <User className="w-4 h-4" />
                       Iniciar sesión
                     </Link>
-                    <Link href="/registro" onClick={() => setMobileMenuOpen(false)} className="py-3 px-2 text-[#E10600] hover:text-[#ff1a1a] transition-colors font-medium rounded-lg hover:bg-white/5 flex items-center gap-2">
+                    <Link href="/registro" onClick={() => setMobileMenuOpen(false)} className="py-3 px-2 text-[#FF6A00] hover:text-[#ff1a1a] transition-colors font-medium rounded-lg hover:bg-white/5 flex items-center gap-2">
                       <User className="w-4 h-4" />
                       Crear cuenta gratis
                     </Link>

@@ -130,13 +130,13 @@ function emailTemplateCliente(order: any) {
 </head>
 <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #333;">
   <div style="text-align: center; margin-bottom: 30px;">
-    <h1 style="color: #E10600; margin-bottom: 10px;">✅ ¡Pedido Confirmado!</h1>
+    <h1 style="color: #FF6A00; margin-bottom: 10px;">✅ ¡Pedido Confirmado!</h1>
     <p style="font-size: 18px; color: #666;">Gracias por tu compra</p>
   </div>
   
   <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
     <h2 style="margin-top: 0; color: #111;">Pedido #${order.order_number}</h2>
-    <p><strong>Estado:</strong> <span style="color: #E10600; font-weight: bold;">Pendiente de pago</span></p>
+    <p><strong>Estado:</strong> <span style="color: #FF6A00; font-weight: bold;">Pendiente de pago</span></p>
     <p><strong>Fecha:</strong> ${new Date().toLocaleDateString('es-VE')}</p>
   </div>
 
@@ -157,10 +157,10 @@ function emailTemplateCliente(order: any) {
   <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
     <p style="margin: 5px 0;"><strong>Subtotal:</strong> $${order.subtotal?.toFixed(2)}</p>
     <p style="margin: 5px 0;"><strong>Envío:</strong> $${order.delivery_cost?.toFixed(2) || '0.00'}</p>
-    <p style="margin: 5px 0; font-size: 18px; color: #E10600;"><strong>Total:</strong> $${order.total?.toFixed(2)}</p>
+    <p style="margin: 5px 0; font-size: 18px; color: #FF6A00;"><strong>Total:</strong> $${order.total?.toFixed(2)}</p>
   </div>
 
-  <div style="border-left: 4px solid #E10600; padding-left: 15px; margin-bottom: 20px;">
+  <div style="border-left: 4px solid #FF6A00; padding-left: 15px; margin-bottom: 20px;">
     <h3 style="margin-top: 0;">📍 Datos de entrega:</h3>
     <p><strong>Nombre:</strong> ${order.customer_name}</p>
     <p><strong>Teléfono:</strong> ${order.customer_phone}</p>
@@ -195,7 +195,7 @@ function emailTemplateCliente(order: any) {
     </a>
     
     <br>
-    <a href="https://repuestohoy.com" style="display: inline-block; margin-top: 15px; padding: 10px 24px; background: #E10600; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; font-size: 14px;">Ver tienda</a>
+    <a href="https://repuestohoy.com" style="display: inline-block; margin-top: 15px; padding: 10px 24px; background: #FF6A00; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; font-size: 14px;">Ver tienda</a>
   </div>
 </body>
 </html>
@@ -233,17 +233,17 @@ function emailTemplateAdmin(order: any) {
 </head>
 <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #333;">
   <div style="text-align: center; margin-bottom: 30px;">
-    <h1 style="color: #E10600; margin-bottom: 10px;">🛒 ¡NUEVA ORDEN!</h1>
+    <h1 style="color: #FF6A00; margin-bottom: 10px;">🛒 ¡NUEVA ORDEN!</h1>
     <p style="font-size: 18px; color: #666;">Se ha recibido un nuevo pedido</p>
   </div>
   
   <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
     <h2 style="margin-top: 0; color: #111;">Pedido #${order.order_number}</h2>
-    <p><strong>Estado:</strong> <span style="color: #E10600; font-weight: bold;">${order.status}</span></p>
+    <p><strong>Estado:</strong> <span style="color: #FF6A00; font-weight: bold;">${order.status}</span></p>
     <p><strong>Fecha:</strong> ${new Date().toLocaleString('es-VE')}</p>
   </div>
 
-  <div style="border-left: 4px solid #E10600; padding-left: 15px; margin-bottom: 20px;">
+  <div style="border-left: 4px solid #FF6A00; padding-left: 15px; margin-bottom: 20px;">
     <h3 style="margin-top: 0;">👤 Cliente:</h3>
     <p><strong>Nombre:</strong> ${order.customer_name}</p>
     <p><strong>Teléfono:</strong> <a href="https://wa.me/${order.customer_phone?.replace(/\D/g, '')}" style="color: #25D366; text-decoration: none;">${order.customer_phone}</a></p>
@@ -284,7 +284,7 @@ function emailTemplateAdmin(order: any) {
   ${comprobanteSection}
 
   <div style="text-align: center; margin-top: 30px;">
-    <a href="https://repuestohoy.com/admin" style="display: inline-block; padding: 12px 30px; background: #E10600; color: white; text-decoration: none; border-radius: 5px; font-weight: bold;">Ver en Admin</a>
+    <a href="https://repuestohoy.com/admin" style="display: inline-block; padding: 12px 30px; background: #FF6A00; color: white; text-decoration: none; border-radius: 5px; font-weight: bold;">Ver en Admin</a>
   </div>
 </body>
 </html>

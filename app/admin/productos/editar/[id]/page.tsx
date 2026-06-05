@@ -6,9 +6,9 @@ import { createClient } from '@/lib/supabase/client'
 import { CATEGORIES } from '@/lib/data'
 import { categoryIcons } from '@/components/CategoryIcons'
 import { Upload, Save, Check, AlertCircle, ArrowLeft, X, ImageIcon, Loader2 } from 'lucide-react'
-import { validateImage, compressImage } from '@/lib/image-upload'
 import Link from 'next/link'
 import Image from 'next/image'
+import { validateImage, compressImage } from '@/lib/image-upload'
 
 export default function EditarProductoPage() {
   const supabase = createClient()
@@ -35,10 +35,9 @@ export default function EditarProductoPage() {
     stock: ''
   })
 
-  // Cargar datos del producto a editar
   useEffect(() => {
-    const supabaseAuth = createClient()
-    supabaseAuth.auth.getUser().then(({ data: { user } }) => {
+    const sb = createClient()
+    sb.auth.getUser().then(({ data: { user } }) => {
       if (!user) { router.push('/admin'); return }
       loadProduct()
     })
@@ -47,25 +46,12 @@ export default function EditarProductoPage() {
 
   const loadProduct = async () => {
     setLoadingData(true)
-    const { data, error } = await supabase
-      .from('products')
-      .select('*')
-      .eq('id', productId)
-      .single()
-    if (error || !data) {
-      setError('No se pudo cargar el producto.')
-      setLoadingData(false)
-      return
-    }
+    const { data, error } = await supabase.from('products').select('*').eq('id', productId).single()
+    if (error || !data) { setError('No se pudo cargar el producto.'); setLoadingData(false); return }
     setFormData({
-      sku: data.sku || '',
-      name: data.name || '',
-      description: data.description || '',
-      category_id: data.category_id || '',
-      brand: data.brand || '',
-      type: data.type || 'generico',
-      cost_price: data.cost_price?.toString() || '',
-      sale_price: data.sale_price?.toString() || '',
+      sku: data.sku || '', name: data.name || '', description: data.description || '',
+      category_id: data.category_id || '', brand: data.brand || '', type: data.type || 'generico',
+      cost_price: data.cost_price?.toString() || '', sale_price: data.sale_price?.toString() || '',
       stock: data.stock?.toString() || ''
     })
     setUploadedImages(data.images || [])
@@ -80,26 +66,26 @@ export default function EditarProductoPage() {
     setError('')
 
     for (const file of Array.from(files)) {
-      if (file.size > 3 * 1024 * 1024) {
-        setError(`${file.name} es muy grande. Máximo 3MB.`)
+      const check = validateImage(file)
+      if (!check.ok) {
+        setError(`${file.name}: ${check.error}`)
         continue
       }
-      if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
-        setError(`${file.name}: Solo se permiten JPG, PNG o WebP.`)
-        continue
-      }
+      try {
+        const blob = await compressImage(file)
+        const fileName = `producto-${Date.now()}-${Math.random().toString(36).slice(2, 7)}.webp`
+        const { error: uploadError } = await supabase.storage
+          .from('productos')
+          .upload(fileName, blob, { cacheControl: '3600', upsert: false, contentType: 'image/webp' })
 
-      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${file.name.split('.').pop()}`
-
-      const { data, error: uploadError } = await supabase.storage
-        .from('productos')
-        .upload(fileName, file, { cacheControl: '3600', upsert: false })
-
-      if (uploadError) {
-        setError(`Error subiendo ${file.name}: ${uploadError.message}`)
-      } else {
-        const { data: urlData } = supabase.storage.from('productos').getPublicUrl(fileName)
-        setUploadedImages(prev => [...prev, urlData.publicUrl])
+        if (uploadError) {
+          setError(`Error subiendo ${file.name}: ${uploadError.message}`)
+        } else {
+          const { data: urlData } = supabase.storage.from('productos').getPublicUrl(fileName)
+          setUploadedImages(prev => [...prev, urlData.publicUrl])
+        }
+      } catch (err: any) {
+        setError(err.message || `Error procesando ${file.name}`)
       }
     }
     setUploadingImage(false)
@@ -155,7 +141,7 @@ export default function EditarProductoPage() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="w-10 h-10 text-[#E10600] animate-spin mx-auto" />
+          <Loader2 className="w-10 h-10 text-[#FF6A00] animate-spin mx-auto" />
           <p className="mt-4 text-gray-500">Cargando producto…</p>
         </div>
       </div>
@@ -177,7 +163,7 @@ export default function EditarProductoPage() {
       <main className="max-w-4xl mx-auto px-4 py-8">
         <div className="bg-white rounded-2xl shadow-lg p-8">
           <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 bg-[#E10600] rounded-lg flex items-center justify-center">
+            <div className="w-10 h-10 bg-[#FF6A00] rounded-lg flex items-center justify-center">
               <Save className="w-5 h-5 text-white" />
             </div>
             <div>
@@ -204,13 +190,15 @@ export default function EditarProductoPage() {
             {/* SKU y Nombre */}
             <div className="grid md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-bold text-[#111111] mb-2">SKU (Código único) *</label>
+                <label className="block text-sm font-bold text-[#111111] mb-2">SKU (Código del producto) *</label>
                 <input type="text" name="sku" value={formData.sku} onChange={handleChange} required placeholder="Ej: FIL-TOY-COR-001" className="input" />
+                <p className="text-xs text-gray-500 mt-1">Un código único que identifica este repuesto. Tú lo inventas. Ejemplo: FIL-TOY-001</p>
                 <p className="text-xs text-gray-500 mt-1">Debe ser único para cada producto</p>
               </div>
               <div>
                 <label className="block text-sm font-bold text-[#111111] mb-2">Nombre del Producto *</label>
                 <input type="text" name="name" value={formData.name} onChange={handleChange} required placeholder="Ej: Filtro de Aceite Toyota Corolla" className="input" />
+                <p className="text-xs text-gray-500 mt-1">El nombre que verá el cliente en la tienda.</p>
               </div>
             </div>
 
@@ -218,6 +206,7 @@ export default function EditarProductoPage() {
             <div>
               <label className="block text-sm font-bold text-[#111111] mb-2">Descripción *</label>
               <textarea name="description" value={formData.description} onChange={handleChange} required rows={3} placeholder="Compatibilidad, duración, qué incluye..." className="input" />
+              <p className="text-xs text-gray-500 mt-1">Detalles del repuesto: para qué vehículos sirve, qué incluye, etc.</p>
             </div>
 
             {/* Categoría y Marca */}
@@ -234,6 +223,7 @@ export default function EditarProductoPage() {
               <div>
                 <label className="block text-sm font-bold text-[#111111] mb-2">Marca del Repuesto *</label>
                 <input type="text" name="brand" value={formData.brand} onChange={handleChange} required placeholder="Ej: FRAM, Toyota, Genérico" className="input" />
+                <p className="text-xs text-gray-500 mt-1">Quién fabrica el repuesto (la marca de la pieza, no del carro).</p>
               </div>
             </div>
 
@@ -245,7 +235,7 @@ export default function EditarProductoPage() {
                   { id: 'original', label: '⭐ Original', desc: 'Marca oficial del vehículo' },
                   { id: 'generico', label: '🔧 Genérico', desc: 'Marca alternativa' }
                 ].map(tipo => (
-                  <label key={tipo.id} className={`cursor-pointer p-4 rounded-xl border-2 transition-all text-center ${formData.type === tipo.id ? 'border-[#E10600] bg-red-50' : 'border-gray-200 hover:border-gray-300'}`}>
+                  <label key={tipo.id} className={`cursor-pointer p-4 rounded-xl border-2 transition-all text-center ${formData.type === tipo.id ? 'border-[#FF6A00] bg-red-50' : 'border-gray-200 hover:border-gray-300'}`}>
                     <input type="radio" name="type" value={tipo.id} checked={formData.type === tipo.id} onChange={handleChange} className="hidden" />
                     <div className="font-bold text-[#111111]">{tipo.label}</div>
                     <div className="text-xs text-gray-500 mt-1">{tipo.desc}</div>
@@ -262,7 +252,7 @@ export default function EditarProductoPage() {
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">$</span>
                   <input type="number" name="cost_price" value={formData.cost_price} onChange={handleChange} required min="0" step="0.01" placeholder="12.50" className="input pl-8" />
                 </div>
-                <p className="text-xs text-gray-500 mt-1">Lo que pagas tú</p>
+                <p className="text-xs text-gray-500 mt-1">Lo que te cuesta a ti (no se muestra al cliente).</p>
               </div>
               <div>
                 <label className="block text-sm font-bold text-[#111111] mb-2">Precio Venta (USD) *</label>
@@ -270,11 +260,12 @@ export default function EditarProductoPage() {
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">$</span>
                   <input type="number" name="sale_price" value={formData.sale_price} onChange={handleChange} required min="0" step="0.01" placeholder="18.50" className="input pl-8" />
                 </div>
-                <p className="text-xs text-gray-500 mt-1">Lo que cobras</p>
+                <p className="text-xs text-gray-500 mt-1">El precio que paga el cliente.</p>
               </div>
               <div>
                 <label className="block text-sm font-bold text-[#111111] mb-2">Stock (Unidades) *</label>
                 <input type="number" name="stock" value={formData.stock} onChange={handleChange} required min="0" placeholder="15" className="input" />
+                <p className="text-xs text-gray-500 mt-1">Cuántas unidades tienes disponibles.</p>
               </div>
             </div>
 
@@ -325,18 +316,18 @@ export default function EditarProductoPage() {
               {uploadedImages.length < 5 && (
                 <div
                   onClick={() => fileInputRef.current?.click()}
-                  className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-[#E10600] transition-colors cursor-pointer"
+                  className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-[#FF6A00] transition-colors cursor-pointer"
                 >
                   {uploadingImage ? (
                     <div className="flex flex-col items-center gap-3">
-                      <div className="w-8 h-8 border-4 border-[#E10600] border-t-transparent rounded-full animate-spin" />
+                      <div className="w-8 h-8 border-4 border-[#FF6A00] border-t-transparent rounded-full animate-spin" />
                       <p className="text-gray-600">Subiendo...</p>
                     </div>
                   ) : (
                     <>
                       <ImageIcon className="w-10 h-10 text-gray-400 mx-auto mb-3" />
-                      <p className="text-gray-600 font-medium">Click para subir fotos</p>
-                      <p className="text-xs text-gray-500 mt-1">JPG, PNG o WebP • Máximo 3MB por foto</p>
+                      <p className="text-gray-600 font-medium">Haz clic para subir fotos</p>
+                      <p className="text-xs text-gray-500 mt-1">JPG, PNG o WebP • Máximo 8MB · se optimiza solo</p>
                     </>
                   )}
                 </div>

@@ -95,7 +95,7 @@ export default function AdminProductosPage() {
 
   const getTypeBadge = (type: string) => {
     const styles = {
-      original: 'bg-[#E10600] text-white',
+      original: 'bg-[#FF6A00] text-white',
       generico: 'bg-gray-200 text-gray-700'
     }
     return styles[type as keyof typeof styles] || 'bg-gray-100 text-gray-700'
@@ -144,14 +144,14 @@ export default function AdminProductosPage() {
 
         {loading ? (
           <div className="card p-12 text-center">
-            <Loader2 className="w-10 h-10 text-[#E10600] animate-spin mx-auto" />
+            <Loader2 className="w-10 h-10 text-[#FF6A00] animate-spin mx-auto" />
             <p className="mt-4 text-gray-500">Cargando productos...</p>
           </div>
         ) : filteredProducts.length === 0 ? (
           <div className="card p-12 text-center">
             <p className="text-gray-500">No se encontraron productos</p>
             {search && (
-              <button onClick={() => setSearch('')} className="text-[#E10600] hover:underline mt-2">
+              <button onClick={() => setSearch('')} className="text-[#FF6A00] hover:underline mt-2">
                 Limpiar búsqueda
               </button>
             )}
@@ -185,7 +185,7 @@ export default function AdminProductosPage() {
                         </span>
                       </td>
                       <td className="py-4 px-4">
-                        <span className="font-bold text-[#E10600]">${Number(product.sale_price).toFixed(2)}</span>
+                        <span className="font-bold text-[#FF6A00]">${Number(product.sale_price).toFixed(2)}</span>
                       </td>
                       <td className="py-4 px-4">
                         <span className={`font-semibold ${product.stock < 5 ? 'text-orange-600' : 'text-green-600'}`}>

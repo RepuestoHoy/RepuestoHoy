@@ -10,8 +10,8 @@ module.exports = {
       colors: {
         // Paleta oficial Repuesto Hoy
         'rh-red': {
-          DEFAULT: '#E10600',
-          hover: '#B00500',
+          DEFAULT: '#FF6A00',
+          hover: '#E55A00',
         },
         'rh-black': '#111111',
         'rh-gray': '#2A2A2A',

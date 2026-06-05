@@ -94,15 +94,15 @@ export default function GraciasClient() {
           </p>
           <ul className="text-left max-w-md mx-auto text-[#2A2A2A] space-y-2 mb-6">
             <li className="flex items-start gap-2">
-              <span className="text-[#E10600]">•</span>
+              <span className="text-[#FF6A00]">•</span>
               Recargaste la página después de completar el pedido
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-[#E10600]">•</span>
+              <span className="text-[#FF6A00]">•</span>
               Tu navegador borró los datos de sesión
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-[#E10600]">•</span>
+              <span className="text-[#FF6A00]">•</span>
               Accediste directamente a esta página sin hacer un pedido
             </li>
           </ul>
@@ -130,7 +130,7 @@ export default function GraciasClient() {
       <div className="min-h-screen bg-white">
         <Header />
         <div className="max-w-2xl mx-auto px-4 py-16 text-center">
-          <div className="animate-spin w-10 h-10 border-4 border-[#E10600] border-t-transparent rounded-full mx-auto mb-4"></div>
+          <div className="animate-spin w-10 h-10 border-4 border-[#FF6A00] border-t-transparent rounded-full mx-auto mb-4"></div>
           <p className="text-[#2A2A2A]">Cargando información del pedido...</p>
         </div>
         <Footer />
@@ -217,7 +217,7 @@ export default function GraciasClient() {
             <p className="text-xs text-[#2A2A2A]">Tu pedido</p>
           </div>
           <div className="text-center p-4">
-            <div className="w-12 h-12 bg-[#E10600] rounded-lg flex items-center justify-center mx-auto mb-3">
+            <div className="w-12 h-12 bg-[#FF6A00] rounded-lg flex items-center justify-center mx-auto mb-3">
               <Truck className="w-6 h-6 text-white" />
             </div>
             <p className="text-xs font-bold text-[#111111] uppercase">Entrega</p>
@@ -251,7 +251,7 @@ export default function GraciasClient() {
                 <div className="flex-1">
                   <p className="font-bold text-[#111111] text-sm">{item.product.name}</p>
                   <p className="text-xs text-[#2A2A2A]">Cantidad: {item.quantity}</p>
-                  <p className="text-[#E10600] font-bold">${(item.product.price * item.quantity).toFixed(2)}</p>
+                  <p className="text-[#FF6A00] font-bold">${(item.product.price * item.quantity).toFixed(2)}</p>
                 </div>
               </div>
             ))}
@@ -260,7 +260,7 @@ export default function GraciasClient() {
           {/* Delivery Info */}
           <div className="bg-[#F5F5F5] rounded-lg p-4 mb-4">
             <div className="flex items-start gap-3 mb-3">
-              <Truck className="w-5 h-5 text-[#E10600] flex-shrink-0 mt-0.5" />
+              <Truck className="w-5 h-5 text-[#FF6A00] flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-bold text-[#111111] text-sm">Dirección de entrega</p>
                 <p className="text-sm text-[#2A2A2A]">{order.address}</p>
@@ -268,7 +268,7 @@ export default function GraciasClient() {
               </div>
             </div>
             <div className="flex items-start gap-3">
-              <Clock className="w-5 h-5 text-[#E10600] flex-shrink-0 mt-0.5" />
+              <Clock className="w-5 h-5 text-[#FF6A00] flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-bold text-[#111111] text-sm">Método de pago</p>
                 <p className="text-sm text-[#2A2A2A]">{getPaymentMethodText(order.paymentMethod)}</p>
@@ -290,7 +290,7 @@ export default function GraciasClient() {
             </div>
             <div className="flex justify-between text-xl font-extrabold text-[#111111] pt-2 border-t border-[#E0E0E0]">
               <span>TOTAL</span>
-              <span className="text-[#E10600]">${order.total.toFixed(2)}</span>
+              <span className="text-[#FF6A00]">${order.total.toFixed(2)}</span>
             </div>
           </div>
         </div>
