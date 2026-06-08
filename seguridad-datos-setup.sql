@@ -18,6 +18,10 @@ DROP POLICY IF EXISTS "Service role can do everything on orders" ON orders;
 DROP POLICY IF EXISTS "Users can view their own orders" ON orders;
 DROP POLICY IF EXISTS "Users view own orders" ON orders;
 DROP POLICY IF EXISTS "Anyone can create orders" ON orders;
+DROP POLICY IF EXISTS "Publico crea pedidos" ON orders;
+DROP POLICY IF EXISTS "Equipo lee pedidos" ON orders;
+DROP POLICY IF EXISTS "Equipo actualiza pedidos" ON orders;
+DROP POLICY IF EXISTS "Equipo borra pedidos" ON orders;
 
 -- El público (checkout) SOLO puede CREAR pedidos. No leer.
 CREATE POLICY "Publico crea pedidos"
@@ -61,6 +65,8 @@ DROP POLICY IF EXISTS "Anyone can read available products" ON products;
 DROP POLICY IF EXISTS "Public read available products" ON products;
 DROP POLICY IF EXISTS "Service role manages products" ON products;
 DROP POLICY IF EXISTS "Staff gestiona productos" ON products;
+DROP POLICY IF EXISTS "Publico ve productos disponibles" ON products;
+DROP POLICY IF EXISTS "Equipo gestiona productos" ON products;
 
 CREATE POLICY "Publico ve productos disponibles"
   ON products FOR SELECT
