@@ -329,6 +329,46 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // ─── SEGURIDAD: recalcular precios desde la base de datos ───
+    // Nunca confiar en los precios que manda el navegador (podrían
+    // estar manipulados). Se buscan los precios reales por ID.
+    if (!Array.isArray(items) || items.length === 0) {
+      return NextResponse.json({ error: 'El carrito está vacío' }, { status: 400 })
+    }
+    if (!supabaseAdmin) {
+      return NextResponse.json({ error: 'Servidor no configurado' }, { status: 500 })
+    }
+
+    const productIds = items.map((it: any) => it.id).filter(Boolean)
+    const { data: dbProducts, error: prodErr } = await supabaseAdmin
+      .from('products')
+      .select('id, name, sale_price, is_available')
+      .in('id', productIds)
+
+    if (prodErr || !dbProducts) {
+      return NextResponse.json({ error: 'No se pudieron verificar los productos' }, { status: 500 })
+    }
+
+    const priceMap = new Map(dbProducts.map((p: any) => [p.id, p]))
+    let verifiedSubtotal = 0
+    const verifiedItems = []
+    for (const it of items) {
+      const real = priceMap.get(it.id)
+      if (!real || real.is_available === false) {
+        return NextResponse.json(
+          { error: `El producto "${it.name || it.id}" ya no está disponible` },
+          { status: 400 }
+        )
+      }
+      const qty = Math.max(1, parseInt(it.quantity) || 1)
+      const realPrice = Number(real.sale_price)
+      verifiedSubtotal += realPrice * qty
+      verifiedItems.push({ ...it, price: realPrice, sale_price: realPrice, quantity: qty })
+    }
+
+    const verifiedDeliveryCost = Number(deliveryCost) || 0
+    const verifiedTotal = verifiedSubtotal + verifiedDeliveryCost
+
     // Comprobante opcional para Zelle, no requerido para Pago Móvil
     // El pago se coordina por WhatsApp
 
@@ -342,7 +382,7 @@ export async function POST(request: NextRequest) {
     // Generar número de orden
     const orderNumber = `RH-${Date.now().toString(36).toUpperCase()}`
 
-    // Crear orden en la base de datos
+    // Crear orden en la base de datos (con precios VERIFICADOS del servidor)
     const { data: order, error: dbError } = await supabaseAdmin
       .from('orders')
       .insert([{
@@ -350,10 +390,10 @@ export async function POST(request: NextRequest) {
         customer_name: customerName,
         customer_phone: customerPhone,
         customer_email: customerEmail,
-        items,
-        subtotal,
-        delivery_cost: deliveryCost,
-        total,
+        items: verifiedItems,
+        subtotal: verifiedSubtotal,
+        delivery_cost: verifiedDeliveryCost,
+        total: verifiedTotal,
         delivery_zone: deliveryZone,
         address,
         payment_method: paymentMethod,

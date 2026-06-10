@@ -226,7 +226,7 @@ export default function ProductoClient({ productId }: ProductoClientProps) {
                   </span>
                 )}
                 <span className="text-4xl font-extrabold text-[#FF6A00]">
-                  ${product.price.toFixed(2)}
+                  {product.price > 0 ? `$${product.price.toFixed(2)}` : 'Consultar precio'}
                 </span>
               </div>
               <div className="flex items-center gap-2 text-sm">
@@ -411,7 +411,7 @@ export default function ProductoClient({ productId }: ProductoClientProps) {
                       <div className="text-xs text-gray-500 mb-1">{relatedProduct.brand}</div>
                       <h3 className="font-bold text-[#111111] text-sm line-clamp-2 mb-2">{relatedProduct.name}</h3>
                       <div className="text-lg font-extrabold text-[#FF6A00]">
-                        ${relatedProduct.price.toFixed(2)}
+                        {relatedProduct.price > 0 ? `$${relatedProduct.price.toFixed(2)}` : 'Consultar precio'}
                       </div>
                     </div>
                   </Link>

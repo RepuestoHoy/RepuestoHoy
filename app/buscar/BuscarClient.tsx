@@ -393,7 +393,7 @@ function BuscarContent() {
                           {product.name}
                         </h3>
                         <div className="text-lg font-extrabold text-[#FF6A00]">
-                          ${product.price.toFixed(2)}
+                          {product.price > 0 ? `$${product.price.toFixed(2)}` : 'Consultar precio'}
                         </div>
                       </div>
                     </Link>

@@ -88,10 +88,10 @@ export default function HomePage() {
         
         <div className="relative max-w-4xl mx-auto px-4 pt-8 pb-6 text-center">
           <h2 className="text-3xl md:text-4xl font-extrabold text-[#111111] mb-2 tracking-tight">
-            ¿Cual es tu <span className="text-[#FF6A00]">vehiculo</span>?
+            ¿Cuál es tu <span className="text-[#FF6A00]">vehículo</span>?
           </h2>
           <p className="text-base text-[#6B7280] mb-6 max-w-xl mx-auto">
-            Selecciona tu marca, modelo y año. Te mostramos exactamente que repuestos necesita tu vehiculo.
+            Selecciona tu marca, modelo y año. Te mostramos exactamente qué repuestos necesita tu vehículo.
           </p>
 
           {/* Search Box Mejorado */}
@@ -254,9 +254,9 @@ export default function HomePage() {
                 <Car className="w-7 h-7 text-white" />
               </div>
               <div className="step-number">1</div>
-              <h3 className="text-xl font-bold text-[#111111] mb-3">Tu Vehiculo</h3>
+              <h3 className="text-xl font-bold text-[#111111] mb-3">Tu Vehículo</h3>
               <p className="text-[#6B7280]">
-                Selecciona tu carro o moto. Si creas cuenta, guardamos tu vehiculo para agilizar proximas compras.
+                Selecciona tu carro o moto. Si creas cuenta, guardamos tu vehículo para agilizar próximas compras.
               </p>
             </div>
 
@@ -289,32 +289,32 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Categories Section - MOVIDA AQUÍ CON SEARCHBAR */}
-      <section className="py-16 bg-gray-50">
+      {/* Categories Section - estilo Toyota Parts Center */}
+      <section className="py-16 bg-white">
         <div className="max-w-6xl mx-auto px-4">
-          <div className="text-center mb-8">
-            <h3 className="text-3xl font-bold text-[#111111] mb-4">
-              Buscar por categoría
+          <div className="mb-8">
+            <h3 className="text-4xl md:text-5xl font-extrabold text-[#111111] mb-4 tracking-tight">
+              Categorías principales
             </h3>
-            <p className="text-[#6B7280] mb-6">
-              Todo lo que tu carro necesita, organizado por sistema.
+            <p className="text-lg text-[#4B5563] mb-8 max-w-2xl">
+              Dale a tu vehículo el cuidado que merece. Explora nuestros repuestos y accesorios más populares.
             </p>
 
-            {/* Search Bar */}
-            <div className="max-w-md mx-auto mb-8">
+            {/* Search Bar - píldora estilo Toyota */}
+            <div className="max-w-xl mb-8">
               <div className="relative">
                 <input
                   type="text"
                   value={categorySearch}
                   onChange={(e) => setCategorySearch(e.target.value)}
                   placeholder="Buscar categoría... (ej: cauchos, frenos)"
-                  className="w-full px-5 py-3 pl-12 bg-white border-2 border-gray-200 rounded-xl text-[#111111] placeholder-gray-400 focus:outline-none focus:border-[#FF6A00] transition-colors"
+                  className="w-full px-6 py-4 pl-14 bg-white border-2 border-gray-300 rounded-full text-[#111111] placeholder-gray-400 focus:outline-none focus:border-[#FF6A00] transition-colors text-base"
                 />
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 {categorySearch && (
                   <button
                     onClick={() => setCategorySearch('')}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />

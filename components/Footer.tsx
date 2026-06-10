@@ -168,10 +168,10 @@ export default function Footer() {
             © {BUSINESS_CONFIG.year} {BUSINESS_CONFIG.name}. Todos los derechos reservados.
           </p>
           <div className="flex items-center gap-4 text-sm text-gray-500">
-            <Link href="#" className="hover:text-white transition-colors">
+            <Link href="/terminos" className="hover:text-white transition-colors">
               Términos
             </Link>
-            <Link href="#" className="hover:text-white transition-colors">
+            <Link href="/privacidad" className="hover:text-white transition-colors">
               Privacidad
             </Link>
           </div>

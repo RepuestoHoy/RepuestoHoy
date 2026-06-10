@@ -61,6 +61,19 @@ function ShopContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [categoryCounts, setCategoryCounts] = useState<Record<string, number>>({})
+  const [categoryImages, setCategoryImages] = useState<Record<string, string>>({})
+
+  useEffect(() => {
+    supabase.from('categories').select('slug, image_url').then(({ data }) => {
+      if (data) {
+        const map: Record<string, string> = {}
+        data.forEach((c: { slug: string; image_url: string | null }) => {
+          if (c.image_url) map[c.slug] = c.image_url
+        })
+        setCategoryImages(map)
+      }
+    })
+  }, [])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
   
@@ -256,35 +269,40 @@ function ShopContent() {
               <p className="text-gray-500">{group.description}</p>
             </div>
             
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-x-5 gap-y-8">
               {group.items.map((item) => {
                 const count = categoryCounts[item.id] || 0
                 const Icon = item.icon
+                const imageUrl = categoryImages[item.id]
                 const hasProducts = count > 0 || loading
-                
+
                 return (
                   <button
                     key={item.id}
                     onClick={() => handleCategoryClick(item.id)}
                     disabled={!hasProducts}
-                    className={`card p-5 text-center hover:border-[#FF6A00] hover:shadow-xl transition-all group bg-white ${!hasProducts ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    className={`group text-left ${!hasProducts ? 'opacity-50 cursor-not-allowed' : ''}`}
                   >
-                    {/* Icono en rojo como el landing page */}
-                    <div className="w-12 h-12 mx-auto mb-3 flex items-center justify-center text-[#FF6A00] group-hover:scale-110 transition-transform">
-                      <Icon className="w-10 h-10" />
-                    </div>
-                    
-                    {/* Nombre de la categoría */}
-                    <h3 className="font-bold text-[#111111] text-sm uppercase mb-1 group-hover:text-[#FF6A00] transition-colors">
+                    {imageUrl ? (
+                      <div className="w-full aspect-square bg-[#F2F2F2] rounded-2xl overflow-hidden flex items-center justify-center p-6">
+                        <img
+                          src={imageUrl}
+                          alt={item.name}
+                          className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
+                        />
+                      </div>
+                    ) : (
+                      <div className="w-full aspect-square bg-[#F2F2F2] rounded-2xl flex items-center justify-center text-[#FF6A00] group-hover:scale-105 transition-transform duration-300">
+                        <Icon className="w-20 h-20" />
+                      </div>
+                    )}
+
+                    <h3 className="font-bold text-[#111111] text-lg mt-3 group-hover:text-[#FF6A00] transition-colors">
                       {item.name}
                     </h3>
-                    
-                    {/* Descripción */}
-                    <p className="text-xs text-[#6B7280]">{item.desc}</p>
-                    
-                    {/* Contador de productos (opcional, debajo) */}
+                    <p className="text-sm text-[#6B7280] mt-0.5">{item.desc}</p>
                     {!loading && count > 0 && (
-                      <span className="inline-block mt-2 text-xs text-[#FF6A00] font-semibold">
+                      <span className="inline-block mt-1 text-xs text-[#FF6A00] font-semibold">
                         {count} productos
                       </span>
                     )}

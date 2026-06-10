@@ -408,7 +408,6 @@ export default function AdminDashboard() {
 }
 
 function ProductsTab() {
-  const supabase = createClient()
   const [products, setProducts] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
