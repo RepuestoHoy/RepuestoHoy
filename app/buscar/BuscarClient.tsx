@@ -23,20 +23,28 @@ function BuscarContent() {
   const [quickAddedId, setQuickAddedId] = useState<string | null>(null)
   const [problemSearch, setProblemSearch] = useState('')
   const [problemSuggestion, setProblemSuggestion] = useState<ReturnType<typeof searchByProblem>>(null)
-  const [categoryImages, setCategoryImages] = useState<Record<string, string>>({})
+  const [dbCats, setDbCats] = useState<any[]>([])
 
   useEffect(() => {
     const supabase = createClient()
-    supabase.from('categories').select('slug, image_url').then(({ data }) => {
-      if (data) {
-        const map: Record<string, string> = {}
-        data.forEach((c: { slug: string; image_url: string | null }) => {
-          if (c.image_url) map[c.slug] = c.image_url
-        })
-        setCategoryImages(map)
-      }
-    })
+    supabase
+      .from('categories')
+      .select('slug, name, emoji, description, image_url, sort_order')
+      .order('sort_order', { ascending: true })
+      .then(({ data }) => {
+        if (data && data.length > 0) setDbCats(data)
+      })
   }, [])
+
+  // Lista de categorías: Supabase si cargó (editable desde el panel); si no, la del código
+  const categoriasLista = dbCats.length > 0
+    ? dbCats.map((c: any) => ({
+        id: c.slug,
+        name: c.name,
+        emoji: c.emoji || null,
+        image: c.image_url || null,
+      }))
+    : CATEGORIES.map(c => ({ id: c.id, name: c.name, emoji: null, image: null }))
 
   const brand = searchParams.get('brand') || ''
   const model = searchParams.get('model') || ''
@@ -205,8 +213,8 @@ function BuscarContent() {
               <div className="mb-6">
                 <h4 className="font-bold text-[#111111] mb-3 text-sm uppercase">Categorías</h4>
                 <div className="grid grid-cols-2 lg:grid-cols-1 gap-3">
-                  {CATEGORIES.map(cat => {
-                    const imageUrl = categoryImages[cat.id]
+                  {categoriasLista.map(cat => {
+                    const imageUrl = cat.image
                     const isActive = selectedCategory === cat.id
                     return (
                       <button
@@ -220,7 +228,7 @@ function BuscarContent() {
                           {imageUrl ? (
                             <img src={imageUrl} alt={cat.name} className="w-full h-full object-cover" />
                           ) : (
-                            <span className="text-gray-300 text-xs px-2 text-center">{cat.name}</span>
+                            <span className="text-4xl">{cat.emoji || '🔧'}</span>
                           )}
                         </div>
                         <div className={`px-3 py-2 ${isActive ? 'bg-[#FF6A00] text-white' : 'bg-white text-[#111111]'}`}>

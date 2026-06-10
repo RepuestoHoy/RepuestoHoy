@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
@@ -13,6 +13,7 @@ import { Trash2, Plus, Minus, ShoppingBag, ArrowRight, Package } from 'lucide-re
 
 export default function CarritoClient() {
   const router = useRouter()
+  const [zona, setZona] = useState('')
   const { items, updateQuantity, removeFromCart, getSubtotal } = useCart()
 
   const subtotal = getSubtotal()
@@ -183,6 +184,46 @@ export default function CarritoClient() {
                   <span>Subtotal</span>
                   <span className="text-[#FF6A00]">${subtotal.toFixed(2)}</span>
                 </div>
+              </div>
+
+              {/* Cobertura de entrega */}
+              <div className="rounded-lg border border-amber-300 bg-amber-50 p-4 mb-4">
+                <p className="text-sm text-amber-800">
+                  ⚡ Verificamos tu zona antes de confirmar. Si estás fuera de cobertura, te contactamos por WhatsApp antes de procesar el pago.
+                </p>
+              </div>
+
+              <div className="mb-4">
+                <label className="block text-sm font-semibold text-[#111111] mb-1.5">¿En qué zona estás? (opcional)</label>
+                <select
+                  value={zona}
+                  onChange={(e) => setZona(e.target.value)}
+                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#FF6A00]"
+                >
+                  <option value="">Selecciona tu zona</option>
+                  <option value="chacao">Chacao</option>
+                  <option value="baruta">Baruta</option>
+                  <option value="el-hatillo">El Hatillo</option>
+                  <option value="altamira">Altamira</option>
+                  <option value="las-mercedes">Las Mercedes</option>
+                  <option value="otra">Otra zona</option>
+                </select>
+                {zona === 'otra' && (
+                  <p className="text-xs text-amber-700 mt-2">
+                    Tu zona no tiene entrega el mismo día, pero podemos coordinar por WhatsApp.{' '}
+                    <a
+                      href="https://wa.me/584122223775"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="underline font-semibold"
+                    >
+                      Escríbenos aquí
+                    </a>
+                  </p>
+                )}
+                {zona && zona !== 'otra' && (
+                  <p className="text-xs text-green-700 mt-2">✓ Tu zona tiene entrega el mismo día.</p>
+                )}
               </div>
 
               <button

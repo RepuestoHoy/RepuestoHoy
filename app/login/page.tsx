@@ -71,6 +71,16 @@ function LoginForm() {
         </div>
 
         <div className="bg-white rounded-2xl shadow-lg p-8">
+          <div className="mb-6 pb-6 border-b border-gray-100">
+            <p className="text-sm font-bold text-[#111111] mb-3">¿Por qué crear una cuenta?</p>
+            <ul className="space-y-2 text-sm text-gray-600">
+              <li>🚗 Guarda tu vehículo para búsquedas más rápidas</li>
+              <li>📦 Historial completo de tus pedidos</li>
+              <li>🔍 Seguimiento de tu entrega</li>
+              <li>🎁 Ofertas exclusivas para clientes registrados</li>
+            </ul>
+          </div>
+
           {error && (
             <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-red-700">
               <AlertCircle className="w-4 h-4 flex-shrink-0" />

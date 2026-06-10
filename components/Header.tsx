@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { ShoppingCart, Menu, X, ArrowLeft, Phone, User, LogOut } from 'lucide-react'
 import Image from 'next/image'
 import { useCart } from './CartContext'
+import CategoriesSidebar from './CategoriesSidebar'
 import { supabase } from '@/lib/supabase'
 
 interface HeaderProps {
@@ -22,6 +23,7 @@ export default function Header({
   const router = useRouter()
   const { items } = useCart()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const [showBanner, setShowBanner] = useState(true)
   const [user, setUser] = useState<any>(null)
@@ -63,6 +65,7 @@ export default function Header({
 
   return (
     <>
+      <CategoriesSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       {/* Banner promocional */}
       {showBanner && (
         <div className="bg-[#25D366] text-white text-center py-2 px-4 text-sm font-medium relative">
@@ -114,9 +117,13 @@ export default function Header({
 
             {/* Desktop Nav */}
             <nav className="hidden md:flex items-center gap-8">
-              <Link href="/buscar" className="text-gray-300 hover:text-white transition-colors font-medium">
+              <button
+                onClick={() => setSidebarOpen(true)}
+                className="flex items-center gap-1.5 text-gray-300 hover:text-white transition-colors font-medium"
+              >
+                <Menu className="w-4 h-4" />
                 Repuestos
-              </Link>
+              </button>
               <Link href="/" className="text-gray-300 hover:text-white transition-colors font-medium">
                 Inicio
               </Link>
@@ -181,7 +188,7 @@ export default function Header({
                   className="hidden md:flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-sm font-medium transition-colors"
                 >
                   <User className="w-4 h-4" />
-                  Entrar
+                  Mi cuenta
                 </Link>
               )}
 

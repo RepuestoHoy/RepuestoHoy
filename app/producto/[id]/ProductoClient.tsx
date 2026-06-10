@@ -8,6 +8,7 @@ import { SAMPLE_PRODUCTS, CATEGORIES } from '@/lib/data'
 import { categoryIcons } from '@/components/CategoryIcons'
 import { BUSINESS_CONFIG, trackEvent } from '@/lib/config'
 import { useCart } from '@/components/CartContext'
+import { createClient } from '@/lib/supabase/client'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import WhatsAppButton from '@/components/WhatsAppButton'
@@ -21,6 +22,13 @@ interface ProductoClientProps {
 export default function ProductoClient({ productId }: ProductoClientProps) {
   const router = useRouter()
   const { addToCart, addToRecentlyViewed } = useCart()
+  const [isLogged, setIsLogged] = useState<boolean | null>(null)
+  const [showNudge, setShowNudge] = useState(false)
+
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getUser().then(({ data: { user } }) => setIsLogged(!!user))
+  }, [])
   
   const product = SAMPLE_PRODUCTS.find(p => p.id === productId)
   
@@ -70,6 +78,10 @@ export default function ProductoClient({ productId }: ProductoClientProps) {
   const handleAddToCart = () => {
     addToCart(product, quantity)
     setAddedToCart(true)
+    if (isLogged === false && typeof window !== 'undefined' && !sessionStorage.getItem('rh_nudge_login')) {
+      setShowNudge(true)
+      sessionStorage.setItem('rh_nudge_login', '1')
+    }
     // Track add to cart
     trackEvent('add_to_cart', {
       currency: 'USD',
@@ -424,6 +436,21 @@ export default function ProductoClient({ productId }: ProductoClientProps) {
         {/* Recently Viewed */}
         <RecentlyViewed />
       </main>
+
+      {showNudge && (
+        <div className="fixed bottom-4 left-4 right-4 md:left-auto md:right-6 md:w-80 bg-white border border-gray-200 rounded-xl p-4 shadow-xl z-50">
+          <p className="text-sm text-[#111111] font-bold mb-1">¿Quieres guardar tu carrito?</p>
+          <p className="text-xs text-gray-500 mb-3">Crea tu cuenta gratis y guarda tu vehículo para la próxima vez.</p>
+          <div className="flex gap-2">
+            <Link href="/login" className="text-xs bg-[#FF6A00] hover:bg-[#E55A00] text-white px-3 py-1.5 rounded-lg font-semibold transition-colors">
+              Crear cuenta
+            </Link>
+            <button onClick={() => setShowNudge(false)} className="text-xs text-gray-500 hover:text-gray-700 px-3 py-1.5">
+              Continuar sin cuenta
+            </button>
+          </div>
+        </div>
+      )}
 
       <Footer />
       <WhatsAppButton />

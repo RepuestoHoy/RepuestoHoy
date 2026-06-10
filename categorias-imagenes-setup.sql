@@ -41,6 +41,15 @@ DROP POLICY IF EXISTS "Staff actualiza categorías" ON categories;
 CREATE POLICY "Staff actualiza categorías" ON categories
   FOR UPDATE USING (auth.role() = 'authenticated');
 
+-- 4b. Permitir que autenticados creen y borren categorías (gestión completa)
+DROP POLICY IF EXISTS "Staff crea categorías" ON categories;
+CREATE POLICY "Staff crea categorías" ON categories
+  FOR INSERT WITH CHECK (auth.role() = 'authenticated');
+
+DROP POLICY IF EXISTS "Staff borra categorías" ON categories;
+CREATE POLICY "Staff borra categorías" ON categories
+  FOR DELETE USING (auth.role() = 'authenticated');
+
 
 
 -- 5. Asegurar que las 20 categorías de la página existan en la tabla

@@ -145,6 +145,21 @@ export default function Footer() {
                 <MapPin className="w-4 h-4 text-[#FF6A00] mt-0.5 flex-shrink-0" />
                 <span className="text-gray-400">Caracas, Venezuela</span>
               </li>
+              <li>
+                <a
+                  href={`https://wa.me/${BUSINESS_CONFIG.whatsapp}?text=${encodeURIComponent('Quiero rastrear mi pedido')}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-400 hover:text-white transition-colors"
+                >
+                  Rastrear pedido
+                </a>
+              </li>
+              <li>
+                <Link href="/faq" className="text-gray-400 hover:text-white transition-colors">
+                  Preguntas frecuentes
+                </Link>
+              </li>
             </ul>
             
             {/* WhatsApp CTA */}

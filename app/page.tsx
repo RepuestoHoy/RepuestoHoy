@@ -6,6 +6,7 @@ import { CARS, MOTORCYCLES, CATEGORIES } from '@/lib/data'
 import { getToyotaModelOptions, type ModelOption } from '@/lib/toyota-generations'
 import { categoryIcons } from '@/components/CategoryIcons'
 import { createClient } from '@/lib/supabase/client'
+import { BUSINESS_CONFIG } from '@/lib/config'
 import { Search, HelpCircle, Car, Shield, Clock, ChevronRight } from 'lucide-react'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
@@ -19,34 +20,45 @@ export default function HomePage() {
   const [year, setYear] = useState('')
   const [isAnimating, setIsAnimating] = useState(false)
   const [categorySearch, setCategorySearch] = useState('')
-  // Imágenes de categorías subidas desde el panel (slug -> url)
-  const [categoryImages, setCategoryImages] = useState<Record<string, string>>({})
+  // Categorías desde Supabase (nombre, emoji, descripción e imagen editables desde el panel).
+  // Si la carga falla o está vacía, se usa la lista del código como respaldo.
+  const [dbCats, setDbCats] = useState<any[]>([])
 
   useEffect(() => {
     const supabase = createClient()
     supabase
       .from('categories')
-      .select('slug, image_url')
+      .select('slug, name, emoji, description, image_url, sort_order')
+      .order('sort_order', { ascending: true })
       .then(({ data }) => {
-        if (data) {
-          const map: Record<string, string> = {}
-          data.forEach((c: { slug: string; image_url: string | null }) => {
-            if (c.image_url) map[c.slug] = c.image_url
-          })
-          setCategoryImages(map)
-        }
+        if (data && data.length > 0) setDbCats(data)
       })
   }, [])
 
+  // Lista base: Supabase si cargó; si no, la del código (con su ícono)
+  const baseCategories = useMemo(() => {
+    if (dbCats.length > 0) {
+      return dbCats.map((c: any) => ({
+        id: c.slug,
+        name: c.name,
+        description: c.description || '',
+        emoji: c.emoji || null,
+        image: c.image_url || null,
+        icon: CATEGORIES.find(k => k.id === c.slug)?.icon || null,
+      }))
+    }
+    return CATEGORIES.map(c => ({ ...c, emoji: null, image: null }))
+  }, [dbCats])
+
   // Filtrar categorías basado en la búsqueda
   const filteredCategories = useMemo(() => {
-    if (!categorySearch.trim()) return CATEGORIES
+    if (!categorySearch.trim()) return baseCategories
     const query = categorySearch.toLowerCase()
-    return CATEGORIES.filter(cat =>
+    return baseCategories.filter(cat =>
       cat.name.toLowerCase().includes(query) ||
-      cat.description.toLowerCase().includes(query)
+      (cat.description || '').toLowerCase().includes(query)
     )
-  }, [categorySearch])
+  }, [categorySearch, baseCategories])
 
   const vehicleList = vehicleType === 'car' ? CARS : MOTORCYCLES
   const selectedVehicle = vehicleList.find(v => v.brand === brand)
@@ -195,6 +207,13 @@ export default function HomePage() {
                 </div>
               </div>
 
+              <p className="text-sm text-gray-500 text-center">
+                📍 Entrega el mismo día en:{' '}
+                <span className="text-[#111111] font-semibold">
+                  Chacao · Baruta · El Hatillo · Altamira · Las Mercedes
+                </span>
+              </p>
+
               <div className="flex flex-col sm:flex-row gap-3">
                 <button
                   type="submit"
@@ -332,8 +351,8 @@ export default function HomePage() {
 
           <div className="grid grid-cols-2 lg:grid-cols-3 gap-x-5 gap-y-8">
             {filteredCategories.map(cat => {
-              const IconComponent = categoryIcons[cat.icon]
-              const imageUrl = categoryImages[cat.id]
+              const IconComponent = cat.icon ? categoryIcons[cat.icon] : null
+              const imageUrl = cat.image
               return (
                 <a
                   key={cat.id}
@@ -350,7 +369,11 @@ export default function HomePage() {
                     </div>
                   ) : (
                     <div className="w-full aspect-square bg-[#F2F2F2] rounded-2xl flex items-center justify-center text-[#FF6A00] group-hover:scale-105 transition-transform duration-300">
-                      {IconComponent && <IconComponent className="w-20 h-20" />}
+                      {IconComponent ? (
+                        <IconComponent className="w-20 h-20" />
+                      ) : (
+                        <span className="text-6xl">{cat.emoji || '🔧'}</span>
+                      )}
                     </div>
                   )}
                   <h4 className="font-bold text-[#111111] text-lg mt-3">{cat.name}</h4>
@@ -422,6 +445,38 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ¿Qué le pasa a tu carro? — búsqueda por necesidad */}
+      <section className="py-14 bg-[#F7F7F7]">
+        <div className="max-w-6xl mx-auto px-4">
+          <h3 className="text-2xl md:text-3xl font-extrabold text-[#111111] mb-2 tracking-tight">
+            ¿Qué le pasa a tu carro?
+          </h3>
+          <p className="text-[#6B7280] mb-8">Búscalo por síntoma o necesidad.</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            {[
+              { label: 'Mantenimiento preventivo', desc: 'Cambio de aceite, filtros, bujías', slug: 'filtros' },
+              { label: 'Falla detectada / Check Engine', desc: 'Sensores, diagnóstico, sistema eléctrico', slug: 'sensores' },
+              { label: 'Preparación para viaje largo', desc: 'Cauchos, frenos, luces, kit de emergencia', slug: 'neumaticos' },
+              { label: 'Mejora de rendimiento', desc: 'Escape, admisión, suspensión sport', slug: 'motor' },
+              { label: 'Interior y confort', desc: 'Audio, iluminación, cubreasientos', slug: 'interior' },
+              { label: 'Seguridad y visibilidad', desc: 'Cámaras, alarmas, limpiaparabrisas', slug: 'seguridad' },
+            ].map((need) => (
+              <a
+                key={need.label}
+                href={`/buscar?category=${need.slug}`}
+                className="flex items-start gap-3 p-5 rounded-xl bg-white border border-gray-200 hover:border-[#FF6A00] hover:shadow-md transition group"
+              >
+                <div>
+                  <p className="text-sm font-bold text-[#111111] group-hover:text-[#FF6A00] transition-colors">{need.label}</p>
+                  <p className="text-xs text-[#6B7280] mt-1">{need.desc}</p>
+                </div>
+                <span className="ml-auto text-gray-400 text-lg group-hover:text-[#FF6A00]">›</span>
+              </a>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="py-16 bg-gradient-to-r from-[#111111] to-[#2A2A2A]">
         <div className="max-w-4xl mx-auto px-4 text-center">
@@ -442,6 +497,50 @@ export default function HomePage() {
             </svg>
             Escribir por WhatsApp
           </a>
+        </div>
+      </section>
+
+      {/* ¿Necesitas ayuda? */}
+      <section className="py-14 bg-white">
+        <div className="max-w-4xl mx-auto px-4">
+          <h3 className="text-2xl font-extrabold text-[#111111] mb-2 text-center">¿Necesitas ayuda?</h3>
+          <p className="text-sm text-[#6B7280] text-center mb-8">Estamos aquí para asegurarnos de que consigas la pieza correcta.</p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <a
+              href={`https://wa.me/${BUSINESS_CONFIG.whatsapp}?text=${encodeURIComponent('Hola! Quiero rastrear mi pedido')}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex flex-col items-center gap-3 p-6 rounded-xl bg-white border border-gray-200 hover:border-[#FF6A00] hover:shadow-md transition text-center"
+            >
+              <span className="text-3xl">📦</span>
+              <div>
+                <p className="text-sm font-bold text-[#111111]">Rastrear mi pedido</p>
+                <p className="text-xs text-[#6B7280] mt-1">Consulta el estado de tu entrega</p>
+              </div>
+            </a>
+            <a
+              href={`https://wa.me/${BUSINESS_CONFIG.whatsapp}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex flex-col items-center gap-3 p-6 rounded-xl bg-[#FF6A00] hover:bg-[#E55A00] transition text-center"
+            >
+              <span className="text-3xl">💬</span>
+              <div>
+                <p className="text-sm font-bold text-white">Hablar con un experto</p>
+                <p className="text-xs text-orange-100 mt-1">Te ayudamos a encontrar la pieza correcta</p>
+              </div>
+            </a>
+            <a
+              href="/faq"
+              className="flex flex-col items-center gap-3 p-6 rounded-xl bg-white border border-gray-200 hover:border-[#FF6A00] hover:shadow-md transition text-center"
+            >
+              <span className="text-3xl">❓</span>
+              <div>
+                <p className="text-sm font-bold text-[#111111]">Preguntas frecuentes</p>
+                <p className="text-xs text-[#6B7280] mt-1">Envíos, pagos, devoluciones y más</p>
+              </div>
+            </a>
+          </div>
         </div>
       </section>
 

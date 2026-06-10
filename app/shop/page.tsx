@@ -61,18 +61,21 @@ function ShopContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [categoryCounts, setCategoryCounts] = useState<Record<string, number>>({})
-  const [categoryImages, setCategoryImages] = useState<Record<string, string>>({})
+  const [dbCatMap, setDbCatMap] = useState<Record<string, any>>({})
+  const [dbCatsLoaded, setDbCatsLoaded] = useState(false)
 
   useEffect(() => {
-    supabase.from('categories').select('slug, image_url').then(({ data }) => {
-      if (data) {
-        const map: Record<string, string> = {}
-        data.forEach((c: { slug: string; image_url: string | null }) => {
-          if (c.image_url) map[c.slug] = c.image_url
-        })
-        setCategoryImages(map)
-      }
-    })
+    supabase
+      .from('categories')
+      .select('slug, name, emoji, description, image_url')
+      .then(({ data }) => {
+        if (data && data.length > 0) {
+          const map: Record<string, any> = {}
+          data.forEach((c: any) => { map[c.slug] = c })
+          setDbCatMap(map)
+          setDbCatsLoaded(true)
+        }
+      })
   }, [])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
@@ -271,9 +274,14 @@ function ShopContent() {
             
             <div className="grid grid-cols-2 lg:grid-cols-3 gap-x-5 gap-y-8">
               {group.items.map((item) => {
+                const dbCat = dbCatMap[item.id]
+                // Si las categorías de la BD ya cargaron y esta fue eliminada, no se muestra
+                if (dbCatsLoaded && !dbCat) return null
                 const count = categoryCounts[item.id] || 0
                 const Icon = item.icon
-                const imageUrl = categoryImages[item.id]
+                const imageUrl = dbCat?.image_url || null
+                const displayName = dbCat?.name || item.name
+                const displayDesc = dbCat?.description || item.desc
                 const hasProducts = count > 0 || loading
 
                 return (
@@ -287,7 +295,7 @@ function ShopContent() {
                       <div className="w-full aspect-square bg-[#F2F2F2] rounded-2xl overflow-hidden flex items-center justify-center p-6">
                         <img
                           src={imageUrl}
-                          alt={item.name}
+                          alt={displayName}
                           className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
                         />
                       </div>
@@ -298,9 +306,9 @@ function ShopContent() {
                     )}
 
                     <h3 className="font-bold text-[#111111] text-lg mt-3 group-hover:text-[#FF6A00] transition-colors">
-                      {item.name}
+                      {displayName}
                     </h3>
-                    <p className="text-sm text-[#6B7280] mt-0.5">{item.desc}</p>
+                    <p className="text-sm text-[#6B7280] mt-0.5">{displayDesc}</p>
                     {!loading && count > 0 && (
                       <span className="inline-block mt-1 text-xs text-[#FF6A00] font-semibold">
                         {count} productos
