@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
-import { ArrowLeft, Upload, Check, ImageIcon, Loader2 } from 'lucide-react'
+import { ArrowLeft, Upload, Check, ImageIcon, Loader2, Trash2 } from 'lucide-react'
 import { validateImage, compressImage, MAX_FILE_MB } from '@/lib/image-upload'
 
 interface Categoria {
@@ -94,6 +94,27 @@ export default function AdminCategoriasPage() {
     setBusyId(null)
   }
 
+  const handleRemoveImage = async (categoria: Categoria) => {
+    if (!categoria.image_url) return
+    setError('')
+    setBusyId(categoria.id)
+    // Borrar el archivo del storage
+    const oldFile = fileNameFromUrl(categoria.image_url)
+    if (oldFile) await supabase.storage.from('categorias').remove([oldFile])
+    // Quitar la URL de la categoría (vuelve al ícono)
+    const { error: updErr } = await supabase
+      .from('categories').update({ image_url: null }).eq('id', categoria.id)
+    if (updErr) {
+      setError(`No se pudo quitar: ${updErr.message}`)
+      setBusyId(null)
+      return
+    }
+    setCategorias(prev =>
+      prev.map(c => (c.id === categoria.id ? { ...c, image_url: null } : c))
+    )
+    setBusyId(null)
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-[#111111] text-white py-4 sticky top-0 z-50">
@@ -180,14 +201,26 @@ export default function AdminCategoriasPage() {
                         e.target.value = ''
                       }}
                     />
-                    <button
-                      onClick={(e) => { e.stopPropagation(); fileInputs.current[cat.id]?.click() }}
-                      disabled={isBusy}
-                      className="w-full bg-[#FF6A00] hover:bg-[#E55A00] text-white text-sm font-medium py-2 rounded-lg flex items-center justify-center gap-1.5 disabled:opacity-60"
-                    >
-                      {isBusy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
-                      {cat.image_url ? 'Cambiar' : 'Subir'}
-                    </button>
+                    <div className="flex gap-1.5">
+                      <button
+                        onClick={(e) => { e.stopPropagation(); fileInputs.current[cat.id]?.click() }}
+                        disabled={isBusy}
+                        className="flex-1 bg-[#FF6A00] hover:bg-[#E55A00] text-white text-sm font-medium py-2 rounded-lg flex items-center justify-center gap-1.5 disabled:opacity-60"
+                      >
+                        {isBusy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+                        {cat.image_url ? 'Cambiar' : 'Subir'}
+                      </button>
+                      {cat.image_url && (
+                        <button
+                          onClick={(e) => { e.stopPropagation(); handleRemoveImage(cat) }}
+                          disabled={isBusy}
+                          title="Quitar imagen"
+                          className="px-2.5 bg-gray-100 hover:bg-red-50 text-gray-500 hover:text-red-600 rounded-lg disabled:opacity-60 transition-colors"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
               )

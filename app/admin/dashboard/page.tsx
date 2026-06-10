@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import {
   Package, ShoppingBag, DollarSign, Clock, CheckCircle, Truck, XCircle,
-  LogOut, Plus, Eye, BarChart2, RefreshCw, Bell, Car, Trash2, AlertTriangle, Loader2, X
+  LogOut, Plus, Eye, BarChart2, RefreshCw, Bell, Car, Trash2, AlertTriangle, Loader2, X, Edit
 } from 'lucide-react'
 
 interface Order {
@@ -412,6 +412,9 @@ function ProductsTab() {
   const [products, setProducts] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
+  const [toDelete, setToDelete] = useState<any | null>(null)
+  const [deleting, setDeleting] = useState(false)
+  const [deleteError, setDeleteError] = useState('')
 
   useEffect(() => {
     loadProducts()
@@ -420,10 +423,37 @@ function ProductsTab() {
   const loadProducts = async () => {
     const { data } = await supabase
       .from('products')
-      .select('id, sku, name, brand, type, sale_price, stock, is_available')
+      .select('id, sku, name, brand, type, sale_price, stock, is_available, images')
       .order('created_at', { ascending: false })
     if (data) setProducts(data)
     setLoading(false)
+  }
+
+  const handleDelete = async () => {
+    if (!toDelete) return
+    setDeleting(true)
+    setDeleteError('')
+
+    // Borrar también las fotos del producto en el storage (limpieza)
+    if (toDelete.images && toDelete.images.length > 0) {
+      const files = toDelete.images
+        .map((url: string) => {
+          const parts = url.split('/productos/')
+          return parts[1] ? decodeURIComponent(parts[1].split('?')[0]) : null
+        })
+        .filter((x: string | null): x is string => !!x)
+      if (files.length) await supabase.storage.from('productos').remove(files)
+    }
+
+    const { error } = await supabase.from('products').delete().eq('id', toDelete.id)
+    if (error) {
+      setDeleteError(`No se pudo eliminar: ${error.message}`)
+      setDeleting(false)
+      return
+    }
+    setProducts(prev => prev.filter(p => p.id !== toDelete.id))
+    setDeleting(false)
+    setToDelete(null)
   }
 
   const toggleAvailability = async (id: string, current: boolean) => {
@@ -471,6 +501,7 @@ function ProductsTab() {
               <th className="text-left py-3 text-xs text-gray-500 uppercase font-bold">Precio</th>
               <th className="text-left py-3 text-xs text-gray-500 uppercase font-bold">Stock</th>
               <th className="text-left py-3 text-xs text-gray-500 uppercase font-bold">Estado</th>
+              <th className="text-right py-3 text-xs text-gray-500 uppercase font-bold">Acciones</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
@@ -499,10 +530,70 @@ function ProductsTab() {
                     {p.is_available ? '✓ Activo' : '✗ Inactivo'}
                   </button>
                 </td>
+                <td className="py-3 text-right">
+                  <div className="flex items-center justify-end gap-1">
+                    <Link
+                      href={`/admin/productos/editar/${p.id}`}
+                      className="p-2 text-gray-400 hover:text-blue-600 transition-colors"
+                      title="Editar"
+                    >
+                      <Edit className="w-4 h-4" />
+                    </Link>
+                    <button
+                      onClick={() => setToDelete(p)}
+                      className="p-2 text-gray-400 hover:text-red-600 transition-colors"
+                      title="Eliminar"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
+      )}
+
+      {/* Modal confirmación eliminar producto */}
+      {toDelete && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6">
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0">
+                <AlertTriangle className="w-6 h-6 text-red-600" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-bold text-gray-900">Eliminar producto</h3>
+                <p className="text-gray-600 text-sm mt-1">
+                  ¿Seguro que quieres eliminar <strong>{toDelete.name}</strong>? Esta acción no se puede deshacer.
+                </p>
+                {deleteError && (
+                  <p className="text-red-600 text-sm mt-2">{deleteError}</p>
+                )}
+              </div>
+              <button onClick={() => setToDelete(null)} className="text-gray-400 hover:text-gray-600">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={() => setToDelete(null)}
+                disabled={deleting}
+                className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-60"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleDelete}
+                disabled={deleting}
+                className="flex-1 px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium flex items-center justify-center gap-2 disabled:opacity-60"
+              >
+                {deleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                Eliminar
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )
