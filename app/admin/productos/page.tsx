@@ -66,10 +66,17 @@ export default function AdminProductosPage() {
       if (files.length) await supabase.storage.from('productos').remove(files)
     }
 
-    const { error: delErr } = await supabase.from('products').delete().eq('id', toDelete.id)
+    const { data: borrados, error: delErr } = await supabase
+      .from('products').delete().eq('id', toDelete.id).select('id')
     if (delErr) {
       setError(`No se pudo eliminar: ${delErr.message}`)
       setDeleting(false)
+      return
+    }
+    if (!borrados || borrados.length === 0) {
+      setError('No tienes permiso para borrar. Ejecuta "seguridad-datos-setup.sql" en Supabase → SQL Editor y vuelve a intentar.')
+      setDeleting(false)
+      setToDelete(null)
       return
     }
     setProducts((prev) => prev.filter((p) => p.id !== toDelete.id))

@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
-import { ArrowLeft, Upload, Check, ImageIcon, Loader2, Trash2, Pencil, Plus, X, AlertTriangle } from 'lucide-react'
+import { ArrowLeft, Upload, Check, ImageIcon, Loader2, Trash2, Pencil, Plus, X, AlertTriangle, ChevronUp, ChevronDown } from 'lucide-react'
 import { validateImage, compressImage, MAX_FILE_MB } from '@/lib/image-upload'
 
 interface Categoria {
@@ -177,6 +177,34 @@ export default function AdminCategoriasPage() {
     setSaving(false)
   }
 
+  // ─── Reordenar (subir/bajar) ───
+  const moveCategoria = async (cat: Categoria, dir: -1 | 1) => {
+    const lista = [...categorias].sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))
+    const i = lista.findIndex(c => c.id === cat.id)
+    const j = i + dir
+    if (i < 0 || j < 0 || j >= lista.length) return
+    const a = lista[i], b = lista[j]
+    const ordenA = a.sort_order, ordenB = b.sort_order
+    setBusyId(cat.id)
+    setError('')
+    // Cambio optimista en pantalla
+    setCategorias(prev => prev
+      .map(c => c.id === a.id ? { ...c, sort_order: ordenB } : c.id === b.id ? { ...c, sort_order: ordenA } : c)
+      .sort((x, y) => (x.sort_order || 0) - (y.sort_order || 0)))
+    // Persistir ambos (con verificación de permisos)
+    const r1 = await supabase.from('categories').update({ sort_order: ordenB }).eq('id', a.id).select('id')
+    const r2 = await supabase.from('categories').update({ sort_order: ordenA }).eq('id', b.id).select('id')
+    const fallo = r1.error || r2.error || !r1.data?.length || !r2.data?.length
+    if (fallo) {
+      // Revertir y avisar
+      setCategorias(prev => prev
+        .map(c => c.id === a.id ? { ...c, sort_order: ordenA } : c.id === b.id ? { ...c, sort_order: ordenB } : c)
+        .sort((x, y) => (x.sort_order || 0) - (y.sort_order || 0)))
+      setError('No se pudo guardar el orden. Si persiste, ejecuta "categorias-imagenes-setup.sql" en Supabase → SQL Editor.')
+    }
+    setBusyId(null)
+  }
+
   // ─── Borrar categoría ───
   const openDelete = async (cat: Categoria) => {
     setToDelete(cat)
@@ -199,11 +227,19 @@ export default function AdminCategoriasPage() {
     // 2. Borrar la imagen del storage si tiene
     const oldFile = fileNameFromUrl(toDelete.image_url)
     if (oldFile) await supabase.storage.from('categorias').remove([oldFile])
-    // 3. Borrar la categoría
-    const { error: delErr } = await supabase.from('categories').delete().eq('id', toDelete.id)
+    // 3. Borrar la categoría (con verificación REAL de filas borradas)
+    const { data: borradas, error: delErr } = await supabase
+      .from('categories').delete().eq('id', toDelete.id).select('id')
     if (delErr) {
       setError(`No se pudo eliminar: ${delErr.message}`)
       setDeleting(false)
+      return
+    }
+    if (!borradas || borradas.length === 0) {
+      // Supabase bloqueó por permisos (falla silenciosa): faltan las políticas SQL
+      setError('No tienes permiso para borrar categorías. Ejecuta "categorias-imagenes-setup.sql" en Supabase → SQL Editor y vuelve a intentar.')
+      setDeleting(false)
+      setToDelete(null)
       return
     }
     setCategorias(prev => prev.filter(c => c.id !== toDelete.id))
@@ -297,6 +333,22 @@ export default function AdminCategoriasPage() {
                         <span className="font-semibold text-sm text-gray-900 truncate">{cat.name}</span>
                       </div>
                       <div className="flex items-center flex-shrink-0">
+                        <button
+                          onClick={() => moveCategoria(cat, -1)}
+                          disabled={isBusy}
+                          title="Subir"
+                          className="p-1 text-gray-400 hover:text-[#FF6A00] transition-colors disabled:opacity-40"
+                        >
+                          <ChevronUp className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => moveCategoria(cat, 1)}
+                          disabled={isBusy}
+                          title="Bajar"
+                          className="p-1 text-gray-400 hover:text-[#FF6A00] transition-colors disabled:opacity-40"
+                        >
+                          <ChevronDown className="w-4 h-4" />
+                        </button>
                         <button
                           onClick={() => openEdit(cat)}
                           title="Editar nombre/emoji"

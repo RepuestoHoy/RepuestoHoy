@@ -109,10 +109,13 @@ export default function AdminDashboard() {
     setDeletingOrder(true)
     // Borrar primero las líneas de la orden (si existen), luego la orden
     await supabase.from('order_items').delete().eq('order_id', orderToDelete.id)
-    const { error } = await supabase.from('orders').delete().eq('id', orderToDelete.id)
-    if (!error) {
+    const { data: borradas, error } = await supabase
+      .from('orders').delete().eq('id', orderToDelete.id).select('id')
+    if (!error && borradas && borradas.length > 0) {
       setOrders(prev => prev.filter(o => o.id !== orderToDelete.id))
       if (selectedOrder?.id === orderToDelete.id) setSelectedOrder(null)
+    } else if (!error) {
+      alert('No tienes permiso para borrar órdenes. Ejecuta "seguridad-datos-setup.sql" en Supabase → SQL Editor.')
     }
     setDeletingOrder(false)
     setOrderToDelete(null)
@@ -445,10 +448,17 @@ function ProductsTab() {
       if (files.length) await supabase.storage.from('productos').remove(files)
     }
 
-    const { error } = await supabase.from('products').delete().eq('id', toDelete.id)
+    const { data: borrados, error } = await supabase
+      .from('products').delete().eq('id', toDelete.id).select('id')
     if (error) {
       setDeleteError(`No se pudo eliminar: ${error.message}`)
       setDeleting(false)
+      return
+    }
+    if (!borrados || borrados.length === 0) {
+      setDeleteError('No tienes permiso para borrar. Ejecuta "seguridad-datos-setup.sql" en Supabase → SQL Editor y vuelve a intentar.')
+      setDeleting(false)
+      setToDelete(null)
       return
     }
     setProducts(prev => prev.filter(p => p.id !== toDelete.id))
