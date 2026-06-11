@@ -222,8 +222,19 @@ export default function AdminCategoriasPage() {
     setDeleting(true)
     setError('')
 
-    // 1. Desvincular productos (quedan sin categoría, NO se borran)
-    await supabase.from('products').update({ category_id: null }).eq('category_id', toDelete.id)
+    // 1. Desvincular productos (quedan sin categoría, NO se borran) — VERIFICADO
+    if (productCount && productCount > 0) {
+      const { data: desvinculados, error: unlinkErr } = await supabase
+        .from('products')
+        .update({ category_id: null })
+        .eq('category_id', toDelete.id)
+        .select('id')
+      if (unlinkErr || !desvinculados || desvinculados.length === 0) {
+        setError('No se pudieron desvincular los productos de esta categoría (faltan permisos). Ejecuta "EJECUTAR-HOY-SUPABASE.sql" en Supabase → SQL Editor y vuelve a intentar.')
+        setDeleting(false)
+        return
+      }
+    }
     // 2. Borrar la imagen del storage si tiene
     const oldFile = fileNameFromUrl(toDelete.image_url)
     if (oldFile) await supabase.storage.from('categorias').remove([oldFile])
@@ -231,13 +242,16 @@ export default function AdminCategoriasPage() {
     const { data: borradas, error: delErr } = await supabase
       .from('categories').delete().eq('id', toDelete.id).select('id')
     if (delErr) {
-      setError(`No se pudo eliminar: ${delErr.message}`)
+      const esFK = delErr.code === '23503' || /foreign key/i.test(delErr.message)
+      setError(esFK
+        ? 'No se pudo eliminar: la categoría aún tiene productos vinculados. Ejecuta "EJECUTAR-HOY-SUPABASE.sql" en Supabase y vuelve a intentar.'
+        : `No se pudo eliminar: ${delErr.message}`)
       setDeleting(false)
       return
     }
     if (!borradas || borradas.length === 0) {
       // Supabase bloqueó por permisos (falla silenciosa): faltan las políticas SQL
-      setError('No tienes permiso para borrar categorías. Ejecuta "categorias-imagenes-setup.sql" en Supabase → SQL Editor y vuelve a intentar.')
+      setError('No tienes permiso para borrar categorías. Ejecuta "EJECUTAR-HOY-SUPABASE.sql" en Supabase → SQL Editor y vuelve a intentar.')
       setDeleting(false)
       setToDelete(null)
       return

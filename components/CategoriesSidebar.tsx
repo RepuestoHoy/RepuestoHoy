@@ -48,7 +48,6 @@ export default function CategoriesSidebar({ isOpen, onClose }: Props) {
   if (!isOpen) return null
 
   const SOPORTE = [
-    { label: 'Rastrear mi pedido', href: `https://wa.me/${BUSINESS_CONFIG.whatsapp}?text=${encodeURIComponent('Hola! Quiero rastrear mi pedido')}` },
     { label: 'Hablar por WhatsApp', href: `https://wa.me/${BUSINESS_CONFIG.whatsapp}` },
     { label: 'Preguntas frecuentes', href: '/faq' },
   ]
